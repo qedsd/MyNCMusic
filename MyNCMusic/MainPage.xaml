@@ -1,0 +1,262 @@
+﻿<Page
+    x:Class="MyNCMusic.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyNCMusic"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:model="using:MyNCMusic.Model"
+    mc:Ignorable="d"
+    Background="{ThemeResource SystemControlAcrylicWindowBrush}">
+
+    <Page.Resources>
+        <model:GetDt_S x:Key="GetDt_S"/>
+        <model:ReturnInByDouble x:Key="ReturnInByDouble"/>
+        <model:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
+        <model:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+    </Page.Resources>
+    
+    <Grid Name="mainGrid"
+          Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid  Grid.Row="0"
+		       Grid.RowSpan="2"
+			   Margin="0,-1,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+                <Frame x:Name="Frame_all">
+                    <!--<Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="240"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    --><!--导航栏--><!--
+                    <Grid>
+                        <Grid.Background>
+                            <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="WhiteSmoke"
+                          TintOpacity="0.6"
+                          x:Name="AcrylicBrush_menu"/>
+                        </Grid.Background>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="200"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <controls:ImageEx  HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Stretch="Fill" 
+                            Width="128"
+                            Height="128"
+                            PlaceholderSource="http://p1.music.126.net/skJHpgd6McldfmNuFcpCMQ==/2946691197908520.jpg?param=128y128"
+                                       CornerRadius="999"/>
+                        <StackPanel Grid.Row="1">
+                            <Button Style="{StaticResource ButtonStyle_tran}"
+                            HorizontalAlignment="Center"
+                                    Name="Button_recommendation"
+                                    Click="Button_recommendation_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                                        <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE189;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                                        <TextBlock Text="发现音乐"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_myMusicList"
+                                    Click="Button_myMusicList_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                                        <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE142;"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                                        <TextBlock Text="我的歌单"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                            <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_myCollection"
+                                    Click="Button_myCollection_Click">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                                        <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE1CE;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                                        <TextBlock Text="我的收藏"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                    <Frame x:Name="Frame_main" Grid.Column="1">
+                        <Frame.Background>
+                            <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="White"
+                          TintOpacity="0.4"
+                          x:Name="AcrylicBrush_mainFrame"/>
+                        </Frame.Background>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <ProgressRing IsActive="True" Name="ProgressRing_initState"/>
+                            <TextBlock Text="初始化中" Name="TextBlock_initState" Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Frame>
+                </Grid>-->
+                </Frame>
+                <Grid Grid.Row="1"
+                      x:Name="Grid_playBar"
+                      Background="Transparent">
+                    <Grid>
+                        <Grid.Background>
+                            <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="Black"
+                          TintOpacity="0.1"/>
+                        </Grid.Background>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="Button_playInfo" BorderThickness="0" Background="Transparent"
+                            Click="Button_playInfo_Click">
+                        <Button.Content>
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="60" Height="60" Name="Image_playingAlbum"/>
+                                    <StackPanel Width="400" Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                        <TextBlock Text="" Name="TextBlcok_musicName" Foreground="White" FontSize="16"/>
+                                            <TextBlock Text="" Name="TextBlcok_artistName" Foreground="White" Margin="0,2" FontSize="13"/>
+                                            <TextBlock Text="" Name="TextBlcok_albumName" Foreground="White" Visibility="Visible" FontSize="13"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Button.Content>
+                    </Button>
+                    <!--<TextBlock Text="{x:Bind _mediaPlayer.PlaybackSession.Position.Seconds,Mode=OneTime}" Grid.Column="1" VerticalAlignment="Bottom"/>-->
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="0.00" Name="TextBlock_currentTime" Margin="10" VerticalAlignment="Center" Foreground="White"/>
+                        <Slider x:Name="Slider_play" HorizontalAlignment="Stretch" Grid.Column="1" Margin="10"
+                                Foreground="White"
+                                Value="0"
+                                Maximum="5"
+                                ThumbToolTipValueConverter="{StaticResource GetDt_S}"
+                                ValueChanged="Slider_play_ValueChanged">
+                        </Slider>
+                        <TextBlock Text="0.00" Name="TextBlock_lengthTime" Grid.Column="2" Margin="10" VerticalAlignment="Center" Foreground="White"/>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="0,0,10,0">
+                            <Button VerticalAlignment="Center"
+                                    Style="{StaticResource ButtonStyle_tran}"
+                                    Name="Button_isOrNotFavorite"
+                                    Click="Button_isOrNotFavorite_Click">
+                                <TextBlock Text="&#xE006;" FontFamily="Segoe UI Symbol" Foreground="{x:Bind local:MainPage.mainSolidColorBrush}"
+                                            Name="TextBlock_isOrnotFavorite"
+                                               Visibility="Visible"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                           Width="14"/>
+                                    <!--<TextBlock Text="&#xE00B;" FontFamily="Segoe UI Symbol" Foreground="{x:Bind local:MainPage.mainSolidColorBrush}"
+                                            Name="TextBlock_isFavorite"
+                                               Visibility="Collapsed"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>-->
+                            </Button>
+                            <Button x:Name="Button_previous" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_previous_Click">
+                            <Button.Content>
+                                <SymbolIcon Symbol="Previous"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="Button_stopOrPlay" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_stopOrPlay_Click">
+                            <Button.Content>
+                                <SymbolIcon Symbol="Play" x:Name="SymbolIcon_stopOrPlay"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="Button_next" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_next_Click">
+                            <Button.Content>
+                                <SymbolIcon Symbol="Next"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="Button_playOrderState" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_playOrderState_Click">
+                            <Button.Content>
+                                <SymbolIcon Symbol="AlignLeft" x:Name="SymbolIcon_playOrderState"/>
+                            </Button.Content>
+                        </Button>
+                        <Button x:Name="Button_playList" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_playList_Click">
+                            <Button.Content>
+                                <SymbolIcon Symbol="List"/>
+                            </Button.Content>
+                            <Button.Flyout>
+                                <Flyout>
+                                    <ListBox 
+                                             MaxHeight="400"
+                                             Background="{ThemeResource SystemControlAcrylicElementBrush}"
+                                             DoubleTapped="ListBox_DoubleTapped"
+                                             Width="300"
+                                             x:Name="ListBox_playList">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate x:DataType="model:SongsItem">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="&#xE189;" FontFamily="Segoe UI Symbol" Foreground="{StaticResource SystemAccentColorLight1}" VerticalAlignment="Center"
+                                                               ToolTipService.ToolTip="正在播放此歌曲"
+                                                               Visibility="{x:Bind isPlaying,Converter={StaticResource GetPlayingIconVisibility}}">
+                                                        <!--<TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Visibility" Value="{x:Bind isPlaying,Converter={StaticResource GetPlayingIconVisibility}}"/>
+                                                            </Style>
+                                                        </TextBlock.Style>-->
+                                                    </TextBlock>
+                                                    <TextBlock Text="{x:Bind name}" Margin="4,0,0,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </StackPanel>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="0"
+		              Name="MyTitleBar"
+		              Background="Transparent"
+		              />
+    </Grid>
+    
+</Page>

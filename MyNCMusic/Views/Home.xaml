@@ -1,0 +1,140 @@
+﻿<Page
+    x:Class="MyNCMusic.Views.Home"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyNCMusic.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!--导航栏-->
+        <Grid>
+            <Grid.Background>
+                <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="WhiteSmoke"
+                          TintOpacity="0.6"
+                          x:Name="AcrylicBrush_menu"/>
+            </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <controls:ImageEx  HorizontalAlignment="Center" 
+                            VerticalAlignment="Center"
+                            Stretch="Fill" 
+                            Width="128"
+                            Height="128"
+                            PlaceholderSource="http://p1.music.126.net/skJHpgd6McldfmNuFcpCMQ==/2946691197908520.jpg?param=128y128"
+                                       CornerRadius="999"
+                               Name="ImageEx_user"/>
+            <StackPanel Grid.Row="1">
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                            HorizontalAlignment="Center"
+                                    Name="Button_recommendation"
+                                    Click="Button_recommendation_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE189;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="发现音乐"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_myMusicList"
+                                    Click="Button_myMusicList_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE142;"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="我的歌单"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_myCollection"
+                                    Click="Button_myCollection_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE1CE;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="我的收藏"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                            HorizontalAlignment="Center"
+                                    Name="Button_setting"
+                                    Click="Button_setting_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE115;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="应用设置"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Frame x:Name="Frame_main" Grid.Column="1">
+            <Frame.Background>
+                <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="White"
+                          TintOpacity="0.4"
+                          x:Name="AcrylicBrush_mainFrame"/>
+            </Frame.Background>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressRing IsActive="True" Name="ProgressRing_initState"/>
+                <TextBlock Text="初始化中" Name="TextBlock_initState" Margin="0,10,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+            </StackPanel>
+        </Frame>
+        <ContentDialog x:Name="ContentDialog_setting"
+                       CloseButtonText="取消"
+                       PrimaryButtonText="保存"
+                       PrimaryButtonClick="ContentDialog_setting_PrimaryButtonClick">
+            <StackPanel>
+                <TextBox Header="服务器" Width="300" Name="TextBox_serverIP" BorderThickness="0,0,0,1" PlaceholderText="示例：http://localhost:3000"/>
+                <TextBox Header="手机号/163邮箱" Width="300" Name="TextBox_account" BorderThickness="0,0,0,1" Margin="0,10,0,0"/>
+                <PasswordBox Width="300" Header="登陆密码" PasswordChar="•" Name="PasswordBox_password" BorderThickness="0,0,0,1" Margin="0,10,0,0"/>
+                <TextBlock Text="*保存会自动重启以生效" Foreground="OrangeRed" Margin="0,10,0,0"/>
+            </StackPanel>
+        </ContentDialog>
+    </Grid>
+</Page>
