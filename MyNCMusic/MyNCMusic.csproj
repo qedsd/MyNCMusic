@@ -22,7 +22,7 @@
     <PackageCertificateKeyFile>C:\Users\29987\source\repos\MyNCMusic\MyNCMusic\MyNCMusic_TemporaryKey.pfx</PackageCertificateKeyFile>
     <PackageCertificateThumbprint>A7388FF8C875A3428868B2AAB048E42EE6C659AD</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
-    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Always</AppxBundle>
     <AppxBundlePlatforms>x86</AppxBundlePlatforms>

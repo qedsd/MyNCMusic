@@ -32,7 +32,6 @@
                             Stretch="Fill" 
                             Width="128"
                             Height="128"
-                            PlaceholderSource="http://p1.music.126.net/skJHpgd6McldfmNuFcpCMQ==/2946691197908520.jpg?param=128y128"
                                        CornerRadius="999"
                                Name="ImageEx_user"/>
             <StackPanel Grid.Row="1">

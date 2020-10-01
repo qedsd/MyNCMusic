@@ -97,7 +97,7 @@ namespace MyNCMusic.Views
             MyClassManager.uid = loginRoot.account.id;
             
             localSettings.Values["Uid"] = loginRoot.account.id;
-            MyClassManager.avatarImgIdStr = loginRoot.profile.avatarImgIdStr;
+            MyClassManager.avatarImgIdStr = loginRoot.profile.avatarUrl;
             //获取喜欢的歌曲
             MainPage.favoriteSongsRoot = MyClassManager.GetFavoriteSongs();
             if (MainPage.favoriteSongsRoot == null)
