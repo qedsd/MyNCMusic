@@ -72,7 +72,7 @@ namespace MyNCMusic.Views
                     {
                         ProgressRing_initState.IsActive = false;
                         TextBlock_initState.Text = "初始化完成";
-                        ImageEx_user.Source = MyClassManager.avatarImgIdStr;
+                        ImageEx_user.Source = MyClassManager.avatarImgIdStr;//设为用户头像
                     }
                     break;
             }
