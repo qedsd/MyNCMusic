@@ -17,7 +17,7 @@ windows 10 1809及更高
 
 只提供X86的安装包（内含安装说明），其他的请自行打包
 
-[MyNCMusic_1.0.1.0](https://github.com/qedsd/MyNCMusic/releases/download/1.0.1.0/MyNCMusic_1.0.1.0_Test.zip)
+[MyNCMusic_1.0.2.0](https://github.com/qedsd/MyNCMusic/releases/download/1.0.2.0/MyNCMusic_1.0.2.0_Test.zip)
 
 ## 已实现功能
 
