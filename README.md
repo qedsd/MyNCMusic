@@ -6,7 +6,7 @@
 windows 10 1809及更高
 
 ## 使用说明
-- 项目仅提供UWP前端，后端使用[NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)，请自行配置后端并在应用的设置里填写上你的服务器IP。（非程序员看不懂黑话？就是说这个应用并不是直接登录账号就能用，还需要使用[NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)在本地/云搭建个服务器）
+- 项目仅提供UWP前端，后端使用[NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)，请自行配置后端并在应用的设置里填写上你的服务器IP。（非程序员听不懂？就是说这个应用并不是直接登录账号就能用，还需要使用[NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)在本地/云搭建个服务器）
 
 - 如果你是使用本地服务器，需要注意UWP默认是不允许访问localhost的，要想成功连接上本地服务器，需要把当前应用的localhost打开，具体请百度。
 
@@ -26,8 +26,10 @@ windows 10 1809及更高
 - 搜索（音乐、歌手、专辑、歌单）
 - 创建/收藏的歌单
 - 收藏的歌手、专辑
+- 订阅、创建的电台
+- 最近100个听歌记录
 - 歌单、音乐评论
-- 歌词（滚动有点问题）
+- 歌词
 
 一句话：凑合能用
 
