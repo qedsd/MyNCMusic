@@ -1,9 +1,12 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.Model;
 using MyNCMusic.MyUserControl;
+using MyNCMusic.Services;
 using MyNCMusic.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -42,64 +45,48 @@ namespace MyNCMusic
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        MediaPlayer _mediaPlayer;
+        public MediaPlayer _mediaPlayer;
         MediaSource _mediaSource;
         MediaPlaybackItem _mediaPlaybackItem;
         public ImageBrush mainImageBrush;
-        public AlbumRoot _album;
-        public BitmapImage _AlbumBitmapImage;
         MediaTimelineController _mediaTimelineController;//时间控制器
-
-        public ObservableCollection<SongsItem> currentPlayList;
-
-        public static SongsItem songsItem;
-        public static SongUrlRoot songUrlRoot;
         public static FavoriteSongsRoot favoriteSongsRoot;
-        public static long PlayingListId;//1日推 2随机50喜欢 +3相似
         public static SolidColorBrush mainSolidColorBrush;//文字foreground颜色
         public static SolidColorBrush backgroundBrush;//背景图片主颜色
-
-        public static bool isTaskDone=true;
-        int playOrderState = 0;//0顺序播放，1循环列表播放，2随机播放，3单曲循环
-        public List<int> playHistoryIndex;
         bool isSliderChangedFromAuto = false;
-        static Object locker = new object();
         TimeSpan _duration;//进度条长度
+        public Stopwatch playDurationStopwatch;//当前歌曲播放时长
         public MainPage()
         {
             
             backgroundBrush = new SolidColorBrush(Colors.Black);
-            _AlbumBitmapImage = new BitmapImage();
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Loaded += MainPage_Loaded;
             (Application.Current as App).myMainPage = this;
             _mediaPlayer = new MediaPlayer();
-            _mediaTimelineController = new MediaTimelineController();
+            _mediaTimelineController = PlayingService.MediaTimelineController;
             _mediaTimelineController.PositionChanged += _mediaTimelineController_PositionChanged;
             _mediaTimelineController.StateChanged += _mediaTimelineController_StateChanged;
             _mediaPlayer.TimelineController = _mediaTimelineController;
             _mediaPlayer.MediaEnded += _mediaPlayer_MediaEnded;
+            _mediaPlayer.SourceChanged += _mediaPlayer_SourceChanged;
 
             //接管系统播放音频控制
             _mediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             _mediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             _mediaPlayer.CommandManager.PreviousReceived += CommandManager_PreviousReceived;
             _mediaPlayer.CommandManager.NextReceived += CommandManager_NextReceived;
-
-            currentPlayList = new ObservableCollection<SongsItem>();
-            playHistoryIndex = new List<int>();
             mainImageBrush = new ImageBrush();
             mainSolidColorBrush = new SolidColorBrush(Colors.White);
+            playDurationStopwatch = PlayingService.PlayDurationStopwatch;
 
-            //playingAlbumBitmapImage = new BitmapImage(new Uri(""));
-            //playingAlbumBitmapImage.ImageOpened += PlayingAlbumBitmapImage_ImageOpened;
-            //b.ImageSource = playingAlbumBitmapImage;
+            PlayingService.PlayingSongList = new List<SongsItem>();
+            PlayingService.PlayingRadioList = new List<RadioSongItem>();
+            PlayingService.OnPlayingSongChanged += PlayingService_OnPlayingSongChanged;
+            PlayingService.OnPlayingRadioChanged += PlayingService_OnPlayingRadioChanged;
             GetSetting();
-            ChangeImage();
-            GetLastPlayedSong();
 
-            //Test();
             //设置标题栏
             var tiWtleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
             tiWtleBar.BackgroundColor = Colors.Transparent;
@@ -110,32 +97,110 @@ namespace MyNCMusic
             Window.Current.SetTitleBar(MyTitleBar);
         }
 
+        private async void PlayingService_OnPlayingRadioChanged()
+        {
+            ChangeImage();
+            ChangePlayBar(PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.MainSong.Duration / 1000);
+            if ((Application.Current as App).playingPage != null)
+                (Application.Current as App).playingPage.LoadLayout();
+            if ((Application.Current as App).compactOverlayPage != null)
+                (Application.Current as App).compactOverlayPage.UpdateLayout();
+            if (PlayingService.PlayingSongUrlRoot.data.First().url == null)
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("播放地址错误");
+                notifyPopup.Show();
+                //跳过当前到下一首
+                PlayingService.PlayNextRadio();
+                return;
+            }
+            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+            _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
+            _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
+            _mediaPlayer.Source = _mediaPlaybackItem;
+            _mediaTimelineController.Start();
+
+            //修改SMTC 显示的元数据
+            MediaItemDisplayProperties props = _mediaPlaybackItem.GetDisplayProperties();
+            props.Type = Windows.Media.MediaPlaybackType.Music;
+            props.MusicProperties.Title = PlayingService.PlayingRadio.Name;
+            props.MusicProperties.Artist = PlayingService.PlayingRadio.Dj.Nickname;
+            props.Thumbnail = RandomAccessStreamReference.CreateFromFile(await ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) as StorageFile);
+            _mediaPlaybackItem.ApplyDisplayProperties(props);
+        }
+
+        ObservableCollection<PlayingSongBaseObject> playingListBaseObjects = PlayingService.PlayingListBaseObjects;
+
+        private  async void PlayingService_OnPlayingSongChanged()
+        {
+            ChangeImage();
+            ChangePlayBar(PlayingService.PlayingSong,PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.ar.First().name, PlayingService.PlayingSong.al.name, PlayingService.PlayingSong.dt / 1000);
+            if ((Application.Current as App).playingPage != null)
+                (Application.Current as App).playingPage.LoadLayout();
+            if ((Application.Current as App).compactOverlayPage != null)
+                (Application.Current as App).compactOverlayPage.UpdateLayout();
+            if (PlayingService.PlayingSongUrlRoot.data.First().url == null)
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("播放地址错误");
+                notifyPopup.Show();
+                //跳过当前到下一首
+                PlayingService.PlayNextSongs();
+                return;
+            }
+            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+            _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
+            _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
+            _mediaPlayer.Source = _mediaPlaybackItem;
+            _mediaTimelineController.Start();
+            //SetLastPlayedSong();
+
+            //修改SMTC 显示的元数据
+
+            MediaItemDisplayProperties props = _mediaPlaybackItem.GetDisplayProperties();
+            props.Type = Windows.Media.MediaPlaybackType.Music;
+            props.MusicProperties.Title = PlayingService.PlayingSong.Name;
+            props.MusicProperties.Artist = PlayingService.PlayingSong.ar.First().name;
+            props.Thumbnail = RandomAccessStreamReference.CreateFromFile(await ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) as StorageFile);
+            _mediaPlaybackItem.ApplyDisplayProperties(props);
+        }
+
+        private void _mediaPlayer_SourceChanged(MediaPlayer sender, object args)
+        {
+            Thread.Sleep(100);//确保打卡请求到的TotalMilliseconds是有效的而不是被Restart恢复到0了
+            playDurationStopwatch.Restart();
+        }
+
         private async void _mediaTimelineController_StateChanged(MediaTimelineController sender, object args)
         {
+
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 if (sender.State == MediaTimelineControllerState.Running)
+                {
+                    playDurationStopwatch.Start();
                     SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
+                }
                 else
+                {
+                    playDurationStopwatch.Stop();
                     SymbolIcon_stopOrPlay.Symbol = Symbol.Play;
+                }
             });
         }
 
         private void CommandManager_NextReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerNextReceivedEventArgs args)
         {
-            if (playHistoryIndex.Count == 0)
-                return;
-            int index = currentPlayList.IndexOf(songsItem);
-            PlayNextSongs(index);
+            if (PlayingService.IsPlayingSong)
+                PlayingService.PlayNextSongs();
+            else
+                PlayingService.PlayNextRadio();
         }
 
         private void CommandManager_PreviousReceived(MediaPlaybackCommandManager sender, MediaPlaybackCommandManagerPreviousReceivedEventArgs args)
         {
-            if (playHistoryIndex.Count > 1)
-            {
-                playHistoryIndex.Remove(playHistoryIndex.Last());
-                PlayNextSongs(playHistoryIndex.Last(), true);
-            }
+            if (PlayingService.IsPlayingSong)
+                PlayingService.PlayLastSongs();
+            else
+                PlayingService.PlayLastRadio();
         }
 
         //监控修改播放进度条
@@ -145,7 +210,7 @@ namespace MyNCMusic
             {
                 isSliderChangedFromAuto = true;
                 Slider_play.Value = sender.Position.TotalSeconds;
-                TextBlock_currentTime.Text = MyClassManager.GetDt((int)sender.Position.TotalSeconds);
+                TextBlock_currentTime.Text = OtherHelper.GetDt((int)sender.Position.TotalSeconds);
                 if ((Application.Current as App).playingPage != null)
                     (Application.Current as App).playingPage.ChangeLyricPosition(sender.Position.TotalMilliseconds);
             });
@@ -153,163 +218,13 @@ namespace MyNCMusic
 
         private async void _mediaPlayer_MediaEnded(MediaPlayer sender, object args)
         {
-            //int index = currentPlayList.IndexOf(songsItem);
-            //playHistoryIndex.Add(index);
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
-                PlayNextSongs(playHistoryIndex.Last());
+                if (PlayingService.IsPlayingSong)
+                    PlayingService.PlayNextSongs();
+                else
+                    PlayingService.PlayNextRadio();
             });
-            
-            //switch (playOrderState)
-            //{
-            //    case 0:
-            //        {
-            //            //int index=currentPlayList.IndexOf(songsItem);
-            //            if (index == currentPlayList.Count)//播完，停止
-            //            {
-            //                SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-            //                isTaskDone = true;
-            //                return;
-            //            }
-            //            songsItem = currentPlayList[++index];
-            //        }
-            //        break;
-            //    case 1:
-            //        {
-            //            //int index = currentPlayList.IndexOf(songsItem);
-            //            if (index == currentPlayList.Count)//播完，回到第一个
-            //            {
-            //                index = -1;
-            //            }
-            //            songsItem = currentPlayList[++index];
-            //        }
-            //        break;
-            //    case 2:
-            //        {
-            //            Random rd = new Random();
-            //            while(true)
-            //            {
-            //                int i = rd.Next(0, currentPlayList.Count - 1);
-            //                if(playHistoryIndex.Count== currentPlayList.Count)//播完，停止
-            //                {
-            //                    SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-            //                    isTaskDone = true;
-            //                    return;
-            //                }
-            //                if (playHistoryIndex.First()==i)
-            //                {
-            //                    songsItem = currentPlayList[i];
-            //                    break;
-            //                }
-            //                if(playHistoryIndex.IndexOf(i)!=0)//第一个不相等时返回0即为找不到
-            //                {
-            //                    songsItem = currentPlayList[i];
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //        break;
-            //    case 3:
-            //        {
-            //            _mediaPlayer.PlaybackSession.Position = TimeSpan.Zero;
-            //            _mediaPlayer.Play();
-            //        }
-            //        break;
-            //}
-            //if (songsItem == null)
-            //    return;
-            //SongUrlRoot songUrlRootT = MyClassManager.GetMusicUrl(songsItem.id);
-            //if (songUrlRootT == null)
-            //    return;
-            //songUrlRoot = songUrlRootT;
-            //ChnagePlayingSong(songsItem, songUrlRoot);
-        }
-        public async void PlayNextSongs(int index,bool certain=false)
-        {
-            SongsItem songsItem_temp = null;
-            if (certain)
-                songsItem_temp = currentPlayList[index];
-            else
-            {
-                switch (playOrderState)
-                {
-                    case 0:
-                        {
-                            //int index=currentPlayList.IndexOf(songsItem);
-                            if (index == currentPlayList.Count-1)//播完，停止
-                            {
-                                //SymbolIcon_stopOrPlay.Symbol = Symbol.Play;
-                                //isTaskDone = true;
-                                //_mediaTimelineController.Position = TimeSpan.FromMilliseconds(0);
-                                _mediaTimelineController.Start();
-                                _mediaTimelineController.Pause();
-                                return;
-                            }
-                            songsItem_temp = currentPlayList[++index];
-                        }
-                        break;
-                    case 1:
-                        {
-                            //int index = currentPlayList.IndexOf(songsItem);
-                            if (index == currentPlayList.Count-1)//播完，回到第一个
-                            {
-                                index = -1;
-                            }
-                            songsItem_temp = currentPlayList[++index];
-                        }
-                        break;
-                    case 2:
-                        {
-                            Random rd = new Random();
-                            while (true)
-                            {
-                                int i = rd.Next(0, currentPlayList.Count - 1);
-                                if (index == -1)
-                                {
-                                    break;
-                                }
-                                if (playHistoryIndex.Count == currentPlayList.Count)//播完，停止
-                                {
-                                    //SymbolIcon_stopOrPlay.Symbol = Symbol.Play;
-                                    //isTaskDone = true;
-                                    //_mediaTimelineController.Position = TimeSpan.FromMilliseconds(0);
-                                    _mediaTimelineController.Start();
-                                    _mediaTimelineController.Pause();
-                                    return;
-                                }
-                                if (playHistoryIndex.First() == i)
-                                {
-                                    songsItem_temp = currentPlayList[i];
-                                    break;
-                                }
-                                if (playHistoryIndex.IndexOf(i) != 0)//第一个不相等时返回0即为找不到
-                                {
-                                    songsItem_temp = currentPlayList[i];
-                                    break;
-                                }
-                            }
-                        }
-                        break;
-                    case 3:
-                        {
-                            //if (index == -1)
-                            //{
-                            //    songsItem_temp = currentPlayList[0];
-                            //}
-                            //_mediaPlayer.PlaybackSession.Position = TimeSpan.Zero;
-                            //_mediaPlayer.Play();
-                            _mediaTimelineController.Start();
-                            return;
-                        }
-                }
-            }
-            if (songsItem_temp == null)
-                return;
-            SongUrlRoot songUrlRoot_temp = await Task.Run(() => MyClassManager.GetMusicUrl(songsItem_temp.id));
-            if (songUrlRoot_temp == null)
-                return;
-            //songUrlRoot = songUrlRootT;
-            ChnagePlayingSong(songsItem_temp, songUrlRoot_temp);
         }
 
         private void MainPage_Loaded(object sender, RoutedEventArgs e)
@@ -321,33 +236,22 @@ namespace MyNCMusic
             Window.Current.SetTitleBar(MyTitleBar);
         }
 
-
+        /// <summary>
+        /// 读取本地专辑图片修改背景图
+        /// </summary>
         async void ChangeImage()
         {
-            //ImageBrush b = new ImageBrush();
-
-            //byte[]  by=await MyClassManager.DownloadFile(new Uri(""));
-            //SolidColorBrush solidColorBrush=await GetMajorColorAndBlur(by, b);
-
-            //BitmapImage bitmapImageawait =await MyClassManager.DownloadFile(new Uri(""));
-            StorageFile localFile = await ApplicationData.Current.LocalFolder.TryGetItemAsync(MyClassManager.imageFilename) as StorageFile;//判断Local是否有文件
-            if (null != localFile)//本地有专辑图片，读取
+            //判断Local是否有文件
+            if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) is StorageFile localFile)//本地有专辑图片，读取
             {
-                //StorageFile localFile = await StorageFile.GetFileFromPathAsync(MyClassManager.folder.Path + "\\" + MyClassManager.imageFilename);//读取文件
-                WriteableBitmap writeableBitmap = await MyClassManager.OpenWriteableBitmapFile(localFile);
+                WriteableBitmap writeableBitmap = await FileHelper.OpenWriteableBitmapFile(localFile);
                 SolidColorBrush solidColorBrush = new SolidColorBrush(GetColor.GetMajorColor(writeableBitmap));
                 mainImageBrush.ImageSource = writeableBitmap;
                 mainImageBrush.Stretch = Stretch.UniformToFill;
                 mainGrid.Background = mainImageBrush;
 
-                solidColorBrush.Color = MyClassManager.ChangeColor(solidColorBrush.Color, (float)0.4);
-                //if((solidColorBrush.Color.R+ solidColorBrush.Color.G+ solidColorBrush.Color.B)>650)
-                //    mainSolidColorBrush = new SolidColorBrush(Colors.Black);
-                //else
-                //    mainSolidColorBrush = new SolidColorBrush(Colors.White);
-                //Grid_playBar.Background = solidColorBrush;
+                solidColorBrush.Color = OtherHelper.ChangeColor(solidColorBrush.Color, (float)0.4);
                 backgroundBrush = solidColorBrush;
-                //AcrylicBrush_mainFrame.TintColor = solidColorBrush.Color;
             }
             else//本地无专辑图片
             {
@@ -356,160 +260,51 @@ namespace MyNCMusic
                 backgroundBrush = solidColorBrush;
             }
         }
-        async void GetLastPlayedSong()
-        {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values["LastSongName"] != null)
-            {
-                TextBlcok_musicName.Text = localSettings.Values["LastSongName"].ToString();
-            }
-            if (localSettings.Values["LastArtistName"] != null)
-            {
-                TextBlcok_artistName.Text = localSettings.Values["LastArtistName"].ToString();
-            }
-            if (localSettings.Values["LastAlbumName"] != null)
-            {
-                TextBlcok_albumName.Text = localSettings.Values["LastAlbumName"].ToString();
-            }
-            if(localSettings.Values["LastSongId"] != null)
-            {
-                SongsItem songsItem = new SongsItem();
-                songsItem.id = (int)localSettings.Values["LastSongId"];
-                
-                MusicDetailRoot musicDetailRoot = await Task.Run(() => MyClassManager.GetMusicDetail(songsItem.id.ToString()));
-                if (musicDetailRoot == null || musicDetailRoot.songs == null)
-                {
-                    return;
-                }
-                SongUrlRoot songUrlRoot = await Task.Run(() => MyClassManager.GetMusicUrl(songsItem.id));
-                if (songUrlRoot == null)
-                {
-                    return;
-                }
-                if (localSettings.Values["IsFavorite"] != null && (bool)localSettings.Values["IsFavorite"] == true)
-                    musicDetailRoot.songs.First().isFavorite = true;
-                else
-                    musicDetailRoot.songs.First().isFavorite = false;
-                currentPlayList.Add(musicDetailRoot.songs.First());
-                ChnagePlayingSong(musicDetailRoot.songs.First(), songUrlRoot,false);
-            }
-        }
-        void SetLastPlayedSong()
-        {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            localSettings.Values["LastSongName"] = songsItem.name;
-            localSettings.Values["LastArtistName"] = songsItem.ar.First().name;
-            localSettings.Values["LastAlbumName"] = songsItem.al.name;
-            localSettings.Values["LastSongId"] = songsItem.id;
-            localSettings.Values["IsFavorite"] = songsItem.isFavorite;
-        }
-        void GetSetting()
-        {
-            //获取账号、服务器地址
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            if (localSettings.Values["ServerIP"] != null)
-            {
-                MyClassManager.apiUri = localSettings.Values["ServerIP"].ToString();
-            }
-            if (localSettings.Values["PhoneOrEmail"] != null)
-            {
-                MyClassManager.phoneOrEmail = (string)localSettings.Values["PhoneOrEmail"];
-            }
-            if (localSettings.Values["Password"] != null)
-            {
-                MyClassManager.password = localSettings.Values["Password"].ToString();
-            }
-            if (localSettings.Values["Uid"] != null)
-            {
-                MyClassManager.uid = (long)localSettings.Values["Uid"];
-            }
-        }
-        async System.Threading.Tasks.Task<SolidColorBrush> GetMajorColorAndBlur(byte[] b, ImageBrush backgroundBrush)
-        {
-            WriteableBitmap wb = new WriteableBitmap(1000, 1500);
-            using (IRandomAccessStream iras = b.AsBuffer().AsStream().AsRandomAccessStream())
-            {
-                await wb.SetSourceAsync(iras);
-            }
-            //高斯模糊
-            BlurEffect be = new BlurEffect(wb);
-            backgroundBrush.ImageSource = await be.ApplyFilter(10);//高斯模糊等级可以自己定义
-            //取主色调并应用到TagsTextBlock
-            return new SolidColorBrush(GetColor.GetMajorColor(wb));
-        }
-        async System.Threading.Tasks.Task<SolidColorBrush> GetMajorColorAndBlur(string url, ImageBrush backgroundBrush)
-        {
-            WriteableBitmap wb = new WriteableBitmap(1000, 1500);
-            HttpClient hc = new HttpClient();
-            byte[] b = await hc.GetByteArrayAsync(url);
-            using (IRandomAccessStream iras = b.AsBuffer().AsStream().AsRandomAccessStream())
-            {
-                await wb.SetSourceAsync(iras);
-            }
-            //高斯模糊
-            BlurEffect be = new BlurEffect(wb);
-            backgroundBrush.ImageSource = await be.ApplyFilter(10);//高斯模糊等级可以自己定义
-            //取主色调并应用到TagsTextBlock
-            return new SolidColorBrush(GetColor.GetMajorColor(wb));
-        }
 
         /// <summary>
-        /// 修改播放歌曲
-        /// 嗯，change手快打错了，就这样吧
+        /// 获取上一次播放的信息
         /// </summary>
-        /// <param name="songsItem"></param>
-        /// <param name="songUrlRoot"></param>
-        /// <param name="isStartPlaying"></param>
-        public async void ChnagePlayingSong(SongsItem songsItem, SongUrlRoot songUrlRoot,bool isStartPlaying=true)
+        async void GetLastPlayingInfo()
         {
-            //添加读取歌曲进历史记录最后
-            int index = currentPlayList.IndexOf(songsItem);
-            playHistoryIndex.Remove(index);
-            playHistoryIndex.Add(index);
-
-            if(MainPage.songsItem!=null)
-                MainPage.songsItem.isPlaying = false;
-            songsItem.isPlaying = true;
-
-            MainPage.songsItem = songsItem;
-            MainPage.songUrlRoot = songUrlRoot;
-            _mediaTimelineController.Pause();
-            //_mediaPlayer.Pause();
-            //获取专辑
-            _album=await Task.Run(()=>MyClassManager.GetMAlbum(songsItem.al.id));
-            if (_album == null)
-                return;
-            _AlbumBitmapImage = await MyClassManager.DownloadFile(new Uri(_album.album.blurPicUrl+ "?param=200y200"));
             ChangeImage();
-            ChangePlayBar(_AlbumBitmapImage, songsItem.name, songsItem.ar.First().name, songsItem.al.name, songsItem.dt/1000,isStartPlaying);
-            if((Application.Current as App).playingPage!=null)
-                (Application.Current as App).playingPage.LoadLayout();
-            if ((Application.Current as App).compactOverlayPage != null)
-                (Application.Current as App).compactOverlayPage.UpdateLayout_name(songsItem.name);
-            if (songUrlRoot.data.First().url == null)
+            PlayingService.PlayingAlbumBitmapImage = await FileHelper.ReadLoaclBitmapImage(ConfigService.ImageFilename);
+            if (await PlayingService.Load())
             {
-                NotifyPopup notifyPopup = new NotifyPopup("播放地址错误（VIP专属？)");
-                notifyPopup.Show();
-                return;
+                if (PlayingService.IsPlayingSong)
+                {
+                    if(PlayingService.PlayingSong!=null)
+                        ChangePlayBar(PlayingService.PlayingSong, PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.ar.First().name, PlayingService.PlayingSong.al.name, PlayingService.PlayingSong.dt / 1000, false);
+                }
+                else
+                {
+                    if(PlayingService.PlayingRadio!=null)
+                        ChangePlayBar(PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.MainSong.Duration / 1000);
+                }
+                UpDatePlayOrderStateIcon();
+                if (PlayingService.PlayingSongUrlRoot != null)
+                {
+                    _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+                    _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
+                    _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
+                    _mediaPlayer.Source = _mediaPlaybackItem;
+                    
+                }
+                
             }
-            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(songUrlRoot.data.First().url)));
-            _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
-            _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
-            //_mediaPlayer.Source = _mediaSource;//设置MediaPlaybackItem后无法直接设_mediaSource为mediaPlayer.Source 
-            _mediaPlayer.Source = _mediaPlaybackItem;//而应该以MediaPlaybackItem为源
-            //_mediaPlayer.Play();
-            if (isStartPlaying)
-                _mediaTimelineController.Start();
-            SetLastPlayedSong();
+        }
 
-            //修改SMTC 显示的元数据
-            
-            MediaItemDisplayProperties props = _mediaPlaybackItem.GetDisplayProperties();
-            props.Type = Windows.Media.MediaPlaybackType.Music;
-            props.MusicProperties.Title = songsItem.name;
-            props.MusicProperties.Artist = songsItem.ar.First().name;
-            props.Thumbnail = RandomAccessStreamReference.CreateFromFile(await ApplicationData.Current.LocalFolder.TryGetItemAsync(MyClassManager.imageFilename) as StorageFile);
-            _mediaPlaybackItem.ApplyDisplayProperties(props);
+
+        /// <summary>
+        /// 启动时获取应用设置
+        /// </summary>
+        void GetSetting()
+        {
+            try
+            {
+                ConfigService.LoadConfig();
+                GetLastPlayingInfo();
+            }
+            catch (Exception) { }
         }
 
         private async void _mediaSource_OpenOperationCompleted(MediaSource sender, MediaSourceOpenOperationCompletedEventArgs args)
@@ -523,32 +318,16 @@ namespace MyNCMusic
             });
         }
 
-        //void ChangePlayBar(WriteableBitmap writeableBitmap,string musicName, string artistName, string albumName,int progressBarValue,int maximum)
-        //{
-        //    Image_playingAlbum.Source = writeableBitmap;//修改专辑图片
-        //    TextBlcok_musicName.Text = musicName;
-        //    TextBlcok_artistName.Text = artistName;
-        //    TextBlcok_albumName.Text = albumName;
-        //    //Slider_play.Maximum = maximum;
-        //    //Slider_play.Value = progressBarValue;
-        //    //TextBlock_currentTime.Text = progressBarValue.ToString();
-        //    //TextBlock_lengthTime.Text = maximum.ToString();
-        //    SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-        //}
-        async void ChangePlayBar(BitmapImage bitmapImage, string musicName, string artistName, string albumName, int maximum, bool isStartPlaying = true)
+        async void ChangePlayBar(SongsItem song,BitmapImage bitmapImage, string musicName, string artistName, string albumName, int maximum, bool isStartPlaying = true)
         {
             Image_playingAlbum.Source = bitmapImage;//修改专辑图片
             TextBlcok_musicName.Text = musicName;
             TextBlcok_artistName.Text = artistName;
             TextBlcok_albumName.Text = albumName;
-            //Slider_play.Maximum = maximum;
-
-            //Slider_play.Value = progressBarValue;
-            //TextBlock_currentTime.Text = MyClassManager.GetDt(progressBarValue);
-            TextBlock_lengthTime.Text = await Task.Run(() => MyClassManager.GetDt(maximum));
-            if(isStartPlaying)
+            TextBlock_lengthTime.Text = await Task.Run(() => OtherHelper.GetDt(maximum));
+            if (isStartPlaying)
                 SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-            if (songsItem.isFavorite)
+            if (song.isFavorite)
             {
                 TextBlock_isOrnotFavorite.Text = "\xE00B";
             }
@@ -556,105 +335,132 @@ namespace MyNCMusic
             {
                 TextBlock_isOrnotFavorite.Text = "\xE006";
             }
-            //if (isTaskDone)
-            //{
-            //    isTaskDone = false;
-            //    Task.Run(() => ChangePosition());
-            //}
+        }
+
+        /// <summary>
+        /// 播放电台时使用修改底部播放条
+        /// </summary>
+        /// <param name="bitmapImage"></param>
+        /// <param name="musicName"></param>
+        /// <param name="artistName"></param>
+        /// <param name="albumName"></param>
+        /// <param name="maximum"></param>
+        /// <param name="isStartPlaying"></param>
+        async void ChangePlayBar(BitmapImage bitmapImage, string musicName, string artistName, string albumName, int maximum, bool isStartPlaying = true)
+        {
+            Image_playingAlbum.Source = bitmapImage;//修改专辑图片
+            TextBlcok_musicName.Text = musicName;
+            TextBlcok_artistName.Text = artistName;
+            TextBlcok_albumName.Text = albumName;
+            TextBlock_lengthTime.Text = await Task.Run(() => OtherHelper.GetDt(maximum));
+            if (isStartPlaying)
+                SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
         }
 
         private void Button_stopOrPlay_Click(object sender, RoutedEventArgs e)
         {
-            //var t = _mediaPlayer.PlaybackSession.Position;
+            if (_mediaSource == null)
+                return;
             var state = _mediaPlayer.PlaybackSession.PlaybackState;
-            if (state == MediaPlaybackState.Playing)
+            if (state == MediaPlaybackState.Playing)//改为暂停
             {
-                //_mediaPlayer.Pause();
                 _mediaTimelineController.Pause();
-                //SymbolIcon_stopOrPlay.Symbol = Symbol.Play;
-                //isTaskDone = true;
             }
-            else if (state == MediaPlaybackState.Paused)
+            else
             {
-                //_mediaPlayer.Play();
-                //_mediaTimelineController.Start();
-                //if (_mediaTimelineController.Position.TotalMilliseconds == _duration.TotalSeconds)
-                //    _mediaTimelineController.Start();
-                //else
-                    _mediaTimelineController.Resume();
-                //SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-                //isTaskDone = false;
+                _mediaTimelineController.Resume();
             }
         }
 
 
-        /// <summary>
-        /// 后台线程修改播放进度条
-        /// 弃用
-        /// </summary>
-        //async void ChangePosition()
-        //{
-        //    while (!isTaskDone)
-        //    {
-        //        isSliderChangedFromAuto = true;
-        //        if (_mediaPlayer.PlaybackSession.Position.TotalSeconds != _mediaPlayer.PlaybackSession.NaturalDuration.TotalSeconds)
-        //        {
-        //            await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-        //            {
-        //                Slider_play.Value = _mediaPlayer.PlaybackSession.Position.TotalSeconds;
-        //                TextBlock_currentTime.Text = MyClassManager.GetDt((int)_mediaPlayer.PlaybackSession.Position.TotalSeconds);
-        //            });
-        //        }
-        //        Thread.Sleep(400);
-        //    }
-        //}
 
         /// <summary>
         /// 播放列表双击
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void ListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
-            SongsItem songsItem = listBox.SelectedItem as SongsItem;
-            SongUrlRoot songUrlRoot = MyClassManager.GetMusicUrl(songsItem.id);
-            if (songUrlRoot == null)
-                return;
-            ChnagePlayingSong(songsItem, songUrlRoot);
+            PlayingSongBaseObject song = listBox.SelectedItem as PlayingSongBaseObject;
+            if(PlayingService.IsPlayingSong)
+            {
+                await PlayingService.ChangePlayingSong(song.Id);
+            }
+            else
+            {
+                await PlayingService.ChangePlayingRadio(song.Id);
+            }
         }
 
+        /// <summary>
+        /// 点击修改播放顺序
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_playOrderState_Click(object sender, RoutedEventArgs e)
         {
-            switch(playOrderState)
+            switch(PlayingService.PlayOrderState)
             {
-                case 0:
+                case PlayOrderStateEnum.顺序播放:
                     {
-                        playOrderState = 1;
+                        PlayingService.PlayOrderState = PlayOrderStateEnum.列表循环;
                         SymbolIcon_playOrderState.Symbol = Symbol.RepeatAll;
                     }
                     break;
-                case 1:
+                case PlayOrderStateEnum.列表循环:
                     {
-                        playOrderState = 2;
+                        PlayingService.PlayOrderState = PlayOrderStateEnum.随机播放;
                         SymbolIcon_playOrderState.Symbol = Symbol.Shuffle;
                     }
                     break;
-                case 2:
+                case PlayOrderStateEnum.随机播放:
                     {
-                        playOrderState = 3;
+                        PlayingService.PlayOrderState = PlayOrderStateEnum.单曲循环;
                         SymbolIcon_playOrderState.Symbol = Symbol.RepeatOne;
                     }
                     break;
-                case 3:
+                case PlayOrderStateEnum.单曲循环:
                     {
-                        playOrderState = 1;
+                        PlayingService.PlayOrderState = PlayOrderStateEnum.顺序播放;
                         SymbolIcon_playOrderState.Symbol = Symbol.AlignLeft;
                     }
                     break;
             }
         }
 
+        /// <summary>
+        /// 更新播放顺序
+        /// </summary>
+        void UpDatePlayOrderStateIcon()
+        {
+            switch (PlayingService.PlayOrderState)
+            {
+                case PlayOrderStateEnum.顺序播放:
+                    {
+                        SymbolIcon_playOrderState.Symbol = Symbol.AlignLeft;
+                        
+                    }
+                    break;
+                case PlayOrderStateEnum.列表循环:
+                    {
+                        SymbolIcon_playOrderState.Symbol = Symbol.RepeatAll;
+                        
+                    }
+                    break;
+                case PlayOrderStateEnum.随机播放:
+                    {
+                        SymbolIcon_playOrderState.Symbol = Symbol.Shuffle;
+                        
+                    }
+                    break;
+                case PlayOrderStateEnum.单曲循环:
+                    {
+                        SymbolIcon_playOrderState.Symbol = Symbol.RepeatOne;
+                    }
+                    break;
+            }
+        }
 
         private void Slider_play_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
         {
@@ -669,26 +475,18 @@ namespace MyNCMusic
 
         private void Button_previous_Click(object sender, RoutedEventArgs e)
         {
-            if (playHistoryIndex.Count == 0|| playHistoryIndex.Count == 1)
-                return;
-            //var lastSong = currentPlayList.FirstOrDefault(p => p.id == playHistoryIndex.Last());
-            //if (lastSong == null)
-            //    return;
-            playHistoryIndex.Remove(playHistoryIndex.Last());
-            PlayNextSongs(playHistoryIndex.Last(),true);
+            if(PlayingService.IsPlayingSong)
+                PlayingService.PlayLastSongs();
+            else
+                PlayingService.PlayLastRadio();
         }
 
         private void Button_next_Click(object sender, RoutedEventArgs e)
         {
-            if (playHistoryIndex.Count == 0)
-                return;
-            int index = currentPlayList.IndexOf(songsItem);
-            PlayNextSongs(index);
-        }
-
-        private void Button_playList_Click(object sender, RoutedEventArgs e)
-        {
-            ListBox_playList.ItemsSource = currentPlayList;
+            if (PlayingService.IsPlayingSong)
+                PlayingService.PlayNextSongs();
+            else
+                PlayingService.PlayNextRadio();
         }
 
         private void Button_playInfo_Click(object sender, RoutedEventArgs e)
@@ -697,29 +495,44 @@ namespace MyNCMusic
                 (Application.Current as App).homepage.Frame.GoBack();
             else
             {
-                if (songsItem == null)
+                if (PlayingService.PlayingSong == null)
                     return;
                 Frame_all.Navigate(typeof(PlayingPage));
             }
         }
 
-        private async void Button_isOrNotFavorite_Click(object sender, RoutedEventArgs e)
+        public delegate void IsOrNotFavoriteChanged();
+        //与委托相关联的事件
+        public event IsOrNotFavoriteChanged OnIsOrNotFavoriteChanged;
+        //事件触发函数
+        private void WhenIsOrNotFavoriteChange()
         {
-            if (songsItem == null)
+            OnIsOrNotFavoriteChanged?.Invoke();
+        }
+
+        public async void Button_isOrNotFavorite_Click(object sender, RoutedEventArgs e)
+        {
+            if(!PlayingService.IsPlayingSong)
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("无法对电台节目进行此操作");
+                notifyPopup.Show();
+                return;
+            }
+            if (PlayingService.PlayingSong == null)
             {
                 NotifyPopup notifyPopup = new NotifyPopup("无法获取音乐信息");
                 notifyPopup.Show();
                 return;
             }
-            if (songsItem.isFavorite)//取消喜欢
+            if (PlayingService.PlayingSong.isFavorite)//取消喜欢
             {
-                if (await Task.Run(() => MyClassManager.LoveOrDontLove_songs(songsItem.id, false) == true))
+                if (await Task.Run(() => SongService.LoveOrDontLoveSong(PlayingService.PlayingSong.Id, false) == true))
                 {
                     NotifyPopup notifyPopup = new NotifyPopup("已取消喜欢", "\xE00C");
                     notifyPopup.Show();
                     TextBlock_isOrnotFavorite.Text = "\xE006";
-                    songsItem.isFavorite = false;
-                    favoriteSongsRoot.ids.Remove(songsItem.id);
+                    PlayingService.PlayingSong.isFavorite = false;
+                    favoriteSongsRoot.ids.Remove(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
@@ -729,13 +542,13 @@ namespace MyNCMusic
             }
             else//添加为喜欢的
             {
-                if (await Task.Run(() => MyClassManager.LoveOrDontLove_songs(songsItem.id, true) == true))
+                if (await Task.Run(() => SongService.LoveOrDontLoveSong(PlayingService.PlayingSong.Id, true) == true))
                 {
                     NotifyPopup notifyPopup = new NotifyPopup("已添加为喜欢", "\xE00B",Colors.MediumSeaGreen);
                     notifyPopup.Show();
                     TextBlock_isOrnotFavorite.Text = "\xE00B";
-                    songsItem.isFavorite = true;
-                    favoriteSongsRoot.ids.Add(songsItem.id);
+                    PlayingService.PlayingSong.isFavorite = true;
+                    favoriteSongsRoot.ids.Add(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
@@ -743,17 +556,27 @@ namespace MyNCMusic
                     notifyPopup.Show();
                 }
             }
+            WhenIsOrNotFavoriteChange();
         }
 
+        /// <summary>
+        /// 开启迷你置顶模式
+        /// </summary>
         public async void IntoCompactOverlayMode()
         {
             ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
             compactOptions.CustomSize = new Windows.Foundation.Size(340, 160);
-            //if (await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay))
-            //    Frame.Navigate(typeof(CompactOverlayPage),songsItem.name);
-            
             if(await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions))
-                Frame.Navigate(typeof(CompactOverlayPage), songsItem.name);
+                Frame.Navigate(typeof(CompactOverlayPage));
         }
+
+        private void Button_playList_Click(object sender, RoutedEventArgs e)
+        {
+            var temp = PlayingService.PlayingListBaseObjects.FirstOrDefault(p => p.IsPlaying);
+            if(temp!=null)
+                ListBox_playList.ScrollIntoView(temp);
+        }
+
+        
     }
 }

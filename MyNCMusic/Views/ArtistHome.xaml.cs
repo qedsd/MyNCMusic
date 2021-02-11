@@ -1,5 +1,6 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Controls;
 using MyNCMusic.Model;
+using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ namespace MyNCMusic.Views
             {
                 foreach (var temp in artistBaseDetailRoot.hotSongs)
                 {
-                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.id)) != 0)
+                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
                         temp.isFavorite = true;
                 }
             }
@@ -81,12 +82,12 @@ namespace MyNCMusic.Views
         private async void AdaptiveGridViewControl_ItemClick(object sender, ItemClickEventArgs e)
         {
             Album album = e.ClickedItem as Album;
-            if (album.id == MainPage.PlayingListId)
+            if (album.id == PlayingService.PlayingListId)
                 Frame.Navigate(typeof(AlbumDetail));
             else
             {
                 ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-                AlbumRoot albumRoot = await Task.Run(() => MyClassManager.GetMAlbum(album.id));
+                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(album.id));
                 if (albumRoot == null)
                     return;
                 Frame.Navigate(typeof(AlbumDetail), albumRoot);
@@ -94,27 +95,15 @@ namespace MyNCMusic.Views
             }
         }
 
-        private void ListBox_hotSongs_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void ListBox_hotSongs_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = sender as ListBox;
             SongsItem songsItem = listBox.SelectedItem as SongsItem;
             if (songsItem == null)
                 return;
-            SongUrlRoot songUrlRoot = MyClassManager.GetMusicUrl(songsItem.id);
-            if (songUrlRoot == null)
-                return;
-
-            //修改播放列表
-            if (MainPage.PlayingListId != artistBaseDetailRoot.artist.id)//已在播放此歌单，仅修改播放歌曲，否则，重置播放列表及历史记录
-            {
-                (Application.Current as App).myMainPage.currentPlayList.Clear();
-                foreach (var temp in artistBaseDetailRoot.hotSongs)
-                    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-                (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-                MainPage.PlayingListId = artistBaseDetailRoot.artist.id;
-            }
-            //修改mainpage以触发修改正在播放的音乐
-            (Application.Current as App).myMainPage.ChnagePlayingSong(songsItem, songUrlRoot);
+            
+            PlayingService.PlayingListId= songsItem.al.id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, artistBaseDetailRoot.hotSongs, songsItem);
         }
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -124,7 +113,7 @@ namespace MyNCMusic.Views
             {
                 if (artistBaseDetailRoot == null|| AdaptiveGridView_albums.ItemsSource!=null)
                     return;
-                ArtistAllAlbumRoot artistAllAlbumRoot=await Task.Run(() => MyClassManager.GetArtistAllAlbums(artistBaseDetailRoot.artist.id));
+                ArtistAllAlbumRoot artistAllAlbumRoot=await Task.Run(() => AlbumService.GetArtistAllAlbums(artistBaseDetailRoot.artist.id));
                 if(artistAllAlbumRoot!=null)
                 {
                     AdaptiveGridView_albums.ItemsSource = artistAllAlbumRoot.hotAlbums;
@@ -132,14 +121,10 @@ namespace MyNCMusic.Views
             }
         }
 
-        private void Button_allSongs_Click(object sender, RoutedEventArgs e)
+        private async void Button_allSongs_Click(object sender, RoutedEventArgs e)
         {
-            (Application.Current as App).myMainPage.currentPlayList.Clear();
-            foreach (var temp in artistBaseDetailRoot.hotSongs)
-                (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-            (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-            MainPage.PlayingListId = artistBaseDetailRoot.artist.id;
-            (Application.Current as App).myMainPage.PlayNextSongs(-1);
+            PlayingService.PlayingListId= artistBaseDetailRoot.hotSongs.First().al.id;
+            await PlayingService.ChangePlayingSong(artistBaseDetailRoot.hotSongs.First().Id, artistBaseDetailRoot.hotSongs, artistBaseDetailRoot.hotSongs.First());
         }
 
         private async void Button_artists_Click(object sender, RoutedEventArgs e)
@@ -149,7 +134,7 @@ namespace MyNCMusic.Views
             if (songsItem.ar.Count == 1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(songsItem.ar.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(songsItem.ar.First().id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -159,11 +144,11 @@ namespace MyNCMusic.Views
 
         private async void ListBox_artists_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ArItem arItem = ((ListBox)sender).SelectedItem as ArItem;
+            Artist arItem = ((ListBox)sender).SelectedItem as Artist;
             if (arItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(arItem.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(arItem.id));
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -176,7 +161,7 @@ namespace MyNCMusic.Views
             if (songsItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            AlbumRoot albumRoot = await Task.Run(() => MyClassManager.GetMAlbum(songsItem.al.id));
+            AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(songsItem.al.id));
             if (albumRoot == null)
             {
                 ProgressBar_loading.Visibility = Visibility.Collapsed;

@@ -33,7 +33,13 @@
                             Width="128"
                             Height="128"
                                        CornerRadius="999"
-                               Name="ImageEx_user"/>
+                               Name="ImageEx_user">
+                <ToolTipService.ToolTip>
+                    <TextBlock Text="MyNCMusic"
+                               Name="TextBlock_UserName"/>
+                </ToolTipService.ToolTip>
+            </controls:ImageEx>
+
             <StackPanel Grid.Row="1">
                 <Button Style="{StaticResource ButtonStyle_tran}"
                             HorizontalAlignment="Center"
@@ -90,6 +96,43 @@
                         </StackPanel>
                     </Button.Content>
                 </Button>
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_Radio"
+                                    Click="Button_Radio_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE18B;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="我的电台"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                <Button Style="{StaticResource ButtonStyle_tran}"
+                                    HorizontalAlignment="Center"
+                                    Name="Button_History"
+                                    Click="Button_History_Click">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal"
+                                        Width="100">
+                            <TextBlock FontFamily="Segoe UI Symbol"
+                                       Text="&#xE121;"
+                                       FontSize="14"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="听歌记录"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="20,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+                
             </StackPanel>
             <StackPanel Grid.Row="2" Margin="0,0,0,20">
                 <Button Style="{StaticResource ButtonStyle_tran}"
@@ -115,7 +158,7 @@
         <Frame x:Name="Frame_main" Grid.Column="1">
             <Frame.Background>
                 <AcrylicBrush BackgroundSource="Backdrop"
-                          TintColor="White"
+                          TintColor="Black"
                           TintOpacity="0.4"
                           x:Name="AcrylicBrush_mainFrame"/>
             </Frame.Background>

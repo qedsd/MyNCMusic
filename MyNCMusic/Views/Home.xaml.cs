@@ -1,5 +1,7 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.Model;
 using MyNCMusic.MyUserControl;
+using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,15 +41,17 @@ namespace MyNCMusic.Views
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
 
+        string nickName;
+        string avatarImgIdStr;
         private async void Home_Loaded(object sender, RoutedEventArgs e)
         {
             if (!isFirstTimeLoad)
                 return;
             isFirstTimeLoad = false;
             AcrylicBrush_mainFrame.TintColor = MainPage.backgroundBrush.Color;//acrylic背景颜色
-            TextBox_account.Text = MyClassManager.phoneOrEmail;
-            PasswordBox_password.Password = MyClassManager.password;
-            TextBox_serverIP.Text = MyClassManager.apiUri.ToString();
+            TextBox_account.Text = ConfigService.PhoneOrEmail;
+            PasswordBox_password.Password = ConfigService.Password;
+            TextBox_serverIP.Text = ConfigService.ApiUri.ToString();
             ProgressRing_initState.IsActive = true;
             int state = await Task.Run(() => Init());
             switch (state)
@@ -72,7 +76,8 @@ namespace MyNCMusic.Views
                     {
                         ProgressRing_initState.IsActive = false;
                         TextBlock_initState.Text = "初始化完成";
-                        ImageEx_user.Source = MyClassManager.avatarImgIdStr;//设为用户头像
+                        ImageEx_user.Source = avatarImgIdStr;//设为用户头像
+                        TextBlock_UserName.Text = nickName;
                     }
                     break;
             }
@@ -81,25 +86,18 @@ namespace MyNCMusic.Views
 
         int Init()
         {
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            LoginRoot loginRoot = MyClassManager.LoginAccount();
-            if(loginRoot==null)
+            LoginRoot loginRoot = LoginHelper.LoginAccount();
+            if(loginRoot==null|| loginRoot.code!=200)
             {
-                loginRoot = MyClassManager.LoginAccount();
-                if (loginRoot == null)
-                {
-                    MyClassManager.uid = -1;
-                    localSettings.Values["Uid"] = (long)-1;
-                    return 1;
-                }
-
+                ConfigService.Uid = -1;
+                return 1;
             }
-            MyClassManager.uid = loginRoot.account.id;
-            
-            localSettings.Values["Uid"] = loginRoot.account.id;
-            MyClassManager.avatarImgIdStr = loginRoot.profile.avatarUrl;
+            CookieHelper.WriteCookiesToDisk(ConfigService.Folder.Path+"/"+CookieHelper.SavedFileName,Http.cookies);
+            ConfigService.Uid = loginRoot.account.id;
+            avatarImgIdStr = loginRoot.profile.avatarUrl;
+            nickName = loginRoot.profile.nickname;
             //获取喜欢的歌曲
-            MainPage.favoriteSongsRoot = MyClassManager.GetFavoriteSongs();
+            MainPage.favoriteSongsRoot = SongService.GetFavoriteSongs();
             if (MainPage.favoriteSongsRoot == null)
             {
                 
@@ -115,7 +113,7 @@ namespace MyNCMusic.Views
 
         private void Button_myMusicList_Click(object sender, RoutedEventArgs e)
         {
-            if (MyClassManager.uid >= 0)
+            if (ConfigService.Uid >= 0)
                 Frame_main.Navigate(typeof(MyMusicList));
             else
             {
@@ -126,7 +124,7 @@ namespace MyNCMusic.Views
 
         private void Button_myCollection_Click(object sender, RoutedEventArgs e)
         {
-            if (MyClassManager.uid >= 0)
+            if (ConfigService.Uid >= 0)
                 Frame_main.Navigate(typeof(MyCollection));
             else
             {
@@ -137,7 +135,6 @@ namespace MyNCMusic.Views
 
         private async void Button_setting_Click(object sender, RoutedEventArgs e)
         {
-            //MainPage.mainSolidColorBrush.Color = Colors.Black;
             await ContentDialog_setting.ShowAsync();
         }
 
@@ -148,12 +145,33 @@ namespace MyNCMusic.Views
                 args.Cancel = true;
                 return;
             }
-            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
-            localSettings.Values["PhoneOrEmail"] = TextBox_account.Text;
-            localSettings.Values["Password"] = PasswordBox_password.Password;
-            localSettings.Values["ServerIP"] = TextBox_serverIP.Text;
+            ConfigService.ApiUri= TextBox_serverIP.Text;
+            ConfigService.PhoneOrEmail = TextBox_account.Text;
+            ConfigService.Password = PasswordBox_password.Password;
+            ConfigService.SaveConfig();
             await CoreApplication.RequestRestartAsync(String.Empty);
         }
 
+        private void Button_History_Click(object sender, RoutedEventArgs e)
+        {
+            if (ConfigService.Uid >= 0)
+                Frame_main.Navigate(typeof(PlayedRecord));
+            else
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("请先登录");
+                notifyPopup.Show();
+            }
+        }
+
+        private void Button_Radio_Click(object sender, RoutedEventArgs e)
+        {
+            if (ConfigService.Uid >= 0)
+                Frame_main.Navigate(typeof(Radio));
+            else
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("请先登录");
+                notifyPopup.Show();
+            }
+        }
     }
 }

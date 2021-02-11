@@ -5,6 +5,7 @@
     xmlns:local="using:MyNCMusic.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local1="using:MyNCMusic"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     Foreground="{x:Bind local:Home.mainSolidColorBrush}"
@@ -24,7 +25,8 @@
                           x:Name="AcrylicBrush"/>
             </Grid.Background>
         </Grid>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.RowSpan="2">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.RowSpan="2"
+                    Background="Transparent">
             <StackPanel Margin="4" Visibility="Collapsed">
                 <TextBlock x:Name="TextBlock_1_o" FontSize="12" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
                 <TextBlock x:Name="TextBlock_1_t" FontSize="12" Foreground="{x:Bind local:Home.mainSolidColorBrush}" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
@@ -38,6 +40,64 @@
                 <TextBlock x:Name="TextBlock_3_t" FontSize="12" Foreground="{x:Bind local:Home.mainSolidColorBrush}" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
             </StackPanel>
         </StackPanel>
+        <Grid Name="Grid_PlayController"
+              Grid.Row="0"
+              Grid.RowSpan="2"
+              Background="Transparent"
+              PointerExited="Grid_PlayController_PointerExited"
+              PointerEntered="Grid_PlayController_PointerEntered"
+              >
+            <!--<Grid.Background>
+                <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="Black"
+                          TintOpacity="1"/>
+            </Grid.Background>-->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Height="34"
+                        Name="StackPanel_ControlButton"
+                        Visibility="Collapsed">
+                <StackPanel.Background>
+                    <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="Black"
+                          TintOpacity="0.7"
+                                      Opacity="0.9"/>
+                </StackPanel.Background>
+                <Button VerticalAlignment="Center"
+                        Style="{StaticResource  ButtonStyle_tran}"
+                                    Name="Button_IsOrNotFavorite"
+                                    Click="Button_IsOrNotFavorite_Click"
+                        >
+                    <TextBlock Text="&#xE006;" FontFamily="Segoe UI Symbol" Foreground="{x:Bind local1:MainPage.mainSolidColorBrush}"
+                                            Name="TextBlock_IsOrnotFavorite"
+                                               Visibility="Visible"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                           Width="14"/>
+                </Button>
+                <Button x:Name="Button_Previous"  Foreground="White"
+                                Click="Button_Previous_Click"
+                        Style="{StaticResource  ButtonStyle_tran}">
+                    <Button.Content>
+                        <SymbolIcon Symbol="Previous"/>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="Button_StopOrPlay"  Foreground="White"
+                                Click="Button_StopOrPlay_Click"
+                        Style="{StaticResource ButtonStyle_tran}">
+                    <Button.Content>
+                        <SymbolIcon Symbol="Play" x:Name="SymbolIcon_stopOrPlay"/>
+                    </Button.Content>
+                </Button>
+                <Button x:Name="Button_Next" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                                Click="Button_Next_Click"
+                        >
+                    <Button.Content>
+                        <SymbolIcon Symbol="Next"/>
+                    </Button.Content>
+                </Button>
+            </StackPanel>
+        </Grid>
         <Grid Grid.Row="2" Margin="10,0,0,2">
             <TextBlock x:Name="TextBlock_name"  FontSize="16" HorizontalAlignment="Left"
                        VerticalAlignment="Center"

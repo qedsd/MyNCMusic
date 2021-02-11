@@ -1,6 +1,8 @@
 ﻿using MyNCMusic.Model;
+using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -24,28 +26,31 @@ namespace MyNCMusic.Views
     /// </summary>
     public sealed partial class MyMusicList : Page
     {
-        List<PlaylistItem> playlistItems_created;
-        List<PlaylistItem> playlistItems_subscribed;
+        ObservableCollection<PlaylistItem> playlistItems_created = PlayingService.PlaylistItems_Created;
+        ObservableCollection<PlaylistItem> playlistItems_subscribed = PlayingService.PlaylistItems_Subscribed;
         public MyMusicList()
         {
             this.InitializeComponent();
-            playlistItems_created = new List<PlaylistItem>();
-            playlistItems_subscribed = new List<PlaylistItem>();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Loaded += MyMusicList_Loaded;
         }
 
         private async void MyMusicList_Loaded(object sender, RoutedEventArgs e)
         {
-            MyPlaylistRoot myPlaylistRoot = await Task.Run(() => MyClassManager.GetMyPlaylist());
-            foreach(var temp in myPlaylistRoot.playlist)
+            if (playlistItems_created == null && playlistItems_subscribed == null)
             {
-                if (temp.subscribed == "true")
-                    playlistItems_subscribed.Add(temp);
-                else
-                    playlistItems_created.Add(temp);
+                playlistItems_created = new ObservableCollection<PlaylistItem>();
+                playlistItems_subscribed = new ObservableCollection<PlaylistItem>();
+                MyPlaylistRoot myPlaylistRoot = await Task.Run(() => PlaylistService.GetMyPlaylist());
+                foreach (var temp in myPlaylistRoot.playlist)
+                {
+                    if (temp.subscribed == "true")
+                        playlistItems_subscribed.Add(temp);
+                    else
+                        playlistItems_created.Add(temp);
+                }
+                myPlaylistRoot = null;
             }
-            myPlaylistRoot = null;
             AdaptiveGridView_createdByMe.ItemsSource = playlistItems_created;
             AdaptiveGridView_subscribed.ItemsSource = playlistItems_subscribed;
         }
@@ -76,19 +81,56 @@ namespace MyNCMusic.Views
 
         List<Object> prepareToNavigeteToPlaylitDetail(long id)
         {
-            PlayListDetailRoot playListDetailRoot = MyClassManager.GetPlayListDetail(id);
+            PlayListDetailRoot playListDetailRoot = PlaylistService.GetPlaylistDetail(id);
             if (playListDetailRoot == null || playListDetailRoot.playlist.trackIds.Count == 0)
                 return null;
             string ids = "";
-            for (int i = 0; i < playListDetailRoot.playlist.trackIds.Count; i++)
+            //for (int i = 0; i < playListDetailRoot.playlist.trackIds.Count; i++)
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    if (i != 0)
+            //        ids += ",";
+            //    ids += playListDetailRoot.playlist.trackIds[i].id;
+            //}
+            MusicDetailRoot musicDetailRoot = new MusicDetailRoot();
+            musicDetailRoot.songs = new List<SongsItem>();
+            musicDetailRoot.privileges = new List<PrivilegesItem>();
+            for (int i=0;i< playListDetailRoot.playlist.trackIds.Count;i+=1000)//最高单次1000个
             {
-                if (i != 0)
-                    ids += ",";
-                ids += playListDetailRoot.playlist.trackIds[i].id;
+                ids = "";
+                int j = i;
+                if((i+1000)> playListDetailRoot.playlist.trackIds.Count)//剩下的不足1000
+                {
+                    for (; j < playListDetailRoot.playlist.trackIds.Count; j++)
+                    {
+                        if (j%1000 != 0)
+                            ids += ",";
+                        ids += playListDetailRoot.playlist.trackIds[j].id;
+                    }
+                }
+                else//剩下的超过1000
+                {
+                    for (; j < i + 1000; j++)
+                    {
+                        if (j%1000 != 0)
+                            ids += ",";
+                        ids += playListDetailRoot.playlist.trackIds[j].id;
+                    }
+                }
+                MusicDetailRoot musicDetailRootTemp = SongService.GetMusicDetail_Post(ids);
+                if(musicDetailRootTemp!=null&&musicDetailRootTemp.songs!=null&& musicDetailRootTemp.privileges!=null)
+                {
+                    foreach(var temp in musicDetailRootTemp.songs)
+                    {
+                        musicDetailRoot.songs.Add(temp);
+                    }
+                    foreach (var temp in musicDetailRootTemp.privileges)
+                    {
+                        musicDetailRoot.privileges.Add(temp);
+                    }
+                    musicDetailRoot.code = musicDetailRootTemp.code;
+                }
             }
-            MusicDetailRoot musicDetailRoot = MyClassManager.GetMusicDetail_post(ids);
-            if (musicDetailRoot == null)
-                return null;
             List<Object> list = new List<object>();
             list.Add(playListDetailRoot);
             list.Add(musicDetailRoot);

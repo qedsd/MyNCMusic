@@ -1,4 +1,6 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.Model;
+using MyNCMusic.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -31,24 +33,14 @@ namespace MyNCMusic.Views
         {
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            waitToLoad();
+            WaitToLoad();
         }
 
-        async void waitToLoad()
+        async void WaitToLoad()
         {
-            await GetcommendatoryList();
-        }
-
-        async Task<bool> GetcommendatoryList()
-        {
-            string result = await Task.Run(()=>Http.Get(MyClassManager.apiUri + @"/recommend/resource"));
-            if (result == null || result.Equals(""))
-                result = await Task.Run(() => Http.Get(MyClassManager.apiUri + @"/recommend/resource"));
-            if (result == null || result.Equals(""))
-                return false;
-            recommendRoot = JsonConvert.DeserializeObject<RecommendRoot>(result);
-            AdaptiveGridView_recommendList.ItemsSource = recommendRoot.recommend;
-            return true;
+            recommendRoot=await PlaylistService.GetcommendatoryList();
+            if(recommendRoot!=null)
+                AdaptiveGridView_recommendList.ItemsSource = recommendRoot.recommend;
         }
 
         //点击推荐歌单
@@ -58,7 +50,7 @@ namespace MyNCMusic.Views
             Recommend recommend = e.ClickedItem as Recommend;
             if(recommend!=null)
             {
-                PlayListDetailRoot playListDetailRoot=await Task.Run(()=>MyClassManager.GetPlayListDetail(recommend.id));
+                PlayListDetailRoot playListDetailRoot=await Task.Run(()=>PlaylistService.GetPlaylistDetail(recommend.id));
                 if (playListDetailRoot == null || playListDetailRoot.playlist.trackIds.Count == 0)
                 {
                     ProgressBar_loadRecomendList.Visibility = Visibility.Collapsed;
@@ -71,7 +63,7 @@ namespace MyNCMusic.Views
                         ids += ",";
                     ids += playListDetailRoot.playlist.trackIds[i].id;
                 }
-                MusicDetailRoot musicDetailRoot= await Task.Run(() => MyClassManager.GetMusicDetail_post(ids));
+                MusicDetailRoot musicDetailRoot= await Task.Run(() => SongService.GetMusicDetail_Post(ids));
                 if (musicDetailRoot == null)
                 {
                     ProgressBar_loadRecomendList.Visibility = Visibility.Collapsed;
@@ -97,7 +89,7 @@ namespace MyNCMusic.Views
                     return;
                 //string result = await MyClassManager.HttpClientGet(MyClassManager.apiUri + @"/recommend/songs");
                 ProgressBar_loadRecomendSongs.Visibility = Visibility.Visible;
-                string result = await Task.Run(()=>Http.Get(MyClassManager.apiUri + @"/recommend/songs"));
+                string result = await Task.Run(()=>Http.Get(ConfigService.ApiUri + @"/recommend/songs"));
                 if (result == null || result.Equals(""))
                 {
                     ProgressBar_loadRecomendSongs.Visibility = Visibility.Collapsed;
@@ -114,7 +106,7 @@ namespace MyNCMusic.Views
                 {
                     foreach (var temp in recommendMusics.data.dailySongs)
                     {
-                        if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.id)) != 0)
+                        if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
                             temp.isFavorite = true;
                     }
                 }
@@ -133,7 +125,7 @@ namespace MyNCMusic.Views
                     //        ids += ",";
                     //    ids += MainPage.favoriteSongsRoot.ids[i];
                     //}
-                    List<int> idsTemp = new List<int>( MainPage.favoriteSongsRoot.ids);
+                    List<long> idsTemp = new List<long>( MainPage.favoriteSongsRoot.ids);
                     //随机取50条数据
                     int totalCount = 50; //需要取得数据的数量
                     Random random = new Random();
@@ -149,15 +141,17 @@ namespace MyNCMusic.Views
                         ids += idsTemp[i];
                     }
                     ProgressBar_loadRandomFavoriteSongs.Visibility = Visibility.Visible;
-                    MusicDetailRoot musicDetailRoot = await Task.Run(()=>MyClassManager.GetMusicDetail_post(ids));
+                    MusicDetailRoot musicDetailRoot = await Task.Run(()=>SongService.GetMusicDetail_Post(ids));
                     if (musicDetailRoot == null)
                     {
                         ProgressBar_loadRandomFavoriteSongs.Visibility = Visibility.Collapsed;
                         return;
                     }
+                    foreach (var temp in musicDetailRoot.songs)
+                        temp.isFavorite = true;
                     ProgressBar_loadRandomFavoriteSongs.Visibility = Visibility.Collapsed;
                     ListBox_myFavoriteSongs.ItemsSource = musicDetailRoot.songs;
-                    MainPage.favoriteSongsRoot.songs = musicDetailRoot.songs;
+                    MainPage.favoriteSongsRoot.songs = musicDetailRoot.songs.ToList();
                 }
             }
         }
@@ -167,56 +161,45 @@ namespace MyNCMusic.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ListBox_recommendMusic_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void ListBox_recommendMusic_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
             SongsItem songsItem = listBox.SelectedItem as SongsItem;
             if (songsItem == null)
                 return;
-            SongUrlRoot songUrlRoot = MyClassManager.GetMusicUrl(songsItem.id);
-            if (songUrlRoot == null)
-                return;
-            //添加播放列表
-            if (ListBox_recommendMusic.ItemsSource == null)
-                return;
-            if(MainPage.PlayingListId!=1)//已在播放此歌单，仅修改播放歌曲，否则，重置播放列表及历史记录
-            {
-                (Application.Current as App).myMainPage.currentPlayList.Clear();
-                foreach (var temp in ListBox_recommendMusic.ItemsSource as List<SongsItem>)
-                    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-                (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-                MainPage.PlayingListId = 1;
-            }
-            //修改mainpage以触发修改正在播放的音乐
-            (Application.Current as App).myMainPage.ChnagePlayingSong(songsItem, songUrlRoot);
+            
+            PlayingService.PlayingListId = songsItem.al.id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, ListBox_recommendMusic.ItemsSource as List<SongsItem>, songsItem);
         }
         /// <summary>
         /// 双击我喜欢的歌曲
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ListBox_myFavoriteSongs_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void ListBox_myFavoriteSongs_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
             SongsItem songsItem = listBox.SelectedItem as SongsItem;
             if (songsItem == null)
                 return;
-            SongUrlRoot songUrlRoot = MyClassManager.GetMusicUrl(songsItem.id);
-            if (songUrlRoot == null)
-                return;
-            //添加播放列表
-            if (ListBox_myFavoriteSongs.ItemsSource == null)
-                return;
-            if (MainPage.PlayingListId != 2)//已在播放此歌单，仅修改播放歌曲，否则，重置播放列表及历史记录
-            {
-                (Application.Current as App).myMainPage.currentPlayList.Clear();
-                foreach (var temp in ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>)
-                    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-                (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-                MainPage.PlayingListId = 2;
-            }
-            //修改mainpage以触发修改正在播放的音乐
-            (Application.Current as App).myMainPage.ChnagePlayingSong(songsItem, songUrlRoot);
+            //SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
+            //if (songUrlRoot == null)
+            //    return;
+            ////添加播放列表
+            //if (ListBox_myFavoriteSongs.ItemsSource == null)
+            //    return;
+            //if (MainPage.PlayingListId != 2)//已在播放此歌单，仅修改播放歌曲，否则，重置播放列表及历史记录
+            //{
+            //    (Application.Current as App).myMainPage.currentPlayList.Clear();
+            //    foreach (var temp in ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>)
+            //        (Application.Current as App).myMainPage.currentPlayList.Add(temp);
+            //    (Application.Current as App).myMainPage.playHistoryIndex.Clear();
+            //    //MainPage.PlayingListId = 2;
+            //}
+            ////修改mainpage以触发修改正在播放的音乐
+            //(Application.Current as App).myMainPage.ChnagePlayingSong(songsItem, songUrlRoot,-2);
+            PlayingService.PlayingListId = songsItem.al.id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>, songsItem);
         }
 
 
@@ -226,7 +209,7 @@ namespace MyNCMusic.Views
                 ListBox_myFavoriteSongs.ItemsSource = MainPage.favoriteSongsRoot.songs;
             else
             {
-                var list = MainPage.favoriteSongsRoot.songs.FindAll(p => p.name.Contains(sender.Text));
+                var list = MainPage.favoriteSongsRoot.songs.FindAll(p => p.Name.Contains(sender.Text));
                 if(list!=null&&list.Count!=0)
                 {
                     ListBox_myFavoriteSongs.ItemsSource = list;
@@ -239,16 +222,20 @@ namespace MyNCMusic.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Button_playFavoriteSongs_Click(object sender, RoutedEventArgs e)
+        private async void Button_playFavoriteSongs_Click(object sender, RoutedEventArgs e)
         {
             if (ListBox_myFavoriteSongs.ItemsSource == null)
                 return;
-            (Application.Current as App).myMainPage.currentPlayList.Clear();
-            foreach (var temp in ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>)
-                (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-            (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-            MainPage.PlayingListId = 2;
-            (Application.Current as App).myMainPage.PlayNextSongs(-1);
+            //(Application.Current as App).myMainPage.currentPlayList.Clear();
+            //foreach (var temp in ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>)
+            //    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
+            //(Application.Current as App).myMainPage.playHistoryIndex.Clear();
+            //MainPage.PlayingListId = 2;
+            //(Application.Current as App).myMainPage.PlayNextSongs(-1);
+            
+            var songs = ListBox_myFavoriteSongs.ItemsSource as List<SongsItem>;
+            PlayingService.PlayingListId = songs.First().al.id;
+            await PlayingService.ChangePlayingSong(songs.First().Id, songs, songs.First()) ;
         }
 
         /// <summary>
@@ -256,16 +243,13 @@ namespace MyNCMusic.Views
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Button_playDailySongs_Click(object sender, RoutedEventArgs e)
+        private async void Button_playDailySongs_Click(object sender, RoutedEventArgs e)
         {
             if (ListBox_recommendMusic.ItemsSource == null)
                 return;
-            (Application.Current as App).myMainPage.currentPlayList.Clear();
-            foreach (var temp in ListBox_recommendMusic.ItemsSource as List<SongsItem>)
-                (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-            (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-            MainPage.PlayingListId = 1;
-            (Application.Current as App).myMainPage.PlayNextSongs(-1);
+            var songs = ListBox_recommendMusic.ItemsSource as List<SongsItem>;
+            PlayingService.PlayingListId = songs.First().al.id;
+            await PlayingService.ChangePlayingSong(songs.First().Id, songs, songs.First());
         }
 
         private void AutoSuggestBox_search_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
@@ -275,39 +259,12 @@ namespace MyNCMusic.Views
             
             string keyword = sender.Text;//避免线程冲突
             IntoSearch(keyword);
-            //searchType = int.Parse(((PivotItem)Pivot_search.SelectedItem).Tag.ToString());
-            //SearchRoot searchRoot=await Task.Run(()=> MyClassManager.SearchClound(keyword, searchType));
-            //if (searchRoot == null)
-            //    return;
-            //switch (searchType)
-            //{
-            //    case 1:
-            //        {
-            //            ListBox_searchSong.ItemsSource = searchRoot.result.songs;
-            //        }
-            //        break;
-            //    case 10:
-            //        {
-            //            ListBox_searchArtist.ItemsSource = searchRoot.result.albums;
-            //        }
-            //        break;
-            //    case 100:
-            //        {
-            //            ListBox_searchAlbum.ItemsSource = searchRoot.result.artists;
-            //        }
-            //        break;
-            //    case 1000:
-            //        {
-            //            AdaptiveGridView_searchPlaylist.ItemsSource = searchRoot.result.playlists;
-            //        }
-            //        break;
-            //}
         }
 
         async void IntoSearch(string keyword)
         {
             searchType = int.Parse(((PivotItem)Pivot_search.SelectedItem).Tag.ToString());
-            SearchRoot searchRoot = await Task.Run(() => MyClassManager.SearchClound(keyword, searchType));
+            SearchRoot searchRoot = await Task.Run(() => SearchService.SearchClound(keyword, searchType));
             if (searchRoot == null)
                 return;
             switch (searchType)
@@ -319,7 +276,7 @@ namespace MyNCMusic.Views
                         {
                             foreach (var temp in searchRoot.result.songs)
                             {
-                                if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.id)) != 0)
+                                if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
                                     temp.isFavorite = true;
                             }
                         }
@@ -344,29 +301,22 @@ namespace MyNCMusic.Views
             }
         }
 
-        private void ListBox_searchSong_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+        private async void ListBox_searchSong_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
             SongsItem songsItem = listBox.SelectedItem as SongsItem;
             if (songsItem == null)
                 return;
-            SongUrlRoot songUrlRoot = MyClassManager.GetMusicUrl(songsItem.id);
-            if (songUrlRoot == null)
-                return;
-            //添加播放列表
-                (Application.Current as App).myMainPage.currentPlayList.Clear();
-                foreach (var temp in ListBox_searchSong.ItemsSource as List<SongsItem>)
-                    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-                (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-            //修改mainpage以触发修改正在播放的音乐
-            (Application.Current as App).myMainPage.ChnagePlayingSong(songsItem, songUrlRoot);
+            
+            PlayingService.PlayingListId = songsItem.al.id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, ListBox_searchSong.ItemsSource as List<SongsItem>, songsItem);
         }
 
         private async void ListBox_searchArtist_Tapped(object sender, TappedRoutedEventArgs e)
         {
             ListBox listBox = (ListBox)sender;
             Artist artist = ((ListBox)sender).SelectedItem as Artist;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(artist.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.id));
             if (artistBaseDetailRoot == null)
                 return;
             Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
@@ -377,12 +327,12 @@ namespace MyNCMusic.Views
             Album album = ((ListBox)sender).SelectedItem as Album;
             if (album == null)
                 return;
-            if (album.id == MainPage.PlayingListId)
+            if (album.id == PlayingService.PlayingListId)
                 Frame.Navigate(typeof(AlbumDetail));
             else
             {
                 ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-                AlbumRoot albumRoot = await Task.Run(() => MyClassManager.GetMAlbum(album.id));
+                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(album.id));
                 if (albumRoot == null)
                     return;
                 Frame.Navigate(typeof(AlbumDetail), albumRoot);
@@ -404,7 +354,7 @@ namespace MyNCMusic.Views
 
         List<Object> prepareToNavigeteToPlaylitDetail(long id)
         {
-            PlayListDetailRoot playListDetailRoot = MyClassManager.GetPlayListDetail(id);
+            PlayListDetailRoot playListDetailRoot = PlaylistService.GetPlaylistDetail(id);
             if (playListDetailRoot == null || playListDetailRoot.playlist.trackIds.Count == 0)
                 return null;
             string ids = "";
@@ -414,7 +364,7 @@ namespace MyNCMusic.Views
                     ids += ",";
                 ids += playListDetailRoot.playlist.trackIds[i].id;
             }
-            MusicDetailRoot musicDetailRoot = MyClassManager.GetMusicDetail_post(ids);
+            MusicDetailRoot musicDetailRoot = SongService.GetMusicDetail_Post(ids);
             if (musicDetailRoot == null)
                 return null;
             List<Object> list = new List<object>();
@@ -438,7 +388,7 @@ namespace MyNCMusic.Views
             if(songsItem.ar.Count==1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(songsItem.ar.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(songsItem.ar.First().id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -448,11 +398,11 @@ namespace MyNCMusic.Views
 
         private async void ListBox_artists_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ArItem arItem = ((ListBox)sender).SelectedItem as ArItem;
+            Artist arItem = ((ListBox)sender).SelectedItem as Artist;
             if (arItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(arItem.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(arItem.id));
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -466,7 +416,7 @@ namespace MyNCMusic.Views
             if (songsItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            AlbumRoot albumRoot= await Task.Run(() => MyClassManager.GetMAlbum(songsItem.al.id));
+            AlbumRoot albumRoot= await Task.Run(() => AlbumService.GetAlbum(songsItem.al.id));
             if (albumRoot == null)
             {
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
@@ -482,7 +432,7 @@ namespace MyNCMusic.Views
             if (artist == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(artist.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.id));
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -496,7 +446,7 @@ namespace MyNCMusic.Views
             if (artists.Count == 1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(artists.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;

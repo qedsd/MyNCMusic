@@ -1,4 +1,6 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.Model;
+using MyNCMusic.Services;
 using MyNCMusic.Views;
 using System;
 using System.Collections.Generic;
@@ -9,6 +11,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core.Preview;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -34,6 +37,7 @@ namespace MyNCMusic
         public PlayingPage playingPage;
         public PlayListDetai PlayListDetai;
         public CompactOverlayPage compactOverlayPage;
+
         public App()
         {
             this.InitializeComponent();
@@ -79,7 +83,17 @@ namespace MyNCMusic
                 }
                 // 确保当前窗口处于活动状态
                 Window.Current.Activate();
+                Windows.UI.Core.Preview.SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += Page_CloseRequested;
             }
+        }
+
+        private void Page_CloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
+        {
+            PlayingService.Save();
+            if (myMainPage == null || PlayingService.PlayDurationStopwatch == null)
+                return;
+            myMainPage.playDurationStopwatch.Stop();
+            System.Threading.Tasks.Task.Run(() => SongService.MarkPlayDuration(PlayingService.PlayingSong.Id, PlayingService.PlayingListId, PlayingService.PlayDurationStopwatch.ElapsedMilliseconds / 1000));
         }
 
         /// <summary>
@@ -109,7 +123,7 @@ namespace MyNCMusic
         private void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            MyClassManager.ShowContentDialog(e.Exception.ToString());
+            OtherHelper.ShowContentDialog(e.Exception.ToString());
         }
     }
 }

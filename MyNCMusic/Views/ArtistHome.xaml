@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:MyNCMusic.Model"
+    xmlns:converter="using:MyNCMusic.Helper"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Foreground="{x:Bind local:Home.mainSolidColorBrush}">
@@ -16,13 +17,13 @@
     </Page.Background>
 
     <Page.Resources>
-        <model:GetArNames x:Key="GetArNames"/>
-        <model:GetDt x:Key="GetDt"/>
-        <model:GetAlia x:Key="GetAlia"/>
-        <model:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
-        <model:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
-        <model:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <model:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:GetArNames x:Key="GetArNames"/>
+        <converter:GetDt x:Key="GetDt"/>
+        <converter:GetAlia x:Key="GetAlia"/>
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
     </Page.Resources>
     <Grid Margin="20,10,20,0">
         <Grid.RowDefinitions>
@@ -48,8 +49,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Image x:Name="Image_artist"
-                   Height="160"
-                   Width="160"
+                   Height="180"
+                   Width="180"
                    Grid.Column="0"/>
             <Grid Grid.Column="1" Margin="10,10,0,0">
                 <Grid.RowDefinitions>
@@ -112,7 +113,7 @@
                                    Visibility="{Binding isFavorite,Converter={StaticResource GetFavoriteIconVisibility}}"
                                               ToolTipService.ToolTip="喜欢的歌曲"/>
                                     <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                        <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                                         <TextBlock Text="{x:Bind alia,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />
                                     </StackPanel>
 
@@ -123,7 +124,7 @@
                                                 <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged"
                                                          ItemsSource="{x:Bind ar}">
                                                     <ListBox.ItemTemplate>
-                                                        <DataTemplate x:DataType="model:ArItem">
+                                                        <DataTemplate x:DataType="model:Artist">
                                                             <TextBlock Text="{x:Bind name}"/>
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>

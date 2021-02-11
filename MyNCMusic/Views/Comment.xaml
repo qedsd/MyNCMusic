@@ -6,132 +6,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:MyNCMusic.Model"
+    xmlns:converter="using:MyNCMusic.Helper"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
-    Background="Transparent">
+    >
 
-    <!--<Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <ProgressBar x:Name="ProgressBar_loadingComment" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
-        <ScrollViewer x:Name="ScrollViewer_comment" Grid.Row="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <TextBlock Text="热评"
-                                       />
-                <Rectangle Height="1" Fill="Black" Grid.Row="1" Margin="0,10"/>
-                <ListBox x:Name="ListBox_HotComment"
-                         Background="Transparent"
-                                      Grid.Row="2">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="model:CommentsItem">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <controls:ImageEx   HorizontalAlignment="Center" 
-                                                        VerticalAlignment="Top"
-                                                        Stretch="Fill" 
-                                                        Width="48"
-                                                        Height="48"
-                                                        CornerRadius="999"
-                                                        Source="{x:Bind user.avatarUrl,Converter={StaticResource ReturnImageUriWithParam_48}}"
-                                                        />
-                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                    <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
-                                                
-                                                Padding="0"/>
-                                    <TextBlock Text="{x:Bind content}"
-                                                   
-                                                   Margin="0,4,0,0"
-                                                   TextWrapping="WrapWholeWords"/>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
-                                                       
-                                                       VerticalAlignment="Center"/>
-                                        <TextBlock Text="{x:Bind likedCount}"
-                                                       
-                                                       VerticalAlignment="Center"
-                                                       Margin="4,0,0,0"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-                <TextBlock Text="最新" Margin="0,20,0,0"  Grid.Row="3" />
-                <Rectangle Height="1" Fill="Black"  Grid.Row="4" Margin="0,10"/>
-                <ListBox x:Name="ListBox_allComment"
-                                      Grid.Row="15"
-                        Background="Transparent">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate x:DataType="model:CommentsItem">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <controls:ImageEx   HorizontalAlignment="Center" 
-                                                        VerticalAlignment="Top"
-                                                        Stretch="Fill" 
-                                                        Width="48"
-                                                        Height="48"
-                                                        CornerRadius="999"
-                                                        Source="{x:Bind user.avatarUrl}"
-                                                        />
-                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                    <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
-                                                
-                                                Padding="0"/>
-                                    <TextBlock Text="{x:Bind content}"
-                                                   
-                                                   Margin="0,4,0,0"
-                                                   TextWrapping="WrapWholeWords"/>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
-                                                       
-                                                       VerticalAlignment="Center"/>
-                                        <TextBlock Text="{x:Bind likedCount}"
-                                                       
-                                                       VerticalAlignment="Center"
-                                                       Margin="4,0,0,0"/>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </Grid>
-        </ScrollViewer>
-    </Grid>-->
+    <Page.Background>
+        <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="Black"
+                          TintOpacity="0.2"/>
+    </Page.Background>
     <Page.Resources>
-        <model:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
-        <model:GetDt x:Key="GetDt"/>
-        <model:GetAlia x:Key="GetAlia"/>
-        <model:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
-        <model:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
-        <model:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <model:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
+        <converter:GetDt x:Key="GetDt"/>
+        <converter:GetAlia x:Key="GetAlia"/>
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
     </Page.Resources>
     <Grid Margin="20,10,20,0">
         <Grid.RowDefinitions>
@@ -166,12 +58,8 @@
                 <Rectangle Height="1" Fill="{x:Bind local:Home.mainSolidColorBrush}" Grid.Row="1" Margin="0,10"/>
                 <ListBox x:Name="ListBox_HotComment"
                              Background="Transparent"
-                                      Grid.Row="2">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
+                                      Grid.Row="2"
+                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="model:CommentsItem">
                             <Grid>
@@ -213,12 +101,8 @@
                 <Rectangle Height="1" Fill="{x:Bind local:Home.mainSolidColorBrush}"  Grid.Row="4" Margin="0,10"/>
                 <ListBox x:Name="ListBox_allComment"
                              Background="Transparent"
-                                      Grid.Row="15">
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
+                                      Grid.Row="15"
+                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
                     <ListBox.ItemTemplate>
                         <DataTemplate x:DataType="model:CommentsItem">
                             <Grid>

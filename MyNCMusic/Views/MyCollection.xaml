@@ -6,15 +6,16 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:MyNCMusic.Model"
+    xmlns:converter="using:MyNCMusic.Helper"
     mc:Ignorable="d"
     Background="Transparent"
     Foreground="{x:Bind local:Home.mainSolidColorBrush}">
 
     <Page.Resources>
-        <model:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
-        <model:GetAlia x:Key="GetAlia"/>
-        <model:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <model:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
+        <converter:GetAlia x:Key="GetAlia"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
     </Page.Resources>
     <Grid Margin="20,0,10,0">
         <Grid.RowDefinitions>

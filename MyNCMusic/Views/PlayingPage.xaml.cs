@@ -1,6 +1,9 @@
 ﻿using MyNCMusic.Model;
+using MyNCMusic.MyUserControl;
+using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -8,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -28,16 +33,11 @@ namespace MyNCMusic.Views
     {
         SongsItem _songsItem;
         AlbumRoot _albumRoot;
-        //int currentPivotState = 0;//0歌词 1评论 2相似
-        //bool isLoadedComment = false;
-        //public static SolidColorBrush mainSolidColorBrush;
         List<LyricStr> lyricStrs;
-        static Object locker;
+        bool isLoad=false;
         public PlayingPage()
         {
             lyricStrs = new List<LyricStr>();
-            //mainSolidColorBrush = MainPage.mainSolidColorBrush;
-            locker = new object();
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
@@ -52,23 +52,41 @@ namespace MyNCMusic.Views
             //    return;
             //_songsItem = songsItem_temp;
             //_albumRoot = albumRoot_temp;
-            if(_songsItem==null)//仅第一次加载改页面才主动调用LoadLayout更新界面，其他时候都是由mainpage控制
+            if(!isLoad)//仅第一次加载改页面才主动调用LoadLayout更新界面，其他时候都是由mainpage控制
                 LoadLayout();
         }
-        public async void LoadLayout()
+        public void LoadLayout()
         {
+            isLoad = true;
             ProgressBar_loadLyric.Visibility = Visibility.Visible;
-            _albumRoot = (Application.Current as App).myMainPage._album;
-            _songsItem = MainPage.songsItem;
-            Image_album.Source = (Application.Current as App).myMainPage._AlbumBitmapImage;
+            if (PlayingService.IsPlayingSong)
+                UpDateSong();
+            else
+                UpDateRadio();
+            ProgressBar_loadLyric.Visibility = Visibility.Collapsed;
+        }
+
+        void UpDateRadio()
+        {
+            Image_album.Source = PlayingService.PlayingAlbumBitmapImage;
+            Button_albumName.Content = PlayingService.PlayingRadio.Radio.Name;
+            
+            ListBox_artists.ItemsSource = null;
+            Button_artistName.Content = PlayingService.PlayingRadio.Dj.Nickname;
+            TextBlock_songName.Text = PlayingService.PlayingRadio.Name;
+            ListBox_lyric.ItemsSource = null;
+            UpDateRadioComment(PlayingService.PlayingRadio.Id);
+            ListBox_simiSongs.ItemsSource = null;//相似不可用
+
+        }
+
+        async void UpDateSong()
+        {
+            _albumRoot = PlayingService.PlayingAlbum;
+            _songsItem = PlayingService.PlayingSong;
+            Image_album.Source = PlayingService.PlayingAlbumBitmapImage;
             Button_albumName.Content = _albumRoot.album.name;
             string name = "";
-            //for(int i=0;i< _albumRoot.album.artists.Count;i++)
-            //{
-            //    if (i != 0)
-            //        name += "/";
-            //    name += _albumRoot.album.artists[i].name;
-            //}
             for (int i = 0; i < _songsItem.ar.Count; i++)
             {
                 if (i != 0)
@@ -77,66 +95,32 @@ namespace MyNCMusic.Views
             }
             ListBox_artists.ItemsSource = _songsItem.ar;
             Button_artistName.Content = name;
-            TextBlock_songName.Text = _songsItem.name;
-            LyricRoot lyricRoot = await Task.Run(() => MyClassManager.GetLyric(_songsItem.id));
+            TextBlock_songName.Text = _songsItem.Name;
+            LyricRoot lyricRoot = await Task.Run(() => LyricService.GetLyric(_songsItem.Id));
             if (lyricRoot == null)
             {
                 ListBox_lyric.ItemsSource = null;
                 return;
             }
-            lyricStrs = MyClassManager.GetLyricStrs(lyricRoot);
-            if(lyricStrs != null)
+            lyricStrs = LyricService.GetLyricStrs(lyricRoot);
+            if (lyricStrs != null)
             {
-                if(lyricStrs.Count==0)
+                if (lyricStrs.Count == 0)
                 {
                     DateTime dateTime = DateTime.Now;
-                    lyricStrs.Add(new LyricStr() { DateTime = dateTime, Original = "纯音乐，无歌词" });
+                    lyricStrs.Add(new LyricStr() { DateTime = dateTime, Original = "无歌词" });
                 }
-                else
-                    ListBox_lyric.ScrollIntoView(lyricStrs.First());
                 ListBox_lyric.ItemsSource = lyricStrs;
+                ListBox_lyric.ScrollIntoView(lyricStrs.First());
             }
-            //if (currentPivotState == 1)
-            //{
-            //    UpDateComment();
-            //    ListBox_simiSongs.ItemsSource = null;
-            //}
-            //else if (currentPivotState == 2)
-            //{
-            //    UpDateSimiSongs();
-            //    ListBox_HotComment.ItemsSource = null;
-            //    ListBox_allComment.ItemsSource = null;
-            //    TextBlock_commentCount.Text = "";
-            //}
             UpDateComment();
             UpDateSimiSongs();
-            ProgressBar_loadLyric.Visibility = Visibility.Collapsed;
-        }
-
-        private void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //PivotItem pivotItem = (PivotItem)((Pivot)sender).SelectedItem;
-            //if(pivotItem.Tag.ToString() == "0")
-            //    currentPivotState = 0;
-            //else if (pivotItem.Tag.ToString() == "1")
-            //{
-            //    currentPivotState = 1;
-            //    if (ListBox_HotComment.ItemsSource != null)
-            //        return;
-            //    UpDateComment();
-            //}
-            //else if(pivotItem.Tag.ToString() == "2")
-            //{
-            //    currentPivotState = 2;
-            //    if(ListBox_simiSongs.ItemsSource==null)
-            //        UpDateSimiSongs();
-            //}
         }
 
         async void UpDateComment()
         {
             ProgressBar_loadComment.Visibility = Visibility.Visible;
-            CommentRoot commentRoot = await Task.Run(() => MyClassManager.GetSongsComment(_songsItem.id));
+            CommentRoot commentRoot = await Task.Run(() => CommentService.GetSongsComment(_songsItem.Id));
             if (commentRoot == null)
             {
                 ProgressBar_loadComment.Visibility = Visibility.Collapsed;
@@ -148,7 +132,25 @@ namespace MyNCMusic.Views
             ListBox_HotComment.ItemsSource = commentRoot.hotComments;
             ListBox_allComment.ItemsSource = commentRoot.comments;
             TextBlock_commentCount.Text = commentRoot.total.ToString();
-            //ListBox_HotComment.ScrollIntoView(commentRoot.hotComments.First());
+            ScrollViewer_comment.ChangeView(null, 0, null);
+            ProgressBar_loadComment.Visibility = Visibility.Collapsed;
+        }
+
+        async void UpDateRadioComment(long id)
+        {
+            ProgressBar_loadComment.Visibility = Visibility.Visible;
+            CommentRoot commentRoot = await Task.Run(() => CommentService.GetRadioComment(id));
+            if (commentRoot == null)
+            {
+                ProgressBar_loadComment.Visibility = Visibility.Collapsed;
+                ListBox_HotComment.ItemsSource = null;
+                ListBox_allComment.ItemsSource = null;
+                TextBlock_commentCount.Text = "";
+                return;
+            }
+            ListBox_HotComment.ItemsSource = commentRoot.hotComments;
+            ListBox_allComment.ItemsSource = commentRoot.comments;
+            TextBlock_commentCount.Text = commentRoot.total.ToString();
             ScrollViewer_comment.ChangeView(null, 0, null);
             ProgressBar_loadComment.Visibility = Visibility.Collapsed;
         }
@@ -156,19 +158,25 @@ namespace MyNCMusic.Views
         async void UpDateSimiSongs()
         {
             ProgressBar_loadSimiSongs.Visibility = Visibility.Visible;
-            SimiSongsRoot simiSongsRoot =await Task.Run(()=> MyClassManager.GetSimiSongs(_songsItem.id));
+            SimiSongsRoot simiSongsRoot =await Task.Run(()=> SongService.GetSimiSongs(_songsItem.Id));
             if (simiSongsRoot == null)
             {
                 ProgressBar_loadSimiSongs.Visibility = Visibility.Collapsed;
                 ListBox_simiSongs.ItemsSource = null;
                 return;
             }
+            //此处获取的专辑信息为album，需手动赋值给al，歌手信息为artistsm，需改为ar
+            foreach (var temp in simiSongsRoot.songs)
+            {
+                temp.al = temp.album;
+                temp.ar = temp.artists;
+            }
             //判断是否为喜欢歌曲
             if (MainPage.favoriteSongsRoot != null)
             {
                 foreach (var temp in simiSongsRoot.songs)
                 {
-                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.id)) != 0)
+                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
                         temp.isFavorite = true;
                 }
             }
@@ -188,31 +196,8 @@ namespace MyNCMusic.Views
             if (songsItem == null)
                 return;
             ProgressBar_loadSimiSongs.Visibility = Visibility.Visible;
-            MusicDetailRoot musicDetailRoot=await Task.Run(()=>MyClassManager.GetMusicDetail(songsItem.id.ToString()));
-            if (musicDetailRoot == null || musicDetailRoot.songs == null)
-            {
-                ProgressBar_loadSimiSongs.Visibility = Visibility.Collapsed;
-                return;
-            }
-            
-            SongUrlRoot songUrlRoot = await Task.Run(() => MyClassManager.GetMusicUrl(songsItem.id));
-            if (songUrlRoot == null)
-            {
-                ProgressBar_loadSimiSongs.Visibility = Visibility.Collapsed;
-                return;
-            }
-            //修改播放列表
-            if (MainPage.PlayingListId != _songsItem.id+3)//已在播放此歌单，仅修改播放歌曲，否则，重置播放列表及历史记录
-            {
-                (Application.Current as App).myMainPage.currentPlayList.Clear();
-                foreach (var temp in ListBox_simiSongs.ItemsSource as List<SongsItem>)
-                    (Application.Current as App).myMainPage.currentPlayList.Add(temp);
-                (Application.Current as App).myMainPage.playHistoryIndex.Clear();
-                MainPage.PlayingListId = _songsItem.id + 3;
-            }
-            //修改mainpage以触发修改正在播放的音乐
-            (Application.Current as App).myMainPage.ChnagePlayingSong(musicDetailRoot.songs.First(), songUrlRoot);
-            ProgressBar_loadSimiSongs.Visibility = Visibility.Collapsed;
+            PlayingService.PlayingListId = songsItem.al.id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, ListBox_simiSongs.ItemsSource as List<SongsItem>, songsItem);
         }
 
         /// <summary>
@@ -321,15 +306,20 @@ namespace MyNCMusic.Views
 
         private void Button_albumName_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(AlbumDetail), _albumRoot);
+            if(PlayingService.IsPlayingSong)
+                Frame.Navigate(typeof(AlbumDetail), _albumRoot);
+            else
+            {
+                Frame.Navigate(typeof(RadioDetail), PlayingService.PlayingRadioList);
+            }
         }
 
         private async void Button_artistName_Click(object sender, RoutedEventArgs e)
         {
-            if(_songsItem.ar.Count==1)
+            if(PlayingService.IsPlayingSong&&_songsItem.ar.Count==1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(_songsItem.ar.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(_songsItem.ar.First().id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -339,15 +329,130 @@ namespace MyNCMusic.Views
 
         private async void ListBox_artists_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ArItem arItem = ((ListBox)sender).SelectedItem as ArItem;
-            if (arItem == null)
+            if (PlayingService.IsPlayingSong)
+            {
+                Artist arItem = ((ListBox)sender).SelectedItem as Artist;
+                if (arItem == null)
+                    return;
+                ProgressBar_loading.Visibility = Visibility.Visible;
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(arItem.id));
+                ProgressBar_loading.Visibility = Visibility.Collapsed;
+                if (artistBaseDetailRoot == null)
+                    return;
+                Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
+            }
+        }
+
+        private void Button_CloseAddToPlaylistDialog_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog_CreatedPlaylist.Hide();
+        }
+
+        private async void Button_AddToPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            if (!PlayingService.IsPlayingSong)
                 return;
-            ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => MyClassManager.GetArtistBaseDetail(arItem.id));
-            ProgressBar_loading.Visibility = Visibility.Collapsed;
-            if (artistBaseDetailRoot == null)
-                return;
-            Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
+            if(PlayingService.PlaylistItems_Created==null&& PlayingService.PlaylistItems_Subscribed==null)
+            {
+                PlayingService.PlaylistItems_Created = new ObservableCollection<PlaylistItem>();
+                PlayingService.PlaylistItems_Subscribed = new ObservableCollection<PlaylistItem>();
+                MyPlaylistRoot myPlaylistRoot = await Task.Run(() => PlaylistService.GetMyPlaylist());
+                foreach (var temp in myPlaylistRoot.playlist)
+                {
+                    if (temp.subscribed == "true")
+                        PlayingService.PlaylistItems_Subscribed.Add(temp);
+                    else
+                        PlayingService.PlaylistItems_Created.Add(temp);
+                }
+                myPlaylistRoot = null;
+            }
+            ListBox_CreatedPlaylist.ItemsSource = PlayingService.PlaylistItems_Created;
+            await ContentDialog_CreatedPlaylist.ShowAsync();
+        }
+
+        private void ListBox_CreatedPlaylist_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var playlist = ((ListBox)sender).SelectedItem as PlaylistItem;
+            if (PlaylistService.AddToPlaylist(playlist.id, _songsItem.Id))
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("已添加到歌单", "\xF78C", Colors.MediumSeaGreen);
+                notifyPopup.Show();
+                playlist.coverImgUrl = _albumRoot.album.picUrl;
+                ContentDialog_CreatedPlaylist.Hide();
+            }
+            else
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("添加失败", "\xF78A");
+                notifyPopup.Show();
+            }
+        }
+
+        private void Button_AddNewPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog_CreatedPlaylist.Closed += ContentDialog_CreatedPlaylist_Closed;
+            ContentDialog_CreatedPlaylist.Hide();
+        }
+
+        private async void ContentDialog_CreatedPlaylist_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            ContentDialog_CreatedPlaylist.Closed -= ContentDialog_CreatedPlaylist_Closed;
+            await ContentDialog_AddNewPlaylist.ShowAsync();
+        }
+
+        private void Button_CancelNewPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialog_AddNewPlaylist.Closed += ContentDialog_AddNewPlaylist_Closed;
+            ContentDialog_AddNewPlaylist.Hide();
+        }
+
+        private async void ContentDialog_AddNewPlaylist_Closed(ContentDialog sender, ContentDialogClosedEventArgs args)
+        {
+            ContentDialog_AddNewPlaylist.Closed -= ContentDialog_AddNewPlaylist_Closed;
+            await ContentDialog_CreatedPlaylist.ShowAsync();
+        }
+
+        private void Button_ConfirmNewPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            PlayListDetailRoot playListDetailRoot=PlaylistService.AddNewPlaylist((bool)CheckBox_Privacy.IsChecked, TextBox_PlaylistName.Text);
+            if(playListDetailRoot.code!=200)
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("创建失败", "\xF78A");
+                notifyPopup.Show();
+            }
+            else
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("创建成功", "\xF78C", Colors.MediumSeaGreen);
+                notifyPopup.Show();
+                PlayingService.PlaylistItems_Created.Insert(1, playListDetailRoot.playlist);
+                ContentDialog_AddNewPlaylist.Closed += ContentDialog_AddNewPlaylist_Closed;
+                ContentDialog_AddNewPlaylist.Hide();
+            }
+        }
+
+        private void TextBox_PlaylistName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            if(sender.Text.Length>20)
+            {
+                sender.Text = sender.Text.Substring(0, 20);
+            }
+        }
+
+        private void Button_FullScreenMode_Click(object sender, RoutedEventArgs e)
+        {
+            ApplicationView view = ApplicationView.GetForCurrentView();
+            bool isInFullScreenMode = view.IsFullScreenMode;
+            if (isInFullScreenMode)
+            {
+                view.ExitFullScreenMode();
+                TextBlock_FullScreenModeTip.Text = "全屏";
+                FontIcon_FullScreenMode.Glyph = "\xE740";
+            }
+            else
+            {
+                view.TryEnterFullScreenMode();
+                TextBlock_FullScreenModeTip.Text = "退出全屏";
+                FontIcon_FullScreenMode.Glyph = "\xE73F";
+            }
         }
     }
 }

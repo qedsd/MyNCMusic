@@ -6,19 +6,20 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:MyNCMusic.Model"
+    xmlns:converter="using:MyNCMusic.Helper"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="Transparent"
     Foreground="{x:Bind local:Home.mainSolidColorBrush}">
 
     <Page.Resources>
-        <model:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
-        <model:GetDt x:Key="GetDt"/>
-        <model:GetAlia x:Key="GetAlia"/>
-        <model:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
-        <model:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
-        <model:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <model:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
+        <converter:GetDt x:Key="GetDt"/>
+        <converter:GetAlia x:Key="GetAlia"/>
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
     </Page.Resources>
     <!--<Grid>
         <Grid.Background>
@@ -80,7 +81,7 @@
         <Grid.Background>
             <AcrylicBrush BackgroundSource="Backdrop"
                           TintColor="Black"
-                          TintOpacity="0.1"
+                          TintOpacity="0.4"
                           x:Name="AcrylicBrush_mainFrame"/>
         </Grid.Background>
         <Grid Margin="50,50,20,0">
@@ -90,7 +91,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <ProgressBar x:Name="ProgressBar_loading" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Right"
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0" HorizontalAlignment="Right"
                     Grid.Row="1">
                 <Button x:Name="Button_compactOverlay"
                     Style="{StaticResource ButtonStyle_tran}"
@@ -100,44 +101,64 @@
                         ToolTipService.ToolTip="置顶模式">
                     <FontIcon Glyph="&#xE173;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
                 </Button>
-                <Button x:Name="Button_back"
+                <!--<Button x:Name="Button_back"
                     Style="{StaticResource ButtonStyle_tran}"
                 Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                     VerticalAlignment="Center"
                     Click="Button_back_Click">
-                <FontIcon Glyph="&#xE1D8;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
-            </Button>
-        </StackPanel>
-        <Grid x:Name="Grid_header" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Image x:Name="Image_album"
-                   Height="200"
-                   Width="200"
+                    <FontIcon Glyph="&#xE1D8;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
+                </Button>-->
+                <Button x:Name="Button_FullScreenMode"
+                    Style="{StaticResource ButtonStyle_tran}"
+                Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    VerticalAlignment="Center"
+                    Click="Button_FullScreenMode_Click"
+                        >
+                    <ToolTipService.ToolTip>
+                        <TextBlock Name="TextBlock_FullScreenModeTip" Text="全屏"/>
+                    </ToolTipService.ToolTip>
+                    <FontIcon Glyph="&#xE740;" FontFamily="Segoe MDL2 Assets" FontSize="16" Name="FontIcon_FullScreenMode"/>
+                </Button>
+            </StackPanel>
+            <Grid x:Name="Grid_header" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Width="190" Height="190">
+                    <Grid.Background>
+                        <AcrylicBrush BackgroundSource="Backdrop"
+                          TintColor="DarkGray"
+                          TintOpacity="0"
+                          />
+                    </Grid.Background>
+                </Grid>
+                <Image x:Name="Image_album"
+                   Height="180"
+                   Width="180"
                    Grid.Column="0"/>
-            <Grid Grid.Column="1" Margin="20,20,0,0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="TextBlock_songName"
+                <Grid Grid.Column="1" Margin="20,20,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock x:Name="TextBlock_songName"
                        TextWrapping="WrapWholeWords"
                        FontSize="24"/>
-                <StackPanel Orientation="Horizontal" Grid.Row="2">
-                    <TextBlock Text="专辑:" VerticalAlignment="Center"/>
-                    <Button Content="" 
+                    <StackPanel Orientation="Horizontal" Grid.Row="2">
+                        <TextBlock Text="专辑:" VerticalAlignment="Center" Opacity="0.7"/>
+                        <Button Content="" 
                             Name="Button_albumName"
                             Style="{StaticResource ButtonStyle_tran}"
                              VerticalAlignment="Center"
                                 Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                             Padding="4,0,0,0"
                             Click="Button_albumName_Click"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"  Grid.Row="1">
-                    <TextBlock Text="歌手:" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"  Grid.Row="1">
+                        <TextBlock Text="歌手:" VerticalAlignment="Center" Opacity="0.7"/>
                         <Button Content="" 
                             Name="Button_artistName"
                             Style="{StaticResource ButtonStyle_tran}" VerticalAlignment="Center"
@@ -148,7 +169,7 @@
                                 <Flyout>
                                     <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged">
                                         <ListBox.ItemTemplate>
-                                            <DataTemplate x:DataType="model:ArItem">
+                                            <DataTemplate x:DataType="model:Artist">
                                                 <TextBlock Text="{x:Bind name}"/>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -156,15 +177,29 @@
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
-                </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Grid.Row="3">
+                        <Button x:Name="Button_AddToPlaylist" Style="{StaticResource ButtonStyle_tran}" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                                VerticalAlignment="Bottom"
+                                HorizontalAlignment="Right"
+                                Click="Button_AddToPlaylist_Click"
+                                Padding="0">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xF61B;" FontFamily="Segoe MDL2 Assets" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock Text="收藏"  FontSize="13" Margin="10,0,0,0"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
 
+                </Grid>
             </Grid>
-        </Grid>
-        <Pivot Grid.Row="2" SelectionChanged="Pivot_SelectionChanged">
-            <PivotItem Tag="0">
-                <PivotItem.Header>
+            <Pivot Grid.Row="2">
+                <PivotItem Tag="0">
+                    <PivotItem.Header>
                         <TextBlock Text="歌词" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                </PivotItem.Header>
+                    </PivotItem.Header>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -175,12 +210,13 @@
                          Background="Transparent"
                              SelectionMode="Extended"
                                  Grid.Row="1"
-                                 SingleSelectionFollowsFocus="True">
-                            <ListBox.ItemContainerStyle>
+                                 SingleSelectionFollowsFocus="True"
+                                 ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+                            <!--<ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
                                 </Style>
-                            </ListBox.ItemContainerStyle>
+                            </ListBox.ItemContainerStyle>-->
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="model:LyricStr">
                                     <StackPanel>
@@ -191,18 +227,18 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
-                    
+
                 </PivotItem>
-            <PivotItem Tag="1">
-                <PivotItem.Header>
+                <PivotItem Tag="1">
+                    <PivotItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="评论" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                             <TextBlock Text="(" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                             <TextBlock  FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}" Name="TextBlock_commentCount"/>
                             <TextBlock Text=")" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                         </StackPanel>
-                    
-                </PivotItem.Header>
+
+                    </PivotItem.Header>
                     <ScrollViewer x:Name="ScrollViewer_comment">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -211,34 +247,30 @@
                             </Grid.RowDefinitions>
                             <ProgressBar x:Name="ProgressBar_loadComment" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
                             <Grid Grid.Row="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="热评"
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="热评"
                                        Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                        />
                                 <Rectangle Height="1" Fill="{x:Bind local:Home.mainSolidColorBrush}" Grid.Row="1" Margin="0,10"/>
-                            <ListBox x:Name="ListBox_HotComment"
+                                <ListBox x:Name="ListBox_HotComment"
                              Background="Transparent"
-                                      Grid.Row="2">
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="model:CommentsItem">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <controls:ImageEx   HorizontalAlignment="Center" 
+                                      Grid.Row="2"
+                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="model:CommentsItem">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <controls:ImageEx   HorizontalAlignment="Center" 
                                                         VerticalAlignment="Top"
                                                         Stretch="Fill" 
                                                         Width="48"
@@ -246,46 +278,42 @@
                                                         CornerRadius="999"
                                                         Source="{x:Bind user.avatarUrl,Converter={StaticResource ReturnImageUriWithParam_48}}"
                                                         />
-                                            <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                                <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
+                                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
+                                                    <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
                                                 Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                 Padding="0"/>
-                                                <TextBlock Text="{x:Bind content}"
+                                                    <TextBlock Text="{x:Bind content}"
                                                    Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                    Margin="0,4,0,0"
                                                    TextWrapping="WrapWholeWords"/>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                    <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
                                                        Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                        VerticalAlignment="Center"/>
-                                                    <TextBlock Text="{x:Bind likedCount}"
+                                                        <TextBlock Text="{x:Bind likedCount}"
                                                        Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                        VerticalAlignment="Center"
                                                        Margin="4,0,0,0"/>
+                                                    </StackPanel>
                                                 </StackPanel>
-                                            </StackPanel>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
                                 <TextBlock Text="最新" Margin="0,20,0,0"  Grid.Row="3" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                                 <Rectangle Height="1" Fill="{x:Bind local:Home.mainSolidColorBrush}"  Grid.Row="4" Margin="0,10"/>
-                            <ListBox x:Name="ListBox_allComment"
+                                <ListBox x:Name="ListBox_allComment"
                              Background="Transparent"
-                                      Grid.Row="15">
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate x:DataType="model:CommentsItem">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <controls:ImageEx   HorizontalAlignment="Center" 
+                                      Grid.Row="15"
+                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="model:CommentsItem">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <controls:ImageEx   HorizontalAlignment="Center" 
                                                         VerticalAlignment="Top"
                                                         Stretch="Fill" 
                                                         Width="48"
@@ -293,36 +321,36 @@
                                                         CornerRadius="999"
                                                         Source="{x:Bind user.avatarUrl}"
                                                         />
-                                            <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                                <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
+                                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
+                                                    <Button Content="{x:Bind user.nickname}" Style="{StaticResource ButtonStyle_tran}"
                                                 Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                 Padding="0"/>
-                                                <TextBlock Text="{x:Bind content}"
+                                                    <TextBlock Text="{x:Bind content}"
                                                    Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                    Margin="0,4,0,0"
                                                    TextWrapping="WrapWholeWords"/>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                                    <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                        <TextBlock Text="&#xE19F;" FontFamily="Segoe MDL2 Assets"
                                                        Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                        VerticalAlignment="Center"/>
-                                                    <TextBlock Text="{x:Bind likedCount}"
+                                                        <TextBlock Text="{x:Bind likedCount}"
                                                        Foreground="{x:Bind local:Home.mainSolidColorBrush}"
                                                        VerticalAlignment="Center"
                                                        Margin="4,0,0,0"/>
+                                                    </StackPanel>
                                                 </StackPanel>
-                                            </StackPanel>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Grid>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </Grid>
                         </Grid>
                     </ScrollViewer>
                 </PivotItem>
-            <PivotItem Tag="2">
-                <PivotItem.Header>
+                <PivotItem Tag="2">
+                    <PivotItem.Header>
                         <TextBlock Text="相似歌曲" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                </PivotItem.Header>
+                    </PivotItem.Header>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -354,7 +382,7 @@
                                         <TextBlock Text="&#x2764;" FontFamily="Segoe UI Symbol" Foreground="PaleVioletRed" VerticalAlignment="Center"
                                    Visibility="{Binding isFavorite,Converter={StaticResource GetFavoriteIconVisibility}}"/>
                                         <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                            <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                                             <TextBlock Text="{x:Bind alia,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />
                                         </StackPanel>
                                         <Button Content="{x:Bind artists,Converter={StaticResource GetArNames_ArtistsItem}}" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}" Style="{StaticResource ButtonStyle_tran}"/>
@@ -365,9 +393,101 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                     </Grid>
-                   
+
                 </PivotItem>
-        </Pivot>
-    </Grid>
+            </Pivot>
+        </Grid>
+        <ContentDialog x:Name="ContentDialog_CreatedPlaylist"
+                       >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="32"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="添加到歌单" VerticalAlignment="Center"/>
+                    <Button x:Name="Button_CloseAddToPlaylistDialog" Click="Button_CloseAddToPlaylistDialog_Click"
+                            Style="{StaticResource ButtonStyle_tran}"
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Padding="0">
+                        <SymbolIcon Symbol="Cancel"/>
+                    </Button>
+                </Grid>
+                <ListBox Grid.Row="1" Name="ListBox_CreatedPlaylist"
+                             Margin="0,4"
+                         MaxHeight="360"
+                         MaxWidth="360"
+                         Background="White"
+                         Tapped="ListBox_CreatedPlaylist_Tapped">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="model:PlaylistItem">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="48"/>
+                                    <ColumnDefinition Width="*"/>
+                                    
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_48}}" Height="48" Width="48"/>
+                                <StackPanel VerticalAlignment="Center" Grid.Column="1" Margin="10,0,0,0">
+                                    <TextBlock Text="{x:Bind name}"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{x:Bind trackCount}" Foreground="Gray"/>
+                                        <TextBlock Text=" 首音乐" Foreground="Gray"/>
+                                    </StackPanel>
+
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button x:Name="Button_AddNewPlaylist" Style="{StaticResource ButtonStyle_tran}"
+                                HorizontalAlignment="Center"
+                                Click="Button_AddNewPlaylist_Click"
+                                Padding="0,14,0,0"
+                                        Grid.Row="2">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE109;" FontFamily="Segoe MDL2 Assets" FontSize="18" VerticalAlignment="Center"/>
+                            <TextBlock Text="新建歌单"  FontSize="13" Margin="10,0,0,0"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
+            </Grid>
+        </ContentDialog>
+        <ContentDialog x:Name="ContentDialog_AddNewPlaylist"
+                       >
+            <StackPanel>
+                <TextBlock Text="新建歌单" Margin="0,10" FontSize="16"/>
+                <TextBox PlaceholderText="歌单标题" x:Name="TextBox_PlaylistName" BorderThickness="0,0,0,1"
+                         Margin="0,10" 
+                         TextChanging="TextBox_PlaylistName_TextChanging"/>
+                <CheckBox Content="设置为隐私歌单"
+                          x:Name="CheckBox_Privacy"
+                          />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="Button_CancelNewPlaylist"
+                            Background="Transparent"
+                            Click="Button_CancelNewPlaylist_Click"
+                            Content="取消"
+                            Style="{StaticResource ButtonStyle_tran}"
+                            Margin="10,0"/>
+                    <Button x:Name="Button_ConfirmNewPlaylist"
+                            Click="Button_ConfirmNewPlaylist_Click"
+                            Content="创建"
+                            Style="{StaticResource ButtonStyle_tran}"/>
+                </StackPanel>
+            </StackPanel>
+        </ContentDialog>
     </Grid>
 </Page>

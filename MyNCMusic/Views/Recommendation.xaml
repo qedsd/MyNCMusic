@@ -6,21 +6,22 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:model="using:MyNCMusic.Model"
+    xmlns:converter="using:MyNCMusic.Helper"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     mc:Ignorable="d"
     Background="Transparent"
     Foreground="{x:Bind local:Home.mainSolidColorBrush}">
 
     <Page.Resources>
-        <model:GetArNames x:Key="GetArNames"/>
-        <model:GetDt x:Key="GetDt"/>
-        <model:GetAlia x:Key="GetAlia"/>
-        <model:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
-        <model:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <model:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
-        <model:ReturnForegroundIsPlaying x:Key="ReturnForegroundIsPlaying"/>
-        <model:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
-        <model:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+        <converter:GetArNames x:Key="GetArNames"/>
+        <converter:GetDt x:Key="GetDt"/>
+        <converter:GetAlia x:Key="GetAlia"/>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:ReturnForegroundIsPlaying x:Key="ReturnForegroundIsPlaying"/>
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
     </Page.Resources>
     
     <Grid Margin="10,0,4,0">
@@ -124,7 +125,7 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>-->
-                                        <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                                         <TextBlock Text="{x:Bind alia,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />
                                     </StackPanel>
 
@@ -135,7 +136,7 @@
                                                 <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged"
                                                          ItemsSource="{x:Bind ar}">
                                                     <ListBox.ItemTemplate>
-                                                        <DataTemplate x:DataType="model:ArItem">
+                                                        <DataTemplate x:DataType="model:Artist">
                                                             <TextBlock Text="{x:Bind name}"/>
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>
@@ -248,7 +249,7 @@
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>-->
-                                        <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}">
+                                        <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}">
                                             <!--<TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground" Value="{x:Bind isPlaying,Converter={StaticResource ReturnForegroundIsPlaying}}"/>
@@ -264,7 +265,7 @@
                                                 <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged"
                                                          ItemsSource="{x:Bind ar}">
                                                     <ListBox.ItemTemplate>
-                                                        <DataTemplate x:DataType="model:ArItem">
+                                                        <DataTemplate x:DataType="model:Artist">
                                                             <TextBlock Text="{x:Bind name}"/>
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>
@@ -330,7 +331,7 @@
                                             <TextBlock Text="&#x2764;" FontFamily="Segoe UI Symbol" Foreground="PaleVioletRed" VerticalAlignment="Center"
                                    Visibility="{Binding isFavorite,Converter={StaticResource GetFavoriteIconVisibility}}"/>
                                             <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                                <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                                <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
                                                 <TextBlock Text="{x:Bind alia,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />
                                             </StackPanel>
                                             <Button Content="{x:Bind ar,Converter={StaticResource GetArNames}}" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}" Style="{StaticResource ButtonStyle_tran}"
@@ -340,7 +341,7 @@
                                                         <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged"
                                                          ItemsSource="{x:Bind ar}">
                                                             <ListBox.ItemTemplate>
-                                                                <DataTemplate x:DataType="model:ArItem">
+                                                                <DataTemplate x:DataType="model:Artist">
                                                                     <TextBlock Text="{x:Bind name}"/>
                                                                 </DataTemplate>
                                                             </ListBox.ItemTemplate>
