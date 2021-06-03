@@ -1,4 +1,5 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.Model;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
@@ -452,6 +453,19 @@ namespace MyNCMusic.Views
                 view.TryEnterFullScreenMode();
                 TextBlock_FullScreenModeTip.Text = "退出全屏";
                 FontIcon_FullScreenMode.Glyph = "\xE73F";
+            }
+        }
+
+
+        private void ListBox_Comment_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            if (e.OriginalSource.GetType() == typeof(TextBlock))
+            {
+                OtherHelper.CopyTextToClipboard((e.OriginalSource as TextBlock).Text);
+            }
+            else if(e.OriginalSource.GetType() == typeof(Windows.UI.Xaml.Shapes.Rectangle))
+            {
+                OtherHelper.CopyTextToClipboard(((e.OriginalSource as Windows.UI.Xaml.Shapes.Rectangle).DataContext as CommentsItem).content);
             }
         }
     }

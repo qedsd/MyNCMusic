@@ -906,9 +906,9 @@ namespace MyNCMusic.Model
         /// </summary>
         public string type { get; set; }
         /// <summary>
-        /// 
+        /// 21.3.2 4.0.8版本api报错，由原本int改为double，不知道这玩意用来干嘛的
         /// </summary>
-        public int gain { get; set; }
+        public double gain { get; set; }
         /// <summary>
         /// 
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using MyNCMusic.Model;
+using MyNCMusic.MyUserControl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
@@ -238,6 +240,31 @@ namespace MyNCMusic.Helper
             backgroundBrush.ImageSource = await be.ApplyFilter(10);//高斯模糊等级可以自己定义
             //取主色调并应用到TagsTextBlock
             return new SolidColorBrush(GetColor.GetMajorColor(wb));
+        }
+
+        /// <summary>
+        /// 复制txt到粘贴板
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static bool CopyTextToClipboard(string str)
+        {
+            try
+            {
+                //创建一个数据包
+                DataPackage dataPackage = new DataPackage();//设置创建包里的文本内容
+                dataPackage.SetText(str);//把数据包放到剪贴板里
+                Clipboard.SetContent(dataPackage);
+                NotifyPopup notifyPopup = new NotifyPopup("已复制", "\xF78C", Colors.MediumSeaGreen);
+                notifyPopup.Show();
+                return true;
+            }
+            catch (Exception er) 
+            {
+                NotifyPopup notify = new NotifyPopup(er.Message, "\xE10A");
+                notify.Show();
+                return false; 
+            }
         }
     }
 }

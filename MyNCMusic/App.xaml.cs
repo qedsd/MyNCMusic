@@ -93,6 +93,8 @@ namespace MyNCMusic
             if (myMainPage == null || PlayingService.PlayDurationStopwatch == null)
                 return;
             myMainPage.playDurationStopwatch.Stop();
+            if (PlayingService.PlayingSong == null)
+                return;
             System.Threading.Tasks.Task.Run(() => SongService.MarkPlayDuration(PlayingService.PlayingSong.Id, PlayingService.PlayingListId, PlayingService.PlayDurationStopwatch.ElapsedMilliseconds / 1000));
         }
 

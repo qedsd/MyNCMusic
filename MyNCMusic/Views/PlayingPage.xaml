@@ -262,7 +262,8 @@
                                 <ListBox x:Name="ListBox_HotComment"
                              Background="Transparent"
                                       Grid.Row="2"
-                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}"
+                                         RightTapped="ListBox_Comment_RightTapped">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="model:CommentsItem">
                                             <Grid>
@@ -305,7 +306,8 @@
                                 <ListBox x:Name="ListBox_allComment"
                              Background="Transparent"
                                       Grid.Row="15"
-                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+                                         ItemContainerStyle="{StaticResource ListBoxItemStyle1}"
+                                         RightTapped="ListBox_Comment_RightTapped">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate x:DataType="model:CommentsItem">
                                             <Grid>

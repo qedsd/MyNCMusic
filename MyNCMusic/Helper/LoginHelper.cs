@@ -17,13 +17,15 @@ namespace MyNCMusic.Services
         /// <returns></returns>
         public static LoginRoot LoginAccount()
         {
-            if (Http.cookies.GetCookies(new Uri(ConfigService.ApiUri + "/login")).Count != 0)//存在cookies，检查登陆状态
+            if (Http.cookies!=null&&Http.cookies.GetCookies(new Uri(ConfigService.ApiUri + "/login")).Count != 0)//存在cookies，检查登陆状态
             {
                 var status = GetLoginStatus();
-                if (status != null && status.Data.code == 200)
+                if (status != null && status.Data.account !=null)
                     return status.Data;
             }
-                string result = null;
+            if (Http.cookies == null)
+                Http.cookies = new System.Net.CookieContainer();
+            string result = null;
                 if (ConfigService.PhoneOrEmail.Contains('@'))
                 {
                     result = Http.Get(ConfigService.ApiUri + @"/login?email=" + ConfigService.PhoneOrEmail + "&md5_password=" + OtherHelper.Encrypt(ConfigService.Password));
