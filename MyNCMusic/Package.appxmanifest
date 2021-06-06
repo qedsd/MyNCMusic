@@ -12,7 +12,7 @@
   <Identity
     Name="QEDSD.MyNCMusic"
     Publisher="CN=QEDSD"
-    Version="1.0.2.0" />
+    Version="1.0.3.0" />
 
   <mp:PhoneIdentity PhoneProductId="211dfa3c-48a9-4219-ae7f-0cf2f059a970" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 

@@ -17,11 +17,18 @@ namespace MyNCMusic.Services
         /// <returns></returns>
         public static LoginRoot LoginAccount()
         {
-            if (Http.cookies!=null&&Http.cookies.GetCookies(new Uri(ConfigService.ApiUri + "/login")).Count != 0)//存在cookies，检查登陆状态
+            try
             {
-                var status = GetLoginStatus();
-                if (status != null && status.Data.account !=null)
-                    return status.Data;
+                if (Http.cookies != null && Http.cookies.GetCookies(new Uri(ConfigService.ApiUri + "/login")) != null && Http.cookies.GetCookies(new Uri(ConfigService.ApiUri + "/login")).Count != 0)//存在cookies，检查登陆状态
+                {
+                    var status = GetLoginStatus();
+                    if (status != null && status.Data.account != null)
+                        return status.Data;
+                }
+            }
+            catch(NullReferenceException)//上一次请求出错后记录了错误的cookie，再次读取会引发null错误
+            {
+                Http.cookies = null;
             }
             if (Http.cookies == null)
                 Http.cookies = new System.Net.CookieContainer();
