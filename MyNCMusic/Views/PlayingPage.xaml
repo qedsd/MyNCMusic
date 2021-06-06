@@ -136,7 +136,8 @@
                 <Image x:Name="Image_album"
                    Height="180"
                    Width="180"
-                   Grid.Column="0"/>
+                   Grid.Column="0"
+                       />
                 <Grid Grid.Column="1" Margin="20,20,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>

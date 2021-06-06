@@ -1,5 +1,6 @@
 ﻿using MyNCMusic.Helper;
 using MyNCMusic.Model;
+using MyNCMusic.MyUserControl;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -189,8 +190,17 @@ namespace MyNCMusic.Services
                 b=await PreparePlayingSong(PlayingSongId);
             else
                 b=await PreparePlayingSong(PlayingSongId, songsItem);
-            PlayingListToBaseObject(PlayingSongList);
-            WhenPlayingSongChange();
+            if (!b)
+            {
+                NotifyPopup notifyPopup = new NotifyPopup("获取音乐失败");
+                notifyPopup.Show();
+            }
+            else
+            {
+
+                PlayingListToBaseObject(PlayingSongList);
+                WhenPlayingSongChange();
+            }
             return b;
         }
         public static async Task<bool> ChangePlayingSong(long playingSongId, SongsItem songsItem = null)
@@ -483,7 +493,12 @@ namespace MyNCMusic.Services
                         return;
                     }
             }
-            await PlayingService.ChangePlayingSong(willPlayId, PlayingService.PlayingSongList);
+            for (int i = 0; i < 5; i++)
+            {
+                if (await ChangePlayingSong(willPlayId, PlayingSongList))
+                    break;
+            }
+            NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
         }
 
         /// <summary>
@@ -494,7 +509,12 @@ namespace MyNCMusic.Services
             if (PlayedSongId!=null&&PlayedSongId.Count > 1)//上一个是当前歌曲，所以要上上一个
             {
                 PlayedSongId.Remove(PlayedSongId.Last());//移出当前
-                await PlayingService.ChangePlayingSong(PlayedSongId.Last(), PlayingService.PlayedSongList);
+                for (int i = 0; i < 5; i++)
+                {
+                    if (await ChangePlayingSong(PlayedSongId.Last(), PlayingService.PlayedSongList))
+                        break;
+                }
+                NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
             }
         }
 
@@ -555,7 +575,12 @@ namespace MyNCMusic.Services
                         return;
                     }
             }
-            await ChangePlayingRadio(willPlayId, PlayingRadioList);
+            for (int i = 0; i < 5; i++)
+            {
+                if (await ChangePlayingRadio(willPlayId, PlayingRadioList))
+                    break;
+            }
+            NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
         }
 
         /// <summary>
@@ -566,7 +591,12 @@ namespace MyNCMusic.Services
             if (PlayedRadioId!=null&&PlayedRadioId.Count > 1)//上一个是当前电台，所以要上上一个
             {
                 PlayedRadioId.Remove(PlayedRadioId.Last());//移出当前
-                await ChangePlayingRadio(PlayedRadioId.Last(), PlayedRadioList);
+                for (int i = 0; i < 5; i++)
+                {
+                    if (await ChangePlayingRadio(PlayedRadioId.Last(), PlayedRadioList))
+                        break;
+                }
+                NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
             }
         }
 

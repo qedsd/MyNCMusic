@@ -263,42 +263,45 @@ namespace MyNCMusic.Views
 
         async void IntoSearch(string keyword)
         {
+            ProgressBar_Searching.Visibility = Visibility.Visible;
             searchType = int.Parse(((PivotItem)Pivot_search.SelectedItem).Tag.ToString());
             SearchRoot searchRoot = await Task.Run(() => SearchService.SearchClound(keyword, searchType));
-            if (searchRoot == null)
-                return;
-            switch (searchType)
+            if (searchRoot != null&& searchRoot.result!=null)
             {
-                case 1:
-                    {
-                        //判断是否为喜欢歌曲
-                        if (MainPage.favoriteSongsRoot != null)
+                switch (searchType)
+                {
+                    case 1:
                         {
-                            foreach (var temp in searchRoot.result.songs)
+                            //判断是否为喜欢歌曲
+                            if (MainPage.favoriteSongsRoot != null)
                             {
-                                if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
-                                    temp.isFavorite = true;
+                                foreach (var temp in searchRoot.result.songs)
+                                {
+                                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
+                                        temp.isFavorite = true;
+                                }
                             }
+                            ListBox_searchSong.ItemsSource = searchRoot.result.songs;
                         }
-                        ListBox_searchSong.ItemsSource = searchRoot.result.songs;
-                    }
-                    break;
-                case 10:
-                    {
-                        ListBox_searchAlbum.ItemsSource = searchRoot.result.albums;
-                    }
-                    break;
-                case 100:
-                    {
-                        ListBox_searchArtist.ItemsSource = searchRoot.result.artists;
-                    }
-                    break;
-                case 1000:
-                    {
-                        AdaptiveGridView_searchPlaylist.ItemsSource = searchRoot.result.playlists;
-                    }
-                    break;
+                        break;
+                    case 10:
+                        {
+                            ListBox_searchAlbum.ItemsSource = searchRoot.result.albums;
+                        }
+                        break;
+                    case 100:
+                        {
+                            ListBox_searchArtist.ItemsSource = searchRoot.result.artists;
+                        }
+                        break;
+                    case 1000:
+                        {
+                            AdaptiveGridView_searchPlaylist.ItemsSource = searchRoot.result.playlists;
+                        }
+                        break;
+                }
             }
+            ProgressBar_Searching.Visibility = Visibility.Collapsed;
         }
 
         private async void ListBox_searchSong_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
@@ -375,6 +378,8 @@ namespace MyNCMusic.Views
 
         private void Pivot_search_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (string.IsNullOrEmpty(AutoSuggestBox_search.Text))
+                return;
             string keyword = AutoSuggestBox_search.Text;
             IntoSearch(keyword);
         }

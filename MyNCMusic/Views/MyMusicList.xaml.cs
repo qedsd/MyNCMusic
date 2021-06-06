@@ -1,4 +1,5 @@
 ﻿using MyNCMusic.Model;
+using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,12 @@ namespace MyNCMusic.Views
                 playlistItems_created = new ObservableCollection<PlaylistItem>();
                 playlistItems_subscribed = new ObservableCollection<PlaylistItem>();
                 MyPlaylistRoot myPlaylistRoot = await Task.Run(() => PlaylistService.GetMyPlaylist());
+                if(myPlaylistRoot==null|| myPlaylistRoot.playlist==null)
+                {
+                    NotifyPopup notifyPopup = new NotifyPopup("获取失败");
+                    notifyPopup.Show();
+                    return;
+                }
                 foreach (var temp in myPlaylistRoot.playlist)
                 {
                     if (temp.subscribed == "true")

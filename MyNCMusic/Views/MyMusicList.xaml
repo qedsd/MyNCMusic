@@ -42,12 +42,17 @@
                         <DataTemplate x:DataType="model:PlaylistItem">
                             <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
                                         Margin="4"
-                                        >
+                                        CornerRadius="4">
                                 <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           Height="40"
-                                           Margin="4"
-                                           HorizontalAlignment="Center"/>
+                                <Grid Height="40"
+                                          Margin="4"
+                                          >
+                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
+                                           HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                                   MaxHeight="40"
+                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                </Grid>
                             </StackPanel>
                         </DataTemplate>
                     </controls:AdaptiveGridView.ItemTemplate>
@@ -68,12 +73,17 @@
                         <DataTemplate x:DataType="model:PlaylistItem">
                             <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
                                         Margin="4"
-                                        >
+                                        CornerRadius="4">
                                 <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           Height="40"
-                                           Margin="4"
-                                           HorizontalAlignment="Center"/>
+                                <Grid Height="40"
+                                          Margin="4"
+                                          >
+                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
+                                           HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                                   MaxHeight="40"
+                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                </Grid>
                             </StackPanel>
                         </DataTemplate>
                     </controls:AdaptiveGridView.ItemTemplate>

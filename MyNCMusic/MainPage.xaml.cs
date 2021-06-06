@@ -72,6 +72,7 @@ namespace MyNCMusic
             _mediaPlayer.MediaEnded += _mediaPlayer_MediaEnded;
             _mediaPlayer.SourceChanged += _mediaPlayer_SourceChanged;
 
+
             //接管系统播放音频控制
             _mediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
             _mediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
@@ -96,6 +97,8 @@ namespace MyNCMusic
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
             Window.Current.SetTitleBar(MyTitleBar);
         }
+
+
 
         private async void PlayingService_OnPlayingRadioChanged()
         {
@@ -210,6 +213,7 @@ namespace MyNCMusic
             {
                 isSliderChangedFromAuto = true;
                 Slider_play.Value = sender.Position.TotalSeconds;
+                
                 TextBlock_currentTime.Text = OtherHelper.GetDt((int)sender.Position.TotalSeconds);
                 if ((Application.Current as App).playingPage != null)
                     (Application.Current as App).playingPage.ChangeLyricPosition(sender.Position.TotalMilliseconds);
@@ -220,6 +224,7 @@ namespace MyNCMusic
         {
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
+                _mediaTimelineController.Pause();
                 if (PlayingService.IsPlayingSong)
                     PlayingService.PlayNextSongs();
                 else
@@ -283,14 +288,22 @@ namespace MyNCMusic
                 UpDatePlayOrderStateIcon();
                 if (PlayingService.PlayingSongUrlRoot != null)
                 {
-                    _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+                    SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingService.PlayingSongUrlRoot.data.First().id);
+                    //_mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+                    _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(songUrlRoot.data.First().url)));
                     _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
+                    _mediaSource.StateChanged += _mediaSource_StateChanged;
                     _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
                     _mediaPlayer.Source = _mediaPlaybackItem;
                     
                 }
                 
             }
+        }
+
+        private void _mediaSource_StateChanged(MediaSource sender, MediaSourceStateChangedEventArgs args)
+        {
+            
         }
 
 
@@ -310,7 +323,7 @@ namespace MyNCMusic
         private async void _mediaSource_OpenOperationCompleted(MediaSource sender, MediaSourceOpenOperationCompletedEventArgs args)
         {
             _duration = sender.Duration.GetValueOrDefault();
-
+            //_mediaTimelineController.Duration = _duration;
             await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
             {
                 Slider_play.Maximum = _duration.TotalSeconds;

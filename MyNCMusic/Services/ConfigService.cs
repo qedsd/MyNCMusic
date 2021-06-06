@@ -1,6 +1,7 @@
 ﻿using MyNCMusic.Helper;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -11,6 +12,7 @@ using Windows.Storage;
 namespace MyNCMusic.Services
 {
     [Serializable]
+    [Bindable(true)]
     public class ConfigService
     {
         public static StorageFolder Folder = ApplicationData.Current.LocalFolder;

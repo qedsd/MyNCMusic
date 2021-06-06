@@ -125,8 +125,8 @@ namespace MyNCMusic.Views
                 ListBox_musicDetail.ItemsSource = musicDetailRootSource.songs;
             else
             {
-                var list = musicDetailRootSource.songs.Where(p => p.Name.Contains(sender.Text)) as System.Collections.ObjectModel.ObservableCollection<SongsItem>;
-                if (list != null && list.Count != 0)
+                var list = musicDetailRootSource.songs.Where(p => p.Name.Contains(sender.Text));
+                if (list != null && list.Count() != 0)
                 {
                     ListBox_musicDetail.ItemsSource = list;
                 }

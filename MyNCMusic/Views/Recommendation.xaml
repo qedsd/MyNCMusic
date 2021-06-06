@@ -54,12 +54,18 @@
                             <DataTemplate x:DataType="model:Recommend">
                                 <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
                                         Margin="4"
-                                        >
+                                        CornerRadius="4">
                                     <Image Source="{x:Bind picUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           Height="40"
-                                           Margin="4"
-                                           HorizontalAlignment="Center"/>
+                                    <Grid Height="40"
+                                          Margin="4"
+                                          >
+                                        <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
+                                           HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                                   MaxHeight="40"
+                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                    </Grid>
+                                    
                                 </StackPanel>
                             </DataTemplate>
                         </controls:AdaptiveGridView.ItemTemplate>
@@ -289,6 +295,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <AutoSuggestBox Name="AutoSuggestBox_search"
@@ -297,7 +304,10 @@
                                     Style="{StaticResource AutoSuggestBoxStyle1}"
                                     QuerySubmitted="AutoSuggestBox_search_QuerySubmitted"
                                     />
-                    <Pivot Grid.Row="1" Name="Pivot_search"
+                    <ProgressBar x:Name="ProgressBar_Searching" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"
+                                 Grid.Row="1"
+                                 />
+                    <Pivot Grid.Row="2" Name="Pivot_search"
                            SelectionChanged="Pivot_search_SelectionChanged">
                         <PivotItem Tag="1">
                             <PivotItem.Header>
@@ -488,12 +498,17 @@
                                         <DataTemplate x:DataType="model:PlaylistItem">
                                             <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
                                         Margin="4"
-                                        >
+                                        CornerRadius="4">
                                                 <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                                <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           Height="40"
-                                           Margin="4"
-                                           HorizontalAlignment="Center"/>
+                                                <Grid Height="40"
+                                          Margin="4"
+                                          >
+                                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
+                                           HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                                   MaxHeight="40"
+                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                                </Grid>
                                             </StackPanel>
                                         </DataTemplate>
                                     </controls:AdaptiveGridView.ItemTemplate>

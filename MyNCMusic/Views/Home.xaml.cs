@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 
 // https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
@@ -48,7 +49,7 @@ namespace MyNCMusic.Views
             if (!isFirstTimeLoad)
                 return;
             isFirstTimeLoad = false;
-            AcrylicBrush_mainFrame.TintColor = MainPage.backgroundBrush.Color;//acrylic背景颜色
+            //AcrylicBrush_mainFrame.TintColor = MainPage.backgroundBrush.Color;//acrylic背景颜色
             TextBox_account.Text = ConfigService.PhoneOrEmail;
             PasswordBox_password.Password = ConfigService.Password;
             TextBox_serverIP.Text = ConfigService.ApiUri.ToString();
@@ -133,9 +134,10 @@ namespace MyNCMusic.Views
             }
         }
 
-        private async void Button_setting_Click(object sender, RoutedEventArgs e)
+        private void Button_setting_Click(object sender, RoutedEventArgs e)
         {
-            await ContentDialog_setting.ShowAsync();
+            //await ContentDialog_setting.ShowAsync();
+            Frame_main.Navigate(typeof(SettingPage),null, new DrillInNavigationTransitionInfo());
         }
 
         private async void ContentDialog_setting_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)

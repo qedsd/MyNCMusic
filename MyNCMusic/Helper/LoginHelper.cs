@@ -50,7 +50,7 @@ namespace MyNCMusic.Services
         static LoginStatus GetLoginStatus()
         {
             string result = Http.Get(ConfigService.ApiUri + "/login/status");
-            return JsonConvert.DeserializeObject<LoginStatus>(result);
+            return result==null?null:JsonConvert.DeserializeObject<LoginStatus>(result);
         }
     }
 }

@@ -25,7 +25,8 @@
         </Grid.RowDefinitions>
         <Grid  Grid.Row="0"
 		       Grid.RowSpan="2"
-			   Margin="0,-1,0,0">
+			   Margin="0,-1,0,0"
+               >
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -40,7 +41,7 @@
                         <Grid.Background>
                             <AcrylicBrush BackgroundSource="Backdrop"
                           TintColor="Black"
-                          TintOpacity="0.3"/>
+                          TintOpacity="0.4"/>
                         </Grid.Background>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="300"/>
