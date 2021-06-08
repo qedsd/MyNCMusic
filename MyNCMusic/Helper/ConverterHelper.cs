@@ -275,4 +275,19 @@ namespace MyNCMusic.Helper
             return value;
         }
     }
+
+    /// <summary>
+    /// 音量值转换
+    /// </summary>
+    public class ChangeVolumeType : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            return (double)value * 100;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return (double)value / 100; ;
+        }
+    }
 }

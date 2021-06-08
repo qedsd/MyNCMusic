@@ -173,6 +173,8 @@ namespace MyNCMusic.Services
 
         public static bool IsPlayingSong;
 
+        public static double Volume = 1;
+
         /// <summary>
         /// 更改播放歌曲入口函数
         /// </summary>
@@ -688,6 +690,12 @@ namespace MyNCMusic.Services
         {
             get { return PlayingService.PlayedRadioList; }
             set { PlayingService.PlayedRadioList = value??new List<RadioSongItem>(); }
+        }
+
+        public double Volume
+        {
+            get { return PlayingService.Volume; }
+            set { PlayingService.Volume = value; }
         }
     }
 }
