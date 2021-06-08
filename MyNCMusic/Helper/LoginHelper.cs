@@ -35,11 +35,11 @@ namespace MyNCMusic.Services
             string result = null;
                 if (ConfigService.PhoneOrEmail.Contains('@'))
                 {
-                    result = Http.Get(ConfigService.ApiUri + @"/login?email=" + ConfigService.PhoneOrEmail + "&md5_password=" + OtherHelper.Encrypt(ConfigService.Password));
+                    result = Http.Get(ConfigService.ApiUri + @"/login?email=" + ConfigService.PhoneOrEmail + "&md5_password=" + ConfigService.Password);
                 }
                 else
                 {
-                    result = Http.Get(ConfigService.ApiUri + @"/login/cellphone?phone=" + ConfigService.PhoneOrEmail + "&md5_password=" + OtherHelper.Encrypt(ConfigService.Password));
+                    result = Http.Get(ConfigService.ApiUri + @"/login/cellphone?phone=" + ConfigService.PhoneOrEmail + "&md5_password=" + ConfigService.Password);
                 }
                 if (result == null || result.Equals(""))
                     return null;

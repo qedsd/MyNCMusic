@@ -1,4 +1,5 @@
-﻿using MyNCMusic.MyUserControl;
+﻿using MyNCMusic.Helper;
+using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
@@ -39,19 +40,14 @@ namespace MyNCMusic.Views
             if (TextBox_account.Text == "" || PasswordBox_password.Password == "" || TextBox_serverIP.Text == "")
             {
                 NotifyPopup notifyPopup = new NotifyPopup("?");
+                notifyPopup.Show();
                 return;
             }
             ConfigService.ApiUri = TextBox_serverIP.Text;
             ConfigService.PhoneOrEmail = TextBox_account.Text;
-            ConfigService.Password = PasswordBox_password.Password;
+            ConfigService.Password = OtherHelper.Encrypt(PasswordBox_password.Password);
             ConfigService.SaveConfig();
             await CoreApplication.RequestRestartAsync(String.Empty);
-        }
-
-        private async void Button_Github_Click(object sender, RoutedEventArgs e)
-        {
-            var uriBlog = new Uri(@"https://github.com/qedsd/MyNCMusic");
-            await Windows.System.Launcher.LaunchUriAsync(uriBlog);
         }
     }
 }

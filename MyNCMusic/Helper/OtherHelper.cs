@@ -97,12 +97,15 @@ namespace MyNCMusic.Helper
         {
             try
             {
+                ScrollViewer scrollViewer = new ScrollViewer();
+
                 TextBlock textBlock = new TextBlock()
                 {
                     HorizontalAlignment = HorizontalAlignment.Center,
                     TextWrapping=TextWrapping.WrapWholeWords
                 };
                 textBlock.Text = content;
+                scrollViewer.Content = textBlock;
                 var dialog = new ContentDialog()
                 {
                     Title = "Error!",

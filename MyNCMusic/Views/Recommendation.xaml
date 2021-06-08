@@ -63,7 +63,8 @@
                                            HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                    MaxHeight="40"
-                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                                   ToolTipService.ToolTip="{x:Bind name}"
+                                                   TextTrimming="CharacterEllipsis"/>
                                     </Grid>
                                     
                                 </StackPanel>
@@ -507,7 +508,8 @@
                                            HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                    MaxHeight="40"
-                                                   ToolTipService.ToolTip="{x:Bind name}"/>
+                                                   ToolTipService.ToolTip="{x:Bind name}"
+                                                               TextTrimming="CharacterEllipsis"/>
                                                 </Grid>
                                             </StackPanel>
                                         </DataTemplate>

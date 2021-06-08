@@ -16,6 +16,7 @@
         <converter:ReturnInByDouble x:Key="ReturnInByDouble"/>
         <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility"/>
         <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility"/>
+        <converter:ChangeVolumeType x:Key="ChangeVolumeType"/>
     </Page.Resources>
     
     <Grid Name="mainGrid">
@@ -115,12 +116,11 @@
                                 <SymbolIcon Symbol="Next"/>
                             </Button.Content>
                         </Button>
-                        <Button x:Name="Button_playOrderState" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
+                            <Button x:Name="Button_playOrderState" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
                                 Click="Button_playOrderState_Click">
-                            <Button.Content>
-                                <SymbolIcon Symbol="AlignLeft" x:Name="SymbolIcon_playOrderState"/>
-                            </Button.Content>
-                        </Button>
+                                <Button.Content>
+                                    <SymbolIcon Symbol="AlignLeft" x:Name="SymbolIcon_playOrderState"/>
+                                </Button.Content>
                             </Button>
                             <Button x:Name="Button_Volume" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
                                  >
