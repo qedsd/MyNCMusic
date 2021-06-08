@@ -58,13 +58,12 @@ namespace MyNCMusic
         public Stopwatch playDurationStopwatch;//当前歌曲播放时长
         public MainPage()
         {
-            
+            _mediaPlayer = new MediaPlayer();
             backgroundBrush = new SolidColorBrush(Colors.Black);
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Loaded += MainPage_Loaded;
             (Application.Current as App).myMainPage = this;
-            _mediaPlayer = new MediaPlayer();
             _mediaTimelineController = PlayingService.MediaTimelineController;
             _mediaTimelineController.PositionChanged += _mediaTimelineController_PositionChanged;
             _mediaTimelineController.StateChanged += _mediaTimelineController_StateChanged;
@@ -275,6 +274,7 @@ namespace MyNCMusic
             PlayingService.PlayingAlbumBitmapImage = await FileHelper.ReadLoaclBitmapImage(ConfigService.ImageFilename);
             if (await PlayingService.Load())
             {
+                Slider_Volume.Value = PlayingService.Volume * 100;
                 if (PlayingService.IsPlayingSong)
                 {
                     if(PlayingService.PlayingSong!=null)

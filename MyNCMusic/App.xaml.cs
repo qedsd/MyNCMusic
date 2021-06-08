@@ -89,6 +89,7 @@ namespace MyNCMusic
 
         private void Page_CloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
         {
+            PlayingService.Volume = myMainPage._mediaPlayer.Volume;
             PlayingService.Save();
             if (myMainPage == null || PlayingService.PlayDurationStopwatch == null)
                 return;
