@@ -590,6 +590,22 @@ namespace MyNCMusic
                 ListBox_playList.ScrollIntoView(temp);
         }
 
-        
+        private void Flyout_Opened(object sender, object e)
+        {
+
+        }
+
+        private void Slider_Volume_PointerWheelChanged(object sender, PointerRoutedEventArgs e)
+        {
+            //每滚动一次固定值120？向上为正，下为负
+            if(e.GetCurrentPoint(Slider_Volume).Properties.MouseWheelDelta>0)
+            {
+                Slider_Volume.Value += 5;
+            }
+            else
+            {
+                Slider_Volume.Value -= 5;
+            }
+        }
     }
 }

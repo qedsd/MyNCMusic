@@ -123,16 +123,17 @@
                                 </Button.Content>
                             </Button>
                             <Button x:Name="Button_Volume" Style="{StaticResource ButtonStyle_tran}" Foreground="White"
-                                 >
+                                 PointerWheelChanged="Slider_Volume_PointerWheelChanged">
                                 <Button.Content>
                                     <SymbolIcon Symbol="Volume"/>
                                 </Button.Content>
                                 <Button.Flyout>
-                                    <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyle1}" >
+                                    <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyle1}">
                                         <Slider x:Name="Slider_Volume" Orientation="Vertical" Maximum="100" Minimum="0" Height="120" 
                                                 CanBeScrollAnchor="True" 
                                                 Padding="4,10"
-                                                Value="{x:Bind _mediaPlayer.Volume,Mode=TwoWay,Converter={StaticResource ChangeVolumeType}}"/>
+                                                Value="{x:Bind _mediaPlayer.Volume,Mode=TwoWay,Converter={StaticResource ChangeVolumeType}}"
+                                                PointerWheelChanged="Slider_Volume_PointerWheelChanged"/>
                                     </Flyout>
                                 </Button.Flyout>
                             </Button>

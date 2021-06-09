@@ -173,7 +173,7 @@ namespace MyNCMusic.Services
 
         public static bool IsPlayingSong;
 
-        public static double Volume = 1;
+        public static double Volume = 0.5;
 
         /// <summary>
         /// 更改播放歌曲入口函数

@@ -19,9 +19,8 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateKeyFile>
-    </PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>21671089A53989417F2962B3F4521E9FE52853CF</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>MyNCMusic_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>A7388FF8C875A3428868B2AAB048E42EE6C659AD</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
