@@ -2,57 +2,73 @@
     x:Class="MyNCMusic.Views.MyMusicList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MyNCMusic.Views"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    xmlns:model="using:MyNCMusic.Model"
     xmlns:converter="using:MyNCMusic.Helper"
-    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MyNCMusic.Models"
     Background="Transparent"
-    Foreground="{x:Bind local:Home.mainSolidColorBrush}">
+    
+    mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
     </Page.Resources>
-    
+
     <Grid Margin="20,0,10,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <TextBlock Text="我的歌单" FontFamily="SimSun" FontSize="48" Margin="0,48,0,10"/>
-        <ProgressBar x:Name="ProgressBar_loadPlaylistDetail" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"
-                     Grid.Row="1"/>
+        <TextBlock
+            Margin="0,48,0,10"
+            FontFamily="SimSun"
+            FontSize="48"
+            Text="我的歌单" />
+        <ProgressBar
+            x:Name="ProgressBar_loadPlaylistDetail"
+            Grid.Row="1"
+            IsIndeterminate="True"
+            ShowPaused="False"
+            Visibility="Collapsed" />
         <Pivot Grid.Row="2">
             <PivotItem>
                 <PivotItem.Header>
-                    <TextBlock Text="我创建的" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        
+                        Text="我创建的" />
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="AdaptiveGridView_createdByMe"
-                                   OneRowModeEnabled="False"
-                                   SelectionMode="Single"
-                                   IsItemClickEnabled="True"
-                                   ItemClick="AdaptiveGridView_createdByMe_ItemClick"
-                                   Margin="0,10"
-                                   >
+                <controls:AdaptiveGridView
+                    Name="AdaptiveGridView_createdByMe"
+                    Margin="0,10"
+                    IsItemClickEnabled="True"
+                    ItemClick="AdaptiveGridView_createdByMe_ItemClick"
+                    OneRowModeEnabled="False"
+                    SelectionMode="Single">
                     <controls:AdaptiveGridView.ItemTemplate>
                         <DataTemplate x:DataType="model:PlaylistItem">
-                            <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
-                                        Margin="4"
-                                        CornerRadius="4">
-                                <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                <Grid Height="40"
-                                          Margin="4"
-                                          >
-                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                                   MaxHeight="40"
-                                                   ToolTipService.ToolTip="{x:Bind name}"
-                                               TextTrimming="CharacterEllipsis"/>
+                            <StackPanel
+                                Width="160"
+                                Margin="4"
+                                Background="{ThemeResource SystemControlAcrylicElementBrush}"
+                                CornerRadius="4">
+                                <Image
+                                    Width="160"
+                                    Height="160"
+                                    Source="{x:Bind CoverImgUrl, Converter={StaticResource ReturnImageUriWithParam_160}}" />
+                                <Grid Height="40" Margin="4">
+                                    <TextBlock
+                                        MaxHeight="40"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind Name}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="WrapWholeWords"
+                                        ToolTipService.ToolTip="{x:Bind Name}" />
                                 </Grid>
                             </StackPanel>
                         </DataTemplate>
@@ -61,30 +77,38 @@
             </PivotItem>
             <PivotItem>
                 <PivotItem.Header>
-                    <TextBlock Text="我收藏的" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        
+                        Text="我收藏的" />
                 </PivotItem.Header>
-                <controls:AdaptiveGridView Name="AdaptiveGridView_subscribed"
-                                   OneRowModeEnabled="False"
-                                   SelectionMode="Single"
-                                   IsItemClickEnabled="True"
-                                   ItemClick="AdaptiveGridView_subscribed_ItemClick"
-                                   Margin="0,10"
-                                   >
+                <controls:AdaptiveGridView
+                    Name="AdaptiveGridView_subscribed"
+                    Margin="0,10"
+                    IsItemClickEnabled="True"
+                    ItemClick="AdaptiveGridView_subscribed_ItemClick"
+                    OneRowModeEnabled="False"
+                    SelectionMode="Single">
                     <controls:AdaptiveGridView.ItemTemplate>
                         <DataTemplate x:DataType="model:PlaylistItem">
-                            <StackPanel Width="160" Background="{ThemeResource SystemControlAcrylicElementBrush}"
-                                        Margin="4"
-                                        CornerRadius="4">
-                                <Image Source="{x:Bind coverImgUrl,Converter={StaticResource ReturnImageUriWithParam_160}}" Height="160" Width="160"/>
-                                <Grid Height="40"
-                                          Margin="4"
-                                          >
-                                    <TextBlock Text="{x:Bind name}" TextWrapping="WrapWholeWords"
-                                           HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                                   MaxHeight="40"
-                                                   ToolTipService.ToolTip="{x:Bind name}"
-                                               TextTrimming="CharacterEllipsis"/>
+                            <StackPanel
+                                Width="160"
+                                Margin="4"
+                                Background="{ThemeResource SystemControlAcrylicElementBrush}"
+                                CornerRadius="4">
+                                <Image
+                                    Width="160"
+                                    Height="160"
+                                    Source="{x:Bind CoverImgUrl, Converter={StaticResource ReturnImageUriWithParam_160}}" />
+                                <Grid Height="40" Margin="4">
+                                    <TextBlock
+                                        MaxHeight="40"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Text="{x:Bind Name}"
+                                        TextTrimming="CharacterEllipsis"
+                                        TextWrapping="WrapWholeWords"
+                                        ToolTipService.ToolTip="{x:Bind Name}" />
                                 </Grid>
                             </StackPanel>
                         </DataTemplate>

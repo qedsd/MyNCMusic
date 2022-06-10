@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MyNCMusic.Models
+{
+    public class RecommendMusicRoot
+    {
+        public int Code { get; set; }
+        public RecommendMusicData Data { get; set; }
+    }
+}

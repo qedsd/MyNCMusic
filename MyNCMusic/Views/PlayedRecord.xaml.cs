@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
@@ -53,11 +53,11 @@ namespace MyNCMusic.Views
         private async void Button_Artists_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            List<Artist> artists = ((CADataItem)button.DataContext).artists as List<Artist>;
+            List<Artist> artists = ((CADataItem)button.DataContext).Artists as List<Artist>;
             if (artists.Count == 1)
             {
                 ProgressBar_Loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().Id));
                 ProgressBar_Loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -71,7 +71,7 @@ namespace MyNCMusic.Views
             if (artist == null)
                 return;
             ProgressBar_Loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.Id));
             ProgressBar_Loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -104,7 +104,7 @@ namespace MyNCMusic.Views
         private async void Button_Album_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            long id = (button.DataContext as RecordDataItem).Song.al.id;
+            long id = (button.DataContext as RecordDataItem).Song.Al.Id;
             ProgressBar_Loading.Visibility = Visibility.Visible;
             AlbumRoot albumRoot=await Task.Run(()=>AlbumService.GetAlbum(id));
             ProgressBar_Loading.Visibility = Visibility.Collapsed;

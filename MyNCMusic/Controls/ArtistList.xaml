@@ -1,0 +1,86 @@
+﻿<UserControl
+    x:Class="MyNCMusic.Controls.ArtistList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:MyNCMusic.Helper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MyNCMusic.Models"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:GetArNames x:Key="GetArNames" />
+        <converter:GetDt x:Key="GetDt" />
+        <converter:GetAlia x:Key="GetAlia" />
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem" />
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
+        <converter:ReturnForegroundIsPlaying x:Key="ReturnForegroundIsPlaying" />
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility" />
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility" />
+    </UserControl.Resources>
+    <ListBox
+        Name="ListBox_Artist"
+        Grid.Row="1"
+        Margin="0,4"
+        Tapped="ListBox_Artist_Tapped">
+        <ListBox.Background>
+            <AcrylicBrush
+                BackgroundSource="Backdrop"
+                TintColor="Black"
+                TintOpacity="0.1" />
+        </ListBox.Background>
+        <ListBox.ItemContainerStyle>
+            <Style TargetType="ListBoxItem">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+        </ListBox.ItemContainerStyle>
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="model:Artist">
+                <Grid x:Name="Grid_itemTemplate">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Image
+                        Width="48"
+                        Height="48"
+                        Source="{x:Bind PicUrl, Converter={StaticResource ReturnImageUriWithParam_48}}" />
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="10,0,0,0"
+                        Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="{x:Bind Name}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="专辑：" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="{x:Bind AlbumSize}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="MV：" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="{x:Bind MvSize}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

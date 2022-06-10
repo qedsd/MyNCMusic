@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,9 +19,9 @@ namespace MyNCMusic.Services
         public static List<LyricStr> GetLyricStrs(LyricRoot lyricRoot)
         {
             List<LyricStr> lyricStrs = new List<LyricStr>();
-            if (lyricRoot.lrc != null && lyricRoot.lrc.lyric != null)//原歌词
+            if (lyricRoot.Lrc != null && lyricRoot.Lrc.Lyric != null)//原歌词
             {
-                var array = lyricRoot.lrc.lyric.Split("\n");
+                var array = lyricRoot.Lrc.Lyric.Split("\n");
                 foreach (var temp in array)
                 {
                     var array2 = temp.Split(new char[2] { '[', ']' });
@@ -41,9 +41,9 @@ namespace MyNCMusic.Services
                     catch (Exception) { }
                 }
             }
-            if (lyricRoot.tlyric != null && lyricRoot.tlyric.lyric != null)//翻译歌词
+            if (lyricRoot.Tlyric != null && lyricRoot.Tlyric.Lyric != null)//翻译歌词
             {
-                var array = lyricRoot.tlyric.lyric.Split("\n");
+                var array = lyricRoot.Tlyric.Lyric.Split("\n");
                 foreach (var temp in array)
                 {
                     var array2 = temp.Split(new char[2] { '[', ']' });
@@ -76,9 +76,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id">音乐id</param>
         /// <returns></returns>
-        public static LyricRoot GetLyric(long id)
+        public static async Task<LyricRoot> GetLyricAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/lyric?id=" + id);
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/lyric?id=" + id);
             if (result == null || result.Equals(""))
                 return null;
             try

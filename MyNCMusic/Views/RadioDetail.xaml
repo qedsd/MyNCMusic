@@ -5,10 +5,10 @@
     xmlns:local="using:MyNCMusic.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:MyNCMusic.Model"
+    xmlns:model="using:MyNCMusic.Models"
     xmlns:converter="using:MyNCMusic.Helper"
     mc:Ignorable="d"
-    Foreground="{x:Bind local:Home.mainSolidColorBrush}">
+    >
     <Page.Background>
         <AcrylicBrush BackgroundSource="Backdrop"
                           TintColor="Black"
@@ -35,7 +35,7 @@
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="-10,14,0,2" Grid.Row="1">
             <Button x:Name="Button_back"
                     Style="{StaticResource ButtonStyle_tran}"
-                Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                
                     VerticalAlignment="Center"
                     Click="Button_back_Click">
                 <FontIcon Glyph="&#xE112;" FontFamily="Segoe MDL2 Assets" FontSize="16"/>
@@ -62,11 +62,11 @@
                        FontSize="24"/>
                 <Button x:Name="Button_User" Style="{StaticResource ButtonStyle_tran}"
                     VerticalAlignment="Center"
-                    Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    
                         Grid.Row="1"
                         ToolTipService.ToolTip="主持人"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="2" VerticalAlignment="Bottom">
-                    <Button x:Name="Button_Sub" Style="{StaticResource ButtonStyle_tran}" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    <Button x:Name="Button_Sub" Style="{StaticResource ButtonStyle_tran}" 
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Right"
                         Grid.Row="2"
@@ -85,7 +85,7 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button x:Name="Button_Des" Style="{StaticResource ButtonStyle_tran}" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    <Button x:Name="Button_Des" Style="{StaticResource ButtonStyle_tran}" 
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Right"
                         >
@@ -103,7 +103,7 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
-                    <Button x:Name="Button_PlayAll" Style="{StaticResource ButtonStyle_tran}" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    <Button x:Name="Button_PlayAll" Style="{StaticResource ButtonStyle_tran}" 
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Right"
                         Grid.Column="1"
@@ -118,7 +118,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <Button  Style="{StaticResource ButtonStyle_tran}" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                    <Button  Style="{StaticResource ButtonStyle_tran}" 
                              Grid.Column="2"
                              HorizontalAlignment="Right">
                         <Button.Content>
@@ -163,21 +163,21 @@
                         </Grid.ColumnDefinitions>
                         <Image Source="{x:Bind CoverUrl,Converter={StaticResource ReturnImageUriWithParam_48}}" Width="48" Height="48"/>
                         <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10,0,0,0">
-                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                            <TextBlock Text="{x:Bind Name}" VerticalAlignment="Center" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="4,0,0,0">
-                            <TextBlock Text="播放：" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                            <TextBlock Text="{x:Bind ListenerCount}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                            <TextBlock Text="播放：" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind ListenerCount}" VerticalAlignment="Center" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Column="3" Margin="4,0,0,0">
-                            <TextBlock Text="赞：" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                            <TextBlock Text="{x:Bind ListenerCount}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                            <TextBlock Text="赞：" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind ListenerCount}" VerticalAlignment="Center" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Column="4">
-                            <TextBlock Text="{x:Bind CreateTime,Converter={StaticResource TimespanToDateTime}}" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"
+                            <TextBlock Text="{x:Bind CreateTime,Converter={StaticResource TimespanToDateTime}}" VerticalAlignment="Center" Margin="4,0,0,0" 
                                        ToolTipService.ToolTip="创建时间"/>
                         </StackPanel>
-                        <TextBlock Text="{x:Bind Duration,Converter={StaticResource GetDt}}" Grid.Column="5" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                        <TextBlock Text="{x:Bind Duration,Converter={StaticResource GetDt}}" Grid.Column="5" VerticalAlignment="Center" Margin="0,0,6,0" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

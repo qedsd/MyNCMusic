@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
@@ -43,15 +43,15 @@ namespace MyNCMusic.Views
                 playlistItems_created = new ObservableCollection<PlaylistItem>();
                 playlistItems_subscribed = new ObservableCollection<PlaylistItem>();
                 MyPlaylistRoot myPlaylistRoot = await Task.Run(() => PlaylistService.GetMyPlaylist());
-                if(myPlaylistRoot==null|| myPlaylistRoot.playlist==null)
+                if(myPlaylistRoot==null|| myPlaylistRoot.Playlist==null)
                 {
                     NotifyPopup notifyPopup = new NotifyPopup("获取失败");
                     notifyPopup.Show();
                     return;
                 }
-                foreach (var temp in myPlaylistRoot.playlist)
+                foreach (var temp in myPlaylistRoot.Playlist)
                 {
-                    if (temp.subscribed == "true")
+                    if (temp.Subscribed)
                         playlistItems_subscribed.Add(temp);
                     else
                         playlistItems_created.Add(temp);
@@ -68,7 +68,7 @@ namespace MyNCMusic.Views
             PlaylistItem playlistItem = e.ClickedItem as PlaylistItem;
             if (playlistItem == null)
                 return;
-            List<Object> list=await Task.Run(() => prepareToNavigeteToPlaylitDetail(playlistItem.id));
+            List<Object> list=await Task.Run(() => prepareToNavigeteToPlaylitDetail(playlistItem.Id));
             if(list!=null)
                 Frame.Navigate(typeof(PlayListDetai), list);
             ProgressBar_loadPlaylistDetail.Visibility = Visibility.Collapsed;
@@ -80,7 +80,7 @@ namespace MyNCMusic.Views
             PlaylistItem playlistItem = e.ClickedItem as PlaylistItem;
             if (playlistItem == null)
                 return;
-            List<Object> list = await Task.Run(() => prepareToNavigeteToPlaylitDetail(playlistItem.id));
+            List<Object> list = await Task.Run(() => prepareToNavigeteToPlaylitDetail(playlistItem.Id));
             if (list != null)
                 Frame.Navigate(typeof(PlayListDetai), list);
             ProgressBar_loadPlaylistDetail.Visibility = Visibility.Collapsed;
@@ -89,30 +89,23 @@ namespace MyNCMusic.Views
         List<Object> prepareToNavigeteToPlaylitDetail(long id)
         {
             PlayListDetailRoot playListDetailRoot = PlaylistService.GetPlaylistDetail(id);
-            if (playListDetailRoot == null || playListDetailRoot.playlist.trackIds.Count == 0)
+            if (playListDetailRoot == null || playListDetailRoot.Playlist.TrackIds.Count == 0)
                 return null;
             string ids = "";
-            //for (int i = 0; i < playListDetailRoot.playlist.trackIds.Count; i++)
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    if (i != 0)
-            //        ids += ",";
-            //    ids += playListDetailRoot.playlist.trackIds[i].id;
-            //}
             MusicDetailRoot musicDetailRoot = new MusicDetailRoot();
-            musicDetailRoot.songs = new List<SongsItem>();
-            musicDetailRoot.privileges = new List<PrivilegesItem>();
-            for (int i=0;i< playListDetailRoot.playlist.trackIds.Count;i+=1000)//最高单次1000个
+            musicDetailRoot.Songs = new List<MusicItem>();
+            musicDetailRoot.Privileges = new List<PrivilegesItem>();
+            for (int i=0;i< playListDetailRoot.Playlist.TrackIds.Count;i+=1000)//最高单次1000个
             {
                 ids = "";
                 int j = i;
-                if((i+1000)> playListDetailRoot.playlist.trackIds.Count)//剩下的不足1000
+                if((i+1000)> playListDetailRoot.Playlist.TrackIds.Count)//剩下的不足1000
                 {
-                    for (; j < playListDetailRoot.playlist.trackIds.Count; j++)
+                    for (; j < playListDetailRoot.Playlist.TrackIds.Count; j++)
                     {
                         if (j%1000 != 0)
                             ids += ",";
-                        ids += playListDetailRoot.playlist.trackIds[j].id;
+                        ids += playListDetailRoot.Playlist.TrackIds[j].Id;
                     }
                 }
                 else//剩下的超过1000
@@ -121,21 +114,21 @@ namespace MyNCMusic.Views
                     {
                         if (j%1000 != 0)
                             ids += ",";
-                        ids += playListDetailRoot.playlist.trackIds[j].id;
+                        ids += playListDetailRoot.Playlist.TrackIds[j].Id;
                     }
                 }
                 MusicDetailRoot musicDetailRootTemp = SongService.GetMusicDetail_Post(ids);
-                if(musicDetailRootTemp!=null&&musicDetailRootTemp.songs!=null&& musicDetailRootTemp.privileges!=null)
+                if(musicDetailRootTemp!=null&&musicDetailRootTemp.Songs!=null&& musicDetailRootTemp.Privileges!=null)
                 {
-                    foreach(var temp in musicDetailRootTemp.songs)
+                    foreach(var temp in musicDetailRootTemp.Songs)
                     {
-                        musicDetailRoot.songs.Add(temp);
+                        musicDetailRoot.Songs.Add(temp);
                     }
-                    foreach (var temp in musicDetailRootTemp.privileges)
+                    foreach (var temp in musicDetailRootTemp.Privileges)
                     {
-                        musicDetailRoot.privileges.Add(temp);
+                        musicDetailRoot.Privileges.Add(temp);
                     }
-                    musicDetailRoot.code = musicDetailRootTemp.code;
+                    musicDetailRoot.Code = musicDetailRootTemp.Code;
                 }
             }
             List<Object> list = new List<object>();

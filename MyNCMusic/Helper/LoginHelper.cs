@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

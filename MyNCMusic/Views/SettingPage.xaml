@@ -8,7 +8,7 @@
     xmlns:services="using:MyNCMusic.Services"
     mc:Ignorable="d"
     Background="Transparent"
-    Foreground="{x:Bind local:Home.mainSolidColorBrush}">
+    >
     <Page.Resources>
         <Style x:Key="ButtonStyle1" TargetType="Button">
             <Setter Property="Background" Value="LightGray"/>
@@ -100,17 +100,17 @@
             <StackPanel HorizontalAlignment="Left">
                 <TextBox MinWidth="300" Name="TextBox_serverIP" BorderThickness="0,0,0,1" PlaceholderText="示例：http://localhost:3000" Text="{x:Bind services:ConfigService.ApiUri,Mode=OneTime}">
                     <TextBox.Header>
-                        <TextBlock Text="服务器" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                        <TextBlock Text="服务器" />
                     </TextBox.Header>
                 </TextBox>
                 <TextBox MinWidth="300" Name="TextBox_account" BorderThickness="0,0,0,1" Margin="0,20,0,0" Text="{x:Bind services:ConfigService.PhoneOrEmail,Mode=OneTime}">
                     <TextBox.Header>
-                        <TextBlock Text="手机号/163邮箱" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                        <TextBlock Text="手机号/163邮箱" />
                     </TextBox.Header>
                 </TextBox>
                 <PasswordBox MinWidth="300" PasswordChar="•" Name="PasswordBox_password" BorderThickness="0,0,0,1" Margin="0,20,0,0" Password="{x:Bind services:ConfigService.Password,Mode=OneTime}">
                     <PasswordBox.Header>
-                        <TextBlock Text="登陆密码" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                        <TextBlock Text="登陆密码" />
                     </PasswordBox.Header>
                 </PasswordBox>
                 <Button Style="{StaticResource ButtonStyle1}" Content="保存并重启"

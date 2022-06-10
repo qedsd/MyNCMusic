@@ -1,11 +1,12 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -31,30 +32,24 @@ namespace MyNCMusic.Views
     /// </summary>
     public sealed partial class Home : Page
     {
-        static bool isFirstTimeLoad = true;
-        public static SolidColorBrush mainSolidColorBrush;
+        public static Home Instance;
         public Home()
         {
-            mainSolidColorBrush = MainPage.mainSolidColorBrush;
+            DataContext = new ViewModel.HomeViewModel();
+            Instance = this;
             this.InitializeComponent();
             (Application.Current as App).homepage = this;
             Loaded += Home_Loaded;
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
 
-        string nickName;
-        string avatarImgIdStr;
+        private string NickName;
+        private string AvatarImgIdStr;
         private async void Home_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!isFirstTimeLoad)
-                return;
-            isFirstTimeLoad = false;
-            //AcrylicBrush_mainFrame.TintColor = MainPage.backgroundBrush.Color;//acrylic背景颜色
-            TextBox_account.Text = ConfigService.PhoneOrEmail;
-            PasswordBox_password.Password = ConfigService.Password;
-            TextBox_serverIP.Text = ConfigService.ApiUri.ToString();
+            Loaded -= Home_Loaded;//仅第一次启动需要
             ProgressRing_initState.IsActive = true;
-            int state = await Task.Run(() => Init());
+            int state = await InitAsync();
             switch (state)
             {
                 case 1:
@@ -77,15 +72,15 @@ namespace MyNCMusic.Views
                     {
                         ProgressRing_initState.IsActive = false;
                         TextBlock_initState.Text = "初始化完成";
-                        ImageEx_user.Source = avatarImgIdStr;//设为用户头像
-                        TextBlock_UserName.Text = nickName;
+                        ImageEx_user.Source = AvatarImgIdStr;//设为用户头像
+                        TextBlock_UserName.Text = NickName;
                     }
                     break;
             }
             Frame_main.Navigate(typeof(Recommendation));
         }
 
-        int Init()
+        async Task<int> InitAsync()
         {
             LoginRoot loginRoot = LoginHelper.LoginAccount();
             if(loginRoot==null|| loginRoot.code!=200)
@@ -95,14 +90,20 @@ namespace MyNCMusic.Views
             }
             CookieHelper.WriteCookiesToDisk(ConfigService.Folder.Path+"/"+CookieHelper.SavedFileName,Http.cookies);
             ConfigService.Uid = loginRoot.account.id;
-            avatarImgIdStr = loginRoot.profile.avatarUrl;
-            nickName = loginRoot.profile.nickname;
+            AvatarImgIdStr = loginRoot.profile.avatarUrl;
+            NickName = loginRoot.profile.nickname;
             //获取喜欢的歌曲
-            MainPage.favoriteSongsRoot = SongService.GetFavoriteSongs();
-            if (MainPage.favoriteSongsRoot == null)
+            var favoriteSongsRoot = await SongService.GetFavoriteSongsAsync();
+            if (favoriteSongsRoot == null)
             {
-                
                 return 2;
+            }
+            else
+            {
+                favoriteSongsRoot.Ids.ForEach(p =>
+                {
+                    Services.PlayingService.FavoriteMusics.Add(p);
+                });
             }
             return 0;
         }
@@ -136,22 +137,7 @@ namespace MyNCMusic.Views
 
         private void Button_setting_Click(object sender, RoutedEventArgs e)
         {
-            //await ContentDialog_setting.ShowAsync();
             Frame_main.Navigate(typeof(SettingPage),null, new DrillInNavigationTransitionInfo());
-        }
-
-        private async void ContentDialog_setting_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-            if (TextBox_account.Text == "" || PasswordBox_password.Password == ""|| TextBox_serverIP.Text=="")
-            {
-                args.Cancel = true;
-                return;
-            }
-            ConfigService.ApiUri= TextBox_serverIP.Text;
-            ConfigService.PhoneOrEmail = TextBox_account.Text;
-            ConfigService.Password = PasswordBox_password.Password;
-            ConfigService.SaveConfig();
-            await CoreApplication.RequestRestartAsync(String.Empty);
         }
 
         private void Button_History_Click(object sender, RoutedEventArgs e)
@@ -175,5 +161,29 @@ namespace MyNCMusic.Views
                 notifyPopup.Show();
             }
         }
+
+
+
+        #region new
+        /// <summary>
+        /// 显示播放界面
+        /// </summary>
+        public void NavigateToPlayingPage()
+        {
+            MainFrame.Navigate(typeof(PlayingPage));
+        }
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter, [In] NavigationTransitionInfo infoOverride)
+        {
+            Frame_main.Navigate(sourcePageType, parameter, infoOverride);
+        }
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter)
+        {
+            Frame_main.Navigate(sourcePageType, parameter);
+        }
+        public void NavigateTo([In] Type sourcePageType)
+        {
+            Frame_main.Navigate(sourcePageType);
+        }
+        #endregion
     }
 }

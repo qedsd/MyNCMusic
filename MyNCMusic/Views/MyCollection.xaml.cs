@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace MyNCMusic.Views
                 ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
                 return;
             }
-            ListBox_album.ItemsSource = myPlaylistRoot.data;
+            ListBox_album.ItemsSource = myPlaylistRoot.Data;
             ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
         }
 
@@ -55,12 +55,12 @@ namespace MyNCMusic.Views
             CADataItem cADataItem = ((ListBox)sender).SelectedItem as CADataItem;
             if (cADataItem == null)
                 return;
-            if (cADataItem.id == PlayingService.PlayingListId)
+            if (cADataItem.Id == PlayingService.PlayingListId)
                 Frame.Navigate(typeof(AlbumDetail));
             else
             {
                 ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(cADataItem.id));
+                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(cADataItem.Id));
                 if (albumRoot == null)
                 {
                     ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
@@ -85,7 +85,7 @@ namespace MyNCMusic.Views
                     ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
                     return;
                 }
-                ListBox_artist.ItemsSource = myCollectionfArtistRoot.data;
+                ListBox_artist.ItemsSource = myCollectionfArtistRoot.Data;
                 ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
             }
         }
@@ -95,7 +95,7 @@ namespace MyNCMusic.Views
             ProgressBar_loadArtist.Visibility = Visibility.Visible;
             ListBox listBox = (ListBox)sender;
             Artist artist = ((ListBox)sender).SelectedItem as Artist;
-            ArtistBaseDetailRoot artistBaseDetailRoot=await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot=await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.Id));
             ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -105,11 +105,11 @@ namespace MyNCMusic.Views
         private async void Button_artists_Click_Artist(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            List<Artist> artists = ((CADataItem)button.DataContext).artists as List<Artist>;
+            List<Artist> artists = ((CADataItem)button.DataContext).Artists as List<Artist>;
             if (artists.Count == 1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().Id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -123,7 +123,7 @@ namespace MyNCMusic.Views
             if (artist == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.Id));
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;

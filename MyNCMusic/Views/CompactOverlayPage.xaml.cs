@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
@@ -100,7 +100,7 @@ namespace MyNCMusic.Views
         {
             if (!PlayingService.IsPlayingSong)
                 return;
-            if (PlayingService.PlayingSong.isFavorite)
+            if (PlayingService.PlayingSong.IsFavorite)
             {
                 TextBlock_IsOrnotFavorite.Text = "\xE00B";
             }

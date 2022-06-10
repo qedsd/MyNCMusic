@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -27,6 +27,22 @@ namespace MyNCMusic.Services
             catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
         }
         /// <summary>
+        /// 获取我收藏的歌手
+        /// </summary>
+        /// <returns></returns>
+        public static async Task<MyCollectionfArtistRoot> GetMyCollectionOfArtistAsync()
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/artist/sublist");
+            if (result == null || result.Equals(""))
+                return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<MyCollectionfArtistRoot>(result);
+            }
+            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
+        }
+
+        /// <summary>
         /// 获取歌手基本详细信息
         /// </summary>
         /// <param name="id">歌手id</param>
@@ -34,6 +50,22 @@ namespace MyNCMusic.Services
         public static ArtistBaseDetailRoot GetArtistBaseDetail(long id)
         {
             string result = Http.Get(ConfigService.ApiUri + @"/artists?id=" + id);
+            if (result == null || result.Equals(""))
+                return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<ArtistBaseDetailRoot>(result);
+            }
+            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
+        }
+        /// <summary>
+        /// 获取歌手基本详细信息
+        /// </summary>
+        /// <param name="id">歌手id</param>
+        /// <returns></returns>
+        public static async Task<ArtistBaseDetailRoot> GetArtistBaseDetailAsync(long id)
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/artists?id=" + id);
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -55,7 +87,7 @@ namespace MyNCMusic.Services
             {
                 if (i != 0)
                     name += "/";
-                name += arItems[i].name;
+                name += arItems[i].Name;
             }
             return name;
         }

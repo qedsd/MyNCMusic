@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;

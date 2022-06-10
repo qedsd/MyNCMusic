@@ -1,5 +1,5 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Controls;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
@@ -44,7 +44,7 @@ namespace MyNCMusic.Views
             ArtistBaseDetailRoot artistBaseDetailRoot_temp = e.Parameter as ArtistBaseDetailRoot;
             if (artistBaseDetailRoot_temp == null)
                 return;
-            if (artistBaseDetailRoot!=null&&artistBaseDetailRoot_temp.artist.id == artistBaseDetailRoot.artist.id)
+            if (artistBaseDetailRoot!=null&&artistBaseDetailRoot_temp.Artist.Id == artistBaseDetailRoot.Artist.Id)
                 return;
             artistBaseDetailRoot = artistBaseDetailRoot_temp;
             LoadLayout();
@@ -52,26 +52,26 @@ namespace MyNCMusic.Views
 
         void LoadLayout()
         {
-            Image_artist.Source = new BitmapImage(new Uri(artistBaseDetailRoot.artist.img1v1Url));
-            TextBlock_artitName.Text = artistBaseDetailRoot.artist.name;
+            Image_artist.Source = new BitmapImage(new Uri(artistBaseDetailRoot.Artist.Img1v1Url));
+            TextBlock_artitName.Text = artistBaseDetailRoot.Artist.Name;
             string othersName = "";
-            foreach(var temp in artistBaseDetailRoot.artist.alias)
+            foreach(var temp in artistBaseDetailRoot.Artist.Alias)
             {
                 othersName += temp;
                 othersName += "; ";
             }
-            othersName += artistBaseDetailRoot.artist.trans;
+            othersName += artistBaseDetailRoot.Artist.Trans;
             TextBlock_othersName.Text = othersName;
             //判断是否为喜欢歌曲
             if (MainPage.favoriteSongsRoot != null)
             {
-                foreach (var temp in artistBaseDetailRoot.hotSongs)
+                foreach (var temp in artistBaseDetailRoot.HotSongs)
                 {
-                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(temp.Id)) != 0)
-                        temp.isFavorite = true;
+                    if (MainPage.favoriteSongsRoot.Ids.Find(p => p.Equals(temp.Id)) != 0)
+                        temp.IsFavorite = true;
                 }
             }
-            ListBox_hotSongs.ItemsSource = artistBaseDetailRoot.hotSongs;
+            ListBox_hotSongs.ItemsSource = artistBaseDetailRoot.HotSongs;
         }
 
         private void Button_back_Click(object sender, RoutedEventArgs e)
@@ -82,12 +82,12 @@ namespace MyNCMusic.Views
         private async void AdaptiveGridViewControl_ItemClick(object sender, ItemClickEventArgs e)
         {
             Album album = e.ClickedItem as Album;
-            if (album.id == PlayingService.PlayingListId)
+            if (album.Id == PlayingService.PlayingListId)
                 Frame.Navigate(typeof(AlbumDetail));
             else
             {
                 ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(album.id));
+                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(album.Id));
                 if (albumRoot == null)
                     return;
                 Frame.Navigate(typeof(AlbumDetail), albumRoot);
@@ -98,12 +98,12 @@ namespace MyNCMusic.Views
         private async void ListBox_hotSongs_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             ListBox listBox = sender as ListBox;
-            SongsItem songsItem = listBox.SelectedItem as SongsItem;
+            MusicItem songsItem = listBox.SelectedItem as MusicItem;
             if (songsItem == null)
                 return;
             
-            PlayingService.PlayingListId= songsItem.al.id;
-            await PlayingService.ChangePlayingSong(songsItem.Id, artistBaseDetailRoot.hotSongs, songsItem);
+            PlayingService.PlayingListId= songsItem.Al.Id;
+            await PlayingService.ChangePlayingSong(songsItem.Id, artistBaseDetailRoot.HotSongs, songsItem);
         }
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -113,28 +113,28 @@ namespace MyNCMusic.Views
             {
                 if (artistBaseDetailRoot == null|| AdaptiveGridView_albums.ItemsSource!=null)
                     return;
-                ArtistAllAlbumRoot artistAllAlbumRoot=await Task.Run(() => AlbumService.GetArtistAllAlbums(artistBaseDetailRoot.artist.id));
+                ArtistAllAlbumRoot artistAllAlbumRoot=await Task.Run(() => AlbumService.GetArtistAllAlbums(artistBaseDetailRoot.Artist.Id));
                 if(artistAllAlbumRoot!=null)
                 {
-                    AdaptiveGridView_albums.ItemsSource = artistAllAlbumRoot.hotAlbums;
+                    AdaptiveGridView_albums.ItemsSource = artistAllAlbumRoot.HotAlbums;
                 }
             }
         }
 
         private async void Button_allSongs_Click(object sender, RoutedEventArgs e)
         {
-            PlayingService.PlayingListId= artistBaseDetailRoot.hotSongs.First().al.id;
-            await PlayingService.ChangePlayingSong(artistBaseDetailRoot.hotSongs.First().Id, artistBaseDetailRoot.hotSongs, artistBaseDetailRoot.hotSongs.First());
+            PlayingService.PlayingListId= artistBaseDetailRoot.HotSongs.First().Al.Id;
+            await PlayingService.ChangePlayingSong(artistBaseDetailRoot.HotSongs.First().Id, artistBaseDetailRoot.HotSongs, artistBaseDetailRoot.HotSongs.First());
         }
 
         private async void Button_artists_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            SongsItem songsItem = button.DataContext as SongsItem;
-            if (songsItem.ar.Count == 1)
+            MusicItem songsItem = button.DataContext as MusicItem;
+            if (songsItem.Ar.Count == 1)
             {
                 ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(songsItem.ar.First().id));
+                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(songsItem.Ar.First().Id));
                 ProgressBar_loading.Visibility = Visibility.Collapsed;
                 if (artistBaseDetailRoot == null)
                     return;
@@ -148,7 +148,7 @@ namespace MyNCMusic.Views
             if (arItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(arItem.id));
+            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(arItem.Id));
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (artistBaseDetailRoot == null)
                 return;
@@ -157,11 +157,11 @@ namespace MyNCMusic.Views
 
         private async void Button_album_Click(object sender, RoutedEventArgs e)
         {
-            SongsItem songsItem = ((Button)sender).DataContext as SongsItem;
+            MusicItem songsItem = ((Button)sender).DataContext as MusicItem;
             if (songsItem == null)
                 return;
             ProgressBar_loading.Visibility = Visibility.Visible;
-            AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(songsItem.al.id));
+            AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(songsItem.Al.Id));
             if (albumRoot == null)
             {
                 ProgressBar_loading.Visibility = Visibility.Collapsed;

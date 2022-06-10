@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +62,7 @@ namespace MyNCMusic.Helper
             {
                 if (i != 0)
                     name += "/";
-                name += arItems[i].name;
+                name += arItems[i].Name;
             }
             return name;
         }
@@ -86,7 +86,7 @@ namespace MyNCMusic.Helper
             {
                 if (i != 0)
                     name += "/";
-                name += arItems[i].name;
+                name += arItems[i].Name;
             }
             return name;
         }

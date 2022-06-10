@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using MyNCMusic.Views;
@@ -58,39 +58,40 @@ namespace MyNCMusic
         public Stopwatch playDurationStopwatch;//当前歌曲播放时长
         public MainPage()
         {
-            _mediaPlayer = new MediaPlayer();
-            backgroundBrush = new SolidColorBrush(Colors.Black);
             this.InitializeComponent();
-            this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            Loaded += MainPage_Loaded;
-            (Application.Current as App).myMainPage = this;
-            _mediaTimelineController = PlayingService.MediaTimelineController;
-            _mediaTimelineController.PositionChanged += _mediaTimelineController_PositionChanged;
-            _mediaTimelineController.StateChanged += _mediaTimelineController_StateChanged;
-            _mediaPlayer.TimelineController = _mediaTimelineController;
-            _mediaPlayer.MediaEnded += _mediaPlayer_MediaEnded;
-            _mediaPlayer.SourceChanged += _mediaPlayer_SourceChanged;
+            //_mediaPlayer = new MediaPlayer();
+            //backgroundBrush = new SolidColorBrush(Colors.Black);
+            //this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            //Loaded += MainPage_Loaded;
+            //(Application.Current as App).myMainPage = this;
+            //_mediaTimelineController = PlayingService.MediaTimelineController;
+            //_mediaTimelineController.PositionChanged += _mediaTimelineController_PositionChanged;
+            //_mediaTimelineController.StateChanged += _mediaTimelineController_StateChanged;
+            //_mediaPlayer.TimelineController = _mediaTimelineController;
+            //_mediaPlayer.MediaEnded += _mediaPlayer_MediaEnded;
+            //_mediaPlayer.SourceChanged += _mediaPlayer_SourceChanged;
 
 
-            //接管系统播放音频控制
-            _mediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
-            _mediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
-            _mediaPlayer.CommandManager.PreviousReceived += CommandManager_PreviousReceived;
-            _mediaPlayer.CommandManager.NextReceived += CommandManager_NextReceived;
-            mainImageBrush = new ImageBrush();
-            mainSolidColorBrush = new SolidColorBrush(Colors.White);
-            playDurationStopwatch = PlayingService.PlayDurationStopwatch;
+            ////接管系统播放音频控制
+            //_mediaPlayer.CommandManager.NextBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+            //_mediaPlayer.CommandManager.PreviousBehavior.EnablingRule = MediaCommandEnablingRule.Always;
+            //_mediaPlayer.CommandManager.PreviousReceived += CommandManager_PreviousReceived;
+            //_mediaPlayer.CommandManager.NextReceived += CommandManager_NextReceived;
+            //mainImageBrush = new ImageBrush();
+            //mainSolidColorBrush = new SolidColorBrush(Colors.White);
+            //playDurationStopwatch = PlayingService.PlayDurationStopwatch;
 
-            PlayingService.PlayingSongList = new List<SongsItem>();
-            PlayingService.PlayingRadioList = new List<RadioSongItem>();
-            PlayingService.OnPlayingSongChanged += PlayingService_OnPlayingSongChanged;
-            PlayingService.OnPlayingRadioChanged += PlayingService_OnPlayingRadioChanged;
-            GetSetting();
+            //PlayingService.PlayingSongList = new List<MusicItem>();
+            //PlayingService.PlayingRadioList = new List<RadioSongItem>();
+            //PlayingService.OnPlayingSongChanged += PlayingService_OnPlayingSongChanged;
+            //PlayingService.OnPlayingRadioChanged += PlayingService_OnPlayingRadioChanged;
+            //GetSetting();
 
             //设置标题栏
             var tiWtleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
             tiWtleBar.BackgroundColor = Colors.Transparent;
             tiWtleBar.ButtonBackgroundColor = Colors.Transparent;
+            tiWtleBar.ButtonForegroundColor = Colors.White;
             tiWtleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             tiWtleBar.ButtonHoverBackgroundColor = Colors.LightGray;
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
@@ -107,7 +108,7 @@ namespace MyNCMusic
                 (Application.Current as App).playingPage.LoadLayout();
             if ((Application.Current as App).compactOverlayPage != null)
                 (Application.Current as App).compactOverlayPage.UpdateLayout();
-            if (PlayingService.PlayingSongUrlRoot.data.First().url == null)
+            if (PlayingService.PlayingSongUrlRoot.Data.First().Url == null)
             {
                 NotifyPopup notifyPopup = new NotifyPopup("播放地址错误");
                 notifyPopup.Show();
@@ -115,7 +116,7 @@ namespace MyNCMusic
                 PlayingService.PlayNextRadio();
                 return;
             }
-            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.Data.First().Url)));
             _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
             _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
             _mediaPlayer.Source = _mediaPlaybackItem;
@@ -130,17 +131,17 @@ namespace MyNCMusic
             _mediaPlaybackItem.ApplyDisplayProperties(props);
         }
 
-        ObservableCollection<PlayingSongBaseObject> playingListBaseObjects = PlayingService.PlayingListBaseObjects;
+        ObservableCollection<MusicBase> playingListBaseObjects = PlayingService.PlayingList;
 
         private  async void PlayingService_OnPlayingSongChanged()
         {
             ChangeImage();
-            ChangePlayBar(PlayingService.PlayingSong,PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.ar.First().name, PlayingService.PlayingSong.al.name, PlayingService.PlayingSong.dt / 1000);
+            ChangePlayBar(PlayingService.PlayingSong,PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name, PlayingService.PlayingSong.Dt / 1000);
             if ((Application.Current as App).playingPage != null)
                 (Application.Current as App).playingPage.LoadLayout();
             if ((Application.Current as App).compactOverlayPage != null)
                 (Application.Current as App).compactOverlayPage.UpdateLayout();
-            if (PlayingService.PlayingSongUrlRoot.data.First().url == null)
+            if (PlayingService.PlayingSongUrlRoot.Data.First().Url == null)
             {
                 NotifyPopup notifyPopup = new NotifyPopup("播放地址错误");
                 notifyPopup.Show();
@@ -148,7 +149,7 @@ namespace MyNCMusic
                 PlayingService.PlayNextSongs();
                 return;
             }
-            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
+            _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.Data.First().Url)));
             _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
             _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
             _mediaPlayer.Source = _mediaPlaybackItem;
@@ -160,7 +161,7 @@ namespace MyNCMusic
             MediaItemDisplayProperties props = _mediaPlaybackItem.GetDisplayProperties();
             props.Type = Windows.Media.MediaPlaybackType.Music;
             props.MusicProperties.Title = PlayingService.PlayingSong.Name;
-            props.MusicProperties.Artist = PlayingService.PlayingSong.ar.First().name;
+            props.MusicProperties.Artist = PlayingService.PlayingSong.Ar.First().Name;
             props.Thumbnail = RandomAccessStreamReference.CreateFromFile(await ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) as StorageFile);
             _mediaPlaybackItem.ApplyDisplayProperties(props);
         }
@@ -278,7 +279,7 @@ namespace MyNCMusic
                 if (PlayingService.IsPlayingSong)
                 {
                     if(PlayingService.PlayingSong!=null)
-                        ChangePlayBar(PlayingService.PlayingSong, PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.ar.First().name, PlayingService.PlayingSong.al.name, PlayingService.PlayingSong.dt / 1000, false);
+                        ChangePlayBar(PlayingService.PlayingSong, PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name, PlayingService.PlayingSong.Dt / 1000, false);
                 }
                 else
                 {
@@ -288,9 +289,9 @@ namespace MyNCMusic
                 UpDatePlayOrderStateIcon();
                 if (PlayingService.PlayingSongUrlRoot != null)
                 {
-                    SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingService.PlayingSongUrlRoot.data.First().id);
+                    SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingService.PlayingSongUrlRoot.Data.First().Id);
                     //_mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(PlayingService.PlayingSongUrlRoot.data.First().url)));
-                    _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(songUrlRoot.data.First().url)));
+                    _mediaSource = await Task.Run(() => MediaSource.CreateFromUri(new Uri(songUrlRoot.Data.First().Url)));
                     _mediaSource.OpenOperationCompleted += _mediaSource_OpenOperationCompleted;
                     _mediaSource.StateChanged += _mediaSource_StateChanged;
                     _mediaPlaybackItem = new MediaPlaybackItem(_mediaSource);
@@ -331,7 +332,7 @@ namespace MyNCMusic
             });
         }
 
-        async void ChangePlayBar(SongsItem song,BitmapImage bitmapImage, string musicName, string artistName, string albumName, int maximum, bool isStartPlaying = true)
+        async void ChangePlayBar(MusicItem song,BitmapImage bitmapImage, string musicName, string artistName, string albumName, int maximum, bool isStartPlaying = true)
         {
             Image_playingAlbum.Source = bitmapImage;//修改专辑图片
             TextBlcok_musicName.Text = musicName;
@@ -340,7 +341,7 @@ namespace MyNCMusic
             TextBlock_lengthTime.Text = await Task.Run(() => OtherHelper.GetDt(maximum));
             if (isStartPlaying)
                 SymbolIcon_stopOrPlay.Symbol = Symbol.Pause;
-            if (song.isFavorite)
+            if (song.IsFavorite)
             {
                 TextBlock_isOrnotFavorite.Text = "\xE00B";
             }
@@ -537,15 +538,15 @@ namespace MyNCMusic
                 notifyPopup.Show();
                 return;
             }
-            if (PlayingService.PlayingSong.isFavorite)//取消喜欢
+            if (PlayingService.PlayingSong.IsFavorite)//取消喜欢
             {
-                if (await Task.Run(() => SongService.LoveOrDontLoveSong(PlayingService.PlayingSong.Id, false) == true))
+                if (await SongService.LoveOrDontLoveSongAsync(PlayingService.PlayingSong.Id, false) == true)
                 {
                     NotifyPopup notifyPopup = new NotifyPopup("已取消喜欢", "\xE00C");
                     notifyPopup.Show();
                     TextBlock_isOrnotFavorite.Text = "\xE006";
-                    PlayingService.PlayingSong.isFavorite = false;
-                    favoriteSongsRoot.ids.Remove(PlayingService.PlayingSong.Id);
+                    PlayingService.PlayingSong.IsFavorite = false;
+                    favoriteSongsRoot.Ids.Remove(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
@@ -555,13 +556,13 @@ namespace MyNCMusic
             }
             else//添加为喜欢的
             {
-                if (await Task.Run(() => SongService.LoveOrDontLoveSong(PlayingService.PlayingSong.Id, true) == true))
+                if (await SongService.LoveOrDontLoveSongAsync(PlayingService.PlayingSong.Id, true) == true)
                 {
                     NotifyPopup notifyPopup = new NotifyPopup("已添加为喜欢", "\xE00B",Colors.MediumSeaGreen);
                     notifyPopup.Show();
                     TextBlock_isOrnotFavorite.Text = "\xE00B";
-                    PlayingService.PlayingSong.isFavorite = true;
-                    favoriteSongsRoot.ids.Add(PlayingService.PlayingSong.Id);
+                    PlayingService.PlayingSong.IsFavorite = true;
+                    favoriteSongsRoot.Ids.Add(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
@@ -585,7 +586,7 @@ namespace MyNCMusic
 
         private void Button_playList_Click(object sender, RoutedEventArgs e)
         {
-            var temp = PlayingService.PlayingListBaseObjects.FirstOrDefault(p => p.IsPlaying);
+            var temp = PlayingService.PlayingList.FirstOrDefault(p => p.IsPlaying);
             if(temp!=null)
                 ListBox_playList.ScrollIntoView(temp);
         }

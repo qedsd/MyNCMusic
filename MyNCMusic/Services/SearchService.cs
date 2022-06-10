@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,9 +17,9 @@ namespace MyNCMusic.Services
         /// <param name="keyword">关键词</param>
         /// <param name="type">1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单</param>
         /// <returns></returns>
-        public static SearchRoot SearchClound(string keyword, int type)
+        public static async Task<SearchRoot> SearchCloundAsync(string keyword, int type)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/cloudsearch?keywords=" + keyword + "&type=" + type);
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/cloudsearch?keywords=" + keyword + "&type=" + type);
             if (result == null || result.Equals(""))
                 return null;
             try

@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -32,11 +32,45 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="ids"></param>
         /// <returns></returns>
+        public static async Task<MusicDetailRoot> GetMusicDetail_GetAsync(string ids)
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/song/detail?ids=" + ids);
+            if (result == null || result.Equals(""))
+                return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<MusicDetailRoot>(result);
+            }
+            catch (Exception) { return null; }
+        }
+        /// <summary>
+        /// 获取歌曲详细
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         public static MusicDetailRoot GetMusicDetail_Post(string ids)
         {
             TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
             string result = Http.Post(ConfigService.ApiUri + @"/song/detail?timestamp=" + Convert.ToInt64(ts.TotalSeconds).ToString(), "ids=" + ids);
+            if (result == null || result.Equals(""))
+                return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<MusicDetailRoot>(result);
+            }
+            catch (Exception) { return null; }
+        }
+        /// <summary>
+        /// 获取歌曲详细
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
+        public static async Task<MusicDetailRoot> GetMusicDetail_PostAsync(string ids)
+        {
+            TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+
+            string result = await Http.PostAsync(ConfigService.ApiUri + @"/song/detail?timestamp=" + Convert.ToInt64(ts.TotalSeconds).ToString(), "ids=" + ids);
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -64,12 +98,29 @@ namespace MyNCMusic.Services
         }
 
         /// <summary>
+        /// 获取歌曲url
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static async Task<SongUrlRoot> GetMusicUrlAsync(long id)
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/song/url?id=" + id);
+            if (result == null || result.Equals(""))
+                return null;
+            try
+            {
+                return JsonConvert.DeserializeObject<SongUrlRoot>(result);
+            }
+            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
+        }
+
+        /// <summary>
         /// 获取喜欢的歌曲
         /// </summary>
         /// <returns></returns>
-        public static FavoriteSongsRoot GetFavoriteSongs()
+        public static async Task<FavoriteSongsRoot> GetFavoriteSongsAsync()
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/likelist");
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/likelist");
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -79,14 +130,16 @@ namespace MyNCMusic.Services
             catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
         }
 
+
+
         /// <summary>
         /// 获取相似歌曲
         /// </summary>
         /// <param name="id">音乐id</param>
         /// <returns></returns>
-        public static SimiSongsRoot GetSimiSongs(long id)
+        public static async Task<SimiSongsRoot> GetSimiSongsAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/simi/song?id=" + id);
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/simi/song?id=" + id);
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -102,9 +155,9 @@ namespace MyNCMusic.Services
         /// <param name="id">音乐id</param>
         /// <param name="b">true 即喜欢 , 若传 false, 则取消喜欢</param>
         /// <returns></returns>
-        public static bool LoveOrDontLoveSong(long id, bool b)
+        public static async Task<bool> LoveOrDontLoveSongAsync(long id, bool b)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/like?id=" + id + "&like=" + b.ToString());
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/like?id=" + id + "&like=" + b.ToString());
             if (result == null || result.Equals(""))
                 return false;
             else
@@ -118,13 +171,33 @@ namespace MyNCMusic.Services
         /// <param name="sourceId">源id（专辑、歌单）,仅当</param>
         /// <param name="s">持续时间（秒）</param>
         /// <returns></returns>
-        public static void MarkPlayDuration(long songId, long sourceId, long s)
+        public static async Task MarkPlayDurationAsync(long songId, long sourceId, long s)
         {
             if (s < 3)
                 return;
-            Http.Get(ConfigService.ApiUri + @"/scrobble?id=" + songId + "&sourceid=" + sourceId + "&time=" + s);
+            await Http.GetAsync(ConfigService.ApiUri + @"/scrobble?id=" + songId + "&sourceid=" + sourceId + "&time=" + s);
         }
 
-        
+        /// <summary>
+        /// 日推歌曲
+        /// </summary>
+        public static async Task<List<MusicItem>> GetRecommandSongAsync()
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/recommend/songs");
+            if (result == null)
+            {
+                return null;
+            }
+            RecommendMusicRoot recommendMusics = JsonConvert.DeserializeObject<RecommendMusicRoot>(result);
+            if (recommendMusics == null|| recommendMusics.Data == null || recommendMusics.Data.DailySongs ==null || recommendMusics.Data.DailySongs.Count==0)
+            {
+                return null;
+            }
+            //recommendMusics.Data.DailySongs.ForEach(p =>
+            //{
+            //    p.IsFavorite = PlayingService.FavoriteMusics.Contains(p.Id);
+            //});
+            return recommendMusics.Data.DailySongs;
+        }
     }
 }

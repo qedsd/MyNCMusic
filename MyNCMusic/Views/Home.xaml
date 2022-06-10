@@ -2,181 +2,185 @@
     x:Class="MyNCMusic.Views.Home"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MyNCMusic.Views"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
-    mc:Ignorable="d"
-    Background="Transparent">
-
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mycontrols="using:MyNCMusic.Controls"
+    Background="{Binding MainBackgroundBrush}"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style TargetType="TextBlock" x:Key="MenuText">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="MenuIcon">
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        </Style>
+    </Page.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="240"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <!--导航栏-->
-        <Grid>
-            <Grid.Background>
-                <AcrylicBrush BackgroundSource="Backdrop"
-                          TintColor="WhiteSmoke"
-                          TintOpacity="0.6"
-                          x:Name="AcrylicBrush_menu"/>
-            </Grid.Background>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="200"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <controls:ImageEx  HorizontalAlignment="Center" 
-                            VerticalAlignment="Center"
-                            Stretch="Fill" 
-                            Width="128"
-                            Height="128"
-                                       CornerRadius="999"
-                               Name="ImageEx_user">
-                <ToolTipService.ToolTip>
-                    <TextBlock Text="MyNCMusic"
-                               Name="TextBlock_UserName"/>
-                </ToolTipService.ToolTip>
-            </controls:ImageEx>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Frame x:Name="MainFrame">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <!--  左侧导航栏  -->
+                <Grid>
+                    <Grid.Background>
+                        <AcrylicBrush
+                            x:Name="AcrylicBrush_menu"
+                            BackgroundSource="Backdrop"
+                            TintColor="WhiteSmoke"
+                            TintOpacity="0.6" />
+                    </Grid.Background>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <controls:ImageEx
+                        x:Name="ImageEx_user"
+                        Width="128"
+                        Height="128"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        CornerRadius="999"
+                        Stretch="Fill">
+                        <ToolTipService.ToolTip>
+                            <TextBlock Name="TextBlock_UserName" Text="MyNCMusic" />
+                        </ToolTipService.ToolTip>
+                    </controls:ImageEx>
 
-            <StackPanel Grid.Row="1">
-                <Button Style="{StaticResource ButtonStyle_tran}"
+                    <StackPanel Grid.Row="1">
+                        <Button
+                            Name="Button_recommendation"
                             HorizontalAlignment="Center"
-                                    Name="Button_recommendation"
-                                    Click="Button_recommendation_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE189;"
-                                       FontSize="14"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="发现音乐"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Style="{StaticResource ButtonStyle_tran}"
-                                    HorizontalAlignment="Center"
-                                    Name="Button_myMusicList"
-                                    Click="Button_myMusicList_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE142;"
-                                       FontSize="14"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="我的歌单"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Style="{StaticResource ButtonStyle_tran}"
-                                    HorizontalAlignment="Center"
-                                    Name="Button_myCollection"
-                                    Click="Button_myCollection_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE1CE;"
-                                       FontSize="14"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="我的收藏"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Style="{StaticResource ButtonStyle_tran}"
-                                    HorizontalAlignment="Center"
-                                    Name="Button_Radio"
-                                    Click="Button_Radio_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE18B;"
-                                       FontSize="14"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="我的电台"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                <Button Style="{StaticResource ButtonStyle_tran}"
-                                    HorizontalAlignment="Center"
-                                    Name="Button_History"
-                                    Click="Button_History_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE121;"
-                                       FontSize="14"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="听歌记录"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-                
-            </StackPanel>
-            <StackPanel Grid.Row="2" Margin="0,0,0,20">
-                <Button Style="{StaticResource ButtonStyle_tran}"
+                            Click="Button_recommendation_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE189;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="发现音乐" 
+                                        Style="{StaticResource MenuText}"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button
+                            Name="Button_myMusicList"
                             HorizontalAlignment="Center"
-                                    Name="Button_setting"
-                                    Click="Button_setting_Click">
-                    <Button.Content>
-                        <StackPanel Orientation="Horizontal"
-                                        Width="100">
-                            <TextBlock FontFamily="Segoe UI Symbol"
-                                       Text="&#xE115;"
-                                       FontSize="14"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="应用设置"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1"
-                                       Margin="20,0,0,0"/>
-                        </StackPanel>
-                    </Button.Content>
-                </Button>
-            </StackPanel>
-        </Grid>
-        <Frame x:Name="Frame_main" Grid.Column="1">
-            <Frame.Background>
-                <AcrylicBrush BackgroundSource="Backdrop"
-                          TintColor="Black"
-                          TintOpacity="0.4"
-                          x:Name="AcrylicBrush_mainFrame"/>
-            </Frame.Background>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <ProgressRing IsActive="True" Name="ProgressRing_initState"/>
-                <TextBlock Text="初始化中" Name="TextBlock_initState" Margin="0,10,0,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-            </StackPanel>
+                            Click="Button_myMusicList_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE142;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="我的歌单" 
+                                        Style="{StaticResource MenuText}"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button
+                            Name="Button_myCollection"
+                            HorizontalAlignment="Center"
+                            Click="Button_myCollection_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE1CE;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource MenuText}"
+                                        Text="我的收藏" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button
+                            Name="Button_Radio"
+                            HorizontalAlignment="Center"
+                            Click="Button_Radio_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE18B;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource MenuText}"
+                                        Text="我的电台" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                        <Button
+                            Name="Button_History"
+                            HorizontalAlignment="Center"
+                            Click="Button_History_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE121;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource MenuText}"
+                                        Text="听歌记录" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+
+                    </StackPanel>
+                    <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                        <Button
+                            Name="Button_setting"
+                            HorizontalAlignment="Center"
+                            Click="Button_setting_Click"
+                            Style="{StaticResource ButtonStyle_tran}">
+                            <Button.Content>
+                                <StackPanel Width="100" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource MenuIcon}"
+                                        Text="&#xE115;" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Style="{StaticResource MenuText}"
+                                        Text="应用设置" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <!--  中心主要内容区  -->
+                <Frame x:Name="Frame_main" Grid.Column="1">
+                    <Frame.Background>
+                        <AcrylicBrush
+                            x:Name="AcrylicBrush_mainFrame"
+                            BackgroundSource="Backdrop"
+                            TintColor="Black"
+                            TintOpacity="0.4" />
+                    </Frame.Background>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <ProgressRing Name="ProgressRing_initState" IsActive="True" />
+                        <TextBlock
+                            Name="TextBlock_initState"
+                            Margin="0,10,0,0"
+                            Text="初始化中" />
+                    </StackPanel>
+                </Frame>
+            </Grid>
         </Frame>
-        <ContentDialog x:Name="ContentDialog_setting"
-                       CloseButtonText="取消"
-                       PrimaryButtonText="保存"
-                       PrimaryButtonClick="ContentDialog_setting_PrimaryButtonClick">
-            <StackPanel>
-                <TextBox Header="服务器" Width="300" Name="TextBox_serverIP" BorderThickness="0,0,0,1" PlaceholderText="示例：http://localhost:3000"/>
-                <TextBox Header="手机号/163邮箱" Width="300" Name="TextBox_account" BorderThickness="0,0,0,1" Margin="0,10,0,0"/>
-                <PasswordBox Width="300" Header="登陆密码" PasswordChar="•" Name="PasswordBox_password" BorderThickness="0,0,0,1" Margin="0,10,0,0"/>
-                <TextBlock Text="*保存会自动重启以生效" Foreground="OrangeRed" Margin="0,10,0,0"/>
-            </StackPanel>
-        </ContentDialog>
+        <mycontrols:ControlBar Grid.Row="1" />
     </Grid>
 </Page>

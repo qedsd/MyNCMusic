@@ -11,7 +11,7 @@
     <AssemblyName>MyNCMusic</AssemblyName>
     <DefaultLanguage>zh-CN</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.19041.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -19,8 +19,9 @@
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateKeyFile>MyNCMusic_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>A7388FF8C875A3428868B2AAB048E42EE6C659AD</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>
+    </PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>CCEAD500E88A34FE3E2EE5BB8F31AC53D7B06DBD</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -128,6 +129,26 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\AlbumList.xaml.cs">
+      <DependentUpon>AlbumList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ArtistList.xaml.cs">
+      <DependentUpon>ArtistList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MusicList.xaml.cs">
+      <DependentUpon>MusicList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PlaylistList.xaml.cs">
+      <DependentUpon>PlaylistList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\WaitingPopup.xaml.cs">
+      <DependentUpon>WaitingPopup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\IntToVisibilityConverter.cs" />
+    <Compile Include="Converters\MusicPlayingStatusConverter.cs" />
+    <Compile Include="Converters\PercentageToNumberConverter.cs" />
+    <Compile Include="Converters\SecondConverter.cs" />
     <Compile Include="Helper\ConverterHelper.cs" />
     <Compile Include="Helper\CookieHelper.cs" />
     <Compile Include="Helper\FileHelper.cs" />
@@ -137,22 +158,77 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\DjRadio.cs" />
-    <Compile Include="Model\BaseObject.cs" />
-    <Compile Include="Model\MyClass.cs" />
-    <Compile Include="Model\MyImage.cs" />
-    <Compile Include="Model\MySourceId.cs" />
-    <Compile Include="Model\PlayOrderState.cs" />
-    <Compile Include="Model\RecordData.cs" />
-    <Compile Include="MyUserControl\NotifyPopup.xaml.cs">
+    <Compile Include="Models\Account\Account.cs" />
+    <Compile Include="Models\Account\LoginRoot.cs" />
+    <Compile Include="Models\Account\LoginStatus.cs" />
+    <Compile Include="Models\Account\Profile.cs" />
+    <Compile Include="Models\Album\AlbumInfo.cs" />
+    <Compile Include="Models\Album\AlbumRoot.cs" />
+    <Compile Include="Models\Album\CADataItem.cs" />
+    <Compile Include="Models\Album\CommentThread.cs" />
+    <Compile Include="Models\Album\MyCollectionfAlbumRoot.cs" />
+    <Compile Include="Models\Album\ResourceInfo.cs" />
+    <Compile Include="Models\Artist\ArtistAllAlbumRoot.cs" />
+    <Compile Include="Models\Artist\ArtistBaseDetailRoot.cs" />
+    <Compile Include="Models\Artist\MyCollectionfArtistRoot.cs" />
+    <Compile Include="Models\Comment\Associator.cs" />
+    <Compile Include="Models\Comment\CommentItem.cs" />
+    <Compile Include="Models\Comment\CommentRoot.cs" />
+    <Compile Include="Models\Comment\CommentUser.cs" />
+    <Compile Include="Models\Comment\VipRights.cs" />
+    <Compile Include="Models\DjRadio.cs" />
+    <Compile Include="Models\BaseObject.cs" />
+    <Compile Include="Models\Lyric\Klyric.cs" />
+    <Compile Include="Models\Lyric\Lrc.cs" />
+    <Compile Include="Models\Lyric\LyricRoot.cs" />
+    <Compile Include="Models\Lyric\LyricStr.cs" />
+    <Compile Include="Models\Lyric\Tlyric.cs" />
+    <Compile Include="Models\Lyric\TransUser.cs" />
+    <Compile Include="Models\MusicBase.cs" />
+    <Compile Include="Models\Album\Album.cs" />
+    <Compile Include="Models\Artist\Artist.cs" />
+    <Compile Include="Models\Music\ChargeInfoListItem.cs" />
+    <Compile Include="Models\Music\Creator.cs" />
+    <Compile Include="Models\Music\MusicDetailRoot.cs" />
+    <Compile Include="Models\Music\MusicItem.cs" />
+    <Compile Include="Models\Music\Privilege.cs" />
+    <Compile Include="Models\Music\SimiSongsRoot.cs" />
+    <Compile Include="Models\Music\SongDataItem.cs" />
+    <Compile Include="Models\Music\SongUrlRoot.cs" />
+    <Compile Include="Models\Playlist\FavoriteSongsRoot.cs" />
+    <Compile Include="Models\Playlist\MyPlaylistRoot.cs" />
+    <Compile Include="Models\Playlist\PlayListDetailRoot.cs" />
+    <Compile Include="Models\Playlist\PlaylistItem.cs" />
+    <Compile Include="Models\Playlist\PlaylistNavItem.cs" />
+    <Compile Include="Models\Playlist\PrivilegesItem.cs" />
+    <Compile Include="Models\Playlist\SubscribersItem.cs" />
+    <Compile Include="Models\Playlist\TrackIdsItem.cs" />
+    <Compile Include="Models\Playlist\TracksItem.cs" />
+    <Compile Include="Models\Recommend\RecommendList.cs" />
+    <Compile Include="Models\Recommend\RecommendListRoot.cs" />
+    <Compile Include="Models\MyClass.cs" />
+    <Compile Include="Models\MyImage.cs" />
+    <Compile Include="Models\MySourceId.cs" />
+    <Compile Include="Models\PlayOrderState.cs" />
+    <Compile Include="Models\Recommend\RecommendMusicData.cs" />
+    <Compile Include="Models\Recommend\RecommendMusicRoot.cs" />
+    <Compile Include="Models\RecordData.cs" />
+    <Compile Include="Controls\ControlBar.xaml.cs">
+      <DependentUpon>ControlBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NotifyPopup.xaml.cs">
       <DependentUpon>NotifyPopup.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\ResponseRoot.cs" />
+    <Compile Include="Models\Search\SearchResult.cs" />
+    <Compile Include="Models\Search\SearchRoot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AlbumService.cs" />
     <Compile Include="Services\ArtistService.cs" />
     <Compile Include="Services\CommentService.cs" />
     <Compile Include="Services\ConfigService.cs" />
     <Compile Include="Services\DjRadioService.cs" />
+    <Compile Include="Services\NavigateService.cs" />
     <Compile Include="Services\PlayingService .cs" />
     <Compile Include="Helper\LoginHelper.cs" />
     <Compile Include="Services\LyricService.cs" />
@@ -160,6 +236,12 @@
     <Compile Include="Services\RecordDataService.cs" />
     <Compile Include="Services\SearchService.cs" />
     <Compile Include="Services\SongService.cs" />
+    <Compile Include="Services\ThemeService.cs" />
+    <Compile Include="ViewModel\ControlBarViewModel.cs" />
+    <Compile Include="ViewModel\HomeViewModel.cs" />
+    <Compile Include="ViewModel\PlayingViewModel.cs" />
+    <Compile Include="ViewModel\PlaylistDetailViewModel.cs" />
+    <Compile Include="ViewModel\RecommendationViewModel.cs" />
     <Compile Include="Views\AlbumDetail.xaml.cs">
       <DependentUpon>AlbumDetail.xaml</DependentUpon>
     </Compile>
@@ -259,11 +341,35 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\AlbumList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ArtistList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MusicList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PlaylistList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\WaitingPopup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MyUserControl\NotifyPopup.xaml">
+    <Page Include="Controls\ControlBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\NotifyPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -326,23 +432,43 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.9</Version>
+      <Version>6.2.13</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI">
-      <Version>6.1.1</Version>
+      <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>6.1.1</Version>
+      <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
-      <Version>6.1.1</Version>
+      <Version>7.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.UI.Xaml">
+      <Version>2.7.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Prism.Core">
+      <Version>8.1.97</Version>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody">
+      <Version>3.4.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="key.snk" />
     <None Include="MyNCMusic_TemporaryKey.pfx" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

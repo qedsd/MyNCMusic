@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using MyNCMusic.Services;
 using MyNCMusic.Views;
 using System;
@@ -89,14 +89,14 @@ namespace MyNCMusic
 
         private void Page_CloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
         {
-            PlayingService.Volume = myMainPage._mediaPlayer.Volume;
+            //PlayingService.Volume = myMainPage._mediaPlayer.Volume;
             PlayingService.Save();
             if (myMainPage == null || PlayingService.PlayDurationStopwatch == null)
                 return;
             myMainPage.playDurationStopwatch.Stop();
             if (PlayingService.PlayingSong == null)
                 return;
-            System.Threading.Tasks.Task.Run(() => SongService.MarkPlayDuration(PlayingService.PlayingSong.Id, PlayingService.PlayingListId, PlayingService.PlayDurationStopwatch.ElapsedMilliseconds / 1000));
+            System.Threading.Tasks.Task.Run(() => SongService.MarkPlayDurationAsync(PlayingService.PlayingSong.Id, PlayingService.PlayingListId, PlayingService.PlayDurationStopwatch.ElapsedMilliseconds / 1000));
         }
 
         /// <summary>

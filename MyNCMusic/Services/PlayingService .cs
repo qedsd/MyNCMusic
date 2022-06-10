@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using MyNCMusic.MyUserControl;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TheGuideToTheNewEden.Helper;
 using Windows.Media;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
 
@@ -17,6 +18,11 @@ namespace MyNCMusic.Services
 {
     public static class PlayingService
     {
+        /// <summary>
+        /// 全局唯一音乐、播客媒体播放控制器
+        /// </summary>
+        public static MediaPlayer MediaPlayer = new MediaPlayer();
+
         /// <summary>
         /// 我创建的歌单
         /// </summary>
@@ -30,13 +36,13 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 上一次播放的歌曲列表
         /// </summary>
-        public static List<SongsItem> PlayedSongList;
+        public static List<MusicItem> PlayedSongList;
 
-        public static List<SongsItem> _PlayingSongList;
+        public static List<MusicItem> _PlayingSongList;
         /// <summary>
         /// 当前播放的歌曲列表
         /// </summary>
-        public static List<SongsItem> PlayingSongList
+        public static List<MusicItem> PlayingSongList
         {
             get { return _PlayingSongList; }
             set
@@ -78,18 +84,18 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 上次播放的歌曲
         /// </summary>
-        public static SongsItem PlayedSong;
+        public static MusicItem PlayedSong;
 
         /// <summary>
         /// 上次播放的电台
         /// </summary>
         public static RadioSongItem PlayedRadio;
 
-        public static SongsItem _PlayingSong;
+        public static MusicItem _PlayingSong;
         /// <summary>
         /// 当前播放歌曲
         /// </summary>
-        public static SongsItem PlayingSong
+        public static MusicItem PlayingSong
         {
             get { return _PlayingSong; }
             set
@@ -182,16 +188,12 @@ namespace MyNCMusic.Services
         /// <param name="songsItems"></param>
         /// <param name="songsItem"></param>
         /// <returns></returns>
-        public static async Task<bool> ChangePlayingSong(long playingSongId, List<SongsItem> songsItems, SongsItem songsItem = null)
+        public static async Task<bool> ChangePlayingSong(long playingSongId, List<MusicItem> songsItems, MusicItem songsItem = null)
         {
             IsPlayingSong = true;
             PlayingSongId = playingSongId;
             PlayingSongList = songsItems;
-            bool b;
-            if (songsItem == null)
-                b=await PreparePlayingSong(PlayingSongId);
-            else
-                b=await PreparePlayingSong(PlayingSongId, songsItem);
+            bool b = await PreparePlayingSong(PlayingSongId, songsItem);
             if (!b)
             {
                 NotifyPopup notifyPopup = new NotifyPopup("获取音乐失败");
@@ -199,25 +201,22 @@ namespace MyNCMusic.Services
             }
             else
             {
-
+                Play(PlayingSong.Id);
                 PlayingListToBaseObject(PlayingSongList);
-                WhenPlayingSongChange();
+                //WhenPlayingSongChange();
             }
             return b;
         }
-        public static async Task<bool> ChangePlayingSong(long playingSongId, SongsItem songsItem = null)
+        public static async Task<bool> ChangePlayingSong(long playingSongId, MusicItem songsItem = null)
         {
             IsPlayingSong = true;
             PlayingSongId = playingSongId;
             PlayingSongList = PlayingSongList;
             
-            bool b;
-            if (songsItem == null)
-                b = await PreparePlayingSong(PlayingSongId);
-            else
-                b = await PreparePlayingSong(PlayingSongId, songsItem);
+            bool b = await PreparePlayingSong(PlayingSongId, songsItem);
+            Play(PlayingSong.Id);
             PlayingListToBaseObject(PlayingSongList);
-            WhenPlayingSongChange();
+            //WhenPlayingSongChange();
             return b;
         }
 
@@ -285,21 +284,21 @@ namespace MyNCMusic.Services
         /// <param name="playingSongId"></param>
         /// <param name="songsItem"></param>
         /// <returns></returns>
-        public static async Task<bool> PreparePlayingSong(long playingSongId, SongsItem songsItem = null)
+        public static async Task<bool> PreparePlayingSong(long playingSongId, MusicItem songsItem = null)
         {
             if (songsItem == null)//需获取实例
             {
                 MusicDetailRoot musicDetailRoot = await Task.Run(() => SongService.GetMusicDetail_Get(playingSongId.ToString()));
-                if (musicDetailRoot == null || musicDetailRoot.songs == null || musicDetailRoot.songs.Count == 0)
+                if (musicDetailRoot == null || musicDetailRoot.Songs == null || musicDetailRoot.Songs.Count == 0)
                 {
                     return false;
                 }
-                songsItem = musicDetailRoot.songs.Last();
+                songsItem = musicDetailRoot.Songs.Last();
                 //判断是否为喜欢歌曲
                 if (MainPage.favoriteSongsRoot != null)
                 {
-                    if (MainPage.favoriteSongsRoot.ids.Find(p => p.Equals(songsItem.Id)) != 0)
-                        songsItem.isFavorite = true;
+                    if (MainPage.favoriteSongsRoot.Ids.Find(p => p.Equals(songsItem.Id)) != 0)
+                        songsItem.IsFavorite = true;
                 }
             }
             SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
@@ -311,7 +310,7 @@ namespace MyNCMusic.Services
             var playingSong = PlayingService.PlayingSongList.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id);
             if(playingSong==null)//将要播放的歌曲不在当前播放列表
             {
-                PlayingSongList = new List<SongsItem>() { PlayingSong };
+                PlayingSongList = new List<MusicItem>() { PlayingSong };
                 playingSong = PlayingSong;
             }
             if(PlayedSongId!=null)
@@ -330,18 +329,18 @@ namespace MyNCMusic.Services
             if (PlayingService.PlayedSong != null)//听歌打卡
             {
                 PlayingService.PlayDurationStopwatch.Stop();
-                await Task.Run(() => SongService.MarkPlayDuration(PlayedSong.Id, PlayedListId, PlayDurationStopwatch.ElapsedMilliseconds / 1000));
+                await SongService.MarkPlayDurationAsync(PlayedSong.Id, PlayedListId, PlayDurationStopwatch.ElapsedMilliseconds / 1000);
             }
 
             //获取专辑
-            PlayingAlbum = await Task.Run(() => AlbumService.GetAlbum(songsItem.al.id));
+            PlayingAlbum = await Task.Run(() => AlbumService.GetAlbum(songsItem.Al.Id));
             if (PlayingAlbum == null)
                 return false;
-            PlayingService.PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingAlbum.album.picUrl + "?param=200y200"));
+            PlayingService.PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingAlbum.Album.PicUrl + "?param=200y200"));
 
-            if(PlayedSong!=null&& PlayedSongList!=null)
-                PlayedSongList.FirstOrDefault(p=>p.Id== PlayedSong.Id).IsPlaying = false;
-            PlayingSongList.FirstOrDefault(p => p.Id == PlayingSong.Id).IsPlaying = true;
+            //if(PlayedSong!=null&& PlayedSongList!=null)
+            //    PlayedSongList.FirstOrDefault(p=>p.Id== PlayedSong.Id).IsPlaying = false;
+            //PlayingSongList.FirstOrDefault(p => p.Id == PlayingSong.Id).IsPlaying = true;
 
             return true;
 
@@ -387,7 +386,7 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 歌曲、电台共用的播放列表
         /// </summary>
-        public static ObservableCollection<PlayingSongBaseObject> PlayingListBaseObjects = new ObservableCollection<PlayingSongBaseObject>();
+        public static ObservableCollection<MusicBase> PlayingList = new ObservableCollection<MusicBase>();
 
         /// <summary>
         /// 将歌曲/电台列表转换到共用的播放列表
@@ -396,18 +395,18 @@ namespace MyNCMusic.Services
         /// <param name="list"></param>
         public static void PlayingListToBaseObject<T>(List<T> list)
         {
-            PlayingListBaseObjects.Clear();
+            PlayingList.Clear();
             if(list!=null)
             {
-                if(list.First().GetType()==typeof(SongsItem))
+                if(list.First().GetType()==typeof(MusicItem))
                 {
                     foreach (var temp in list)
-                        PlayingListBaseObjects.Add(temp as PlayingSongBaseObject);
+                        PlayingList.Add(temp as MusicItem);
                 }
                 else
                 {
                     foreach (var temp in list)
-                        PlayingListBaseObjects.Add((temp as RadioSongItem).MainSong as PlayingSongBaseObject);
+                        PlayingList.Add((temp as RadioSongItem).MainSong);
                 }
             }
             
@@ -421,7 +420,7 @@ namespace MyNCMusic.Services
         {
             if (ls == null)
                 return false;
-            foreach(var temp in PlayingListBaseObjects)
+            foreach(var temp in PlayingList)
             {
                 if (!ls.Contains(temp.Id))
                     return false;
@@ -444,9 +443,9 @@ namespace MyNCMusic.Services
         public static async void PlayNextSongs()
         {
             long willPlayId = 0;
-            if (PlayingListBaseObjects==null||PlayingListBaseObjects.Count == 0)
+            if (PlayingList == null|| PlayingList.Count == 0)
                 return;
-            int index = PlayingService.PlayingListBaseObjects.IndexOf(PlayingService.PlayingListBaseObjects.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id));
+            int index = PlayingService.PlayingList.IndexOf(PlayingService.PlayingList.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id));
             switch (PlayOrderState)
             {
                 case PlayOrderStateEnum.顺序播放:
@@ -457,7 +456,7 @@ namespace MyNCMusic.Services
                             MediaTimelineController.Pause();
                             return;
                         }
-                        willPlayId = PlayingService.PlayingListBaseObjects[++index].Id;
+                        willPlayId = PlayingService.PlayingList[++index].Id;
                     }
                     break;
                 case PlayOrderStateEnum.列表循环:
@@ -466,7 +465,7 @@ namespace MyNCMusic.Services
                         {
                             index = -1;
                         }
-                        willPlayId = PlayingService.PlayingListBaseObjects[++index].Id;
+                        willPlayId = PlayingService.PlayingList[++index].Id;
                     }
                     break;
                 case PlayOrderStateEnum.随机播放:
@@ -480,10 +479,10 @@ namespace MyNCMusic.Services
                         Random rd = new Random();
                         while (true)
                         {
-                            int i = rd.Next(0, PlayingService.PlayingListBaseObjects.Count - 1);
-                            if (!PlayingService.PlayedSongId.Contains(PlayingService.PlayingListBaseObjects[i].Id))
+                            int i = rd.Next(0, PlayingService.PlayingList.Count - 1);
+                            if (!PlayingService.PlayedSongId.Contains(PlayingService.PlayingList[i].Id))
                             {
-                                willPlayId = PlayingService.PlayingListBaseObjects[i].Id;
+                                willPlayId = PlayingService.PlayingList[i].Id;
                                 break;
                             }
                         }
@@ -526,9 +525,9 @@ namespace MyNCMusic.Services
         public static async void PlayNextRadio()
         {
             long willPlayId = 0;
-            if (PlayingListBaseObjects == null || PlayingListBaseObjects.Count == 0)
+            if (PlayingList == null || PlayingList.Count == 0)
                 return;
-            int index = PlayingListBaseObjects.IndexOf(PlayingListBaseObjects.FirstOrDefault(p => p.Id == PlayingRadio.MainSong.Id));
+            int index = PlayingList.IndexOf(PlayingList.FirstOrDefault(p => p.Id == PlayingRadio.MainSong.Id));
             switch (PlayOrderState)
             {
                 case PlayOrderStateEnum.顺序播放:
@@ -539,7 +538,7 @@ namespace MyNCMusic.Services
                             MediaTimelineController.Pause();
                             return;
                         }
-                        willPlayId = PlayingListBaseObjects[++index].Id;
+                        willPlayId = PlayingList[++index].Id;
                     }
                     break;
                 case PlayOrderStateEnum.列表循环:
@@ -548,7 +547,7 @@ namespace MyNCMusic.Services
                         {
                             index = -1;
                         }
-                        willPlayId = PlayingListBaseObjects[++index].Id;
+                        willPlayId = PlayingList[++index].Id;
                     }
                     break;
                 case PlayOrderStateEnum.随机播放:
@@ -562,10 +561,10 @@ namespace MyNCMusic.Services
                         Random rd = new Random();
                         while (true)
                         {
-                            int i = rd.Next(0, PlayingListBaseObjects.Count - 1);
-                            if (!PlayedRadioId.Contains(PlayingListBaseObjects[i].Id))
+                            int i = rd.Next(0, PlayingList.Count - 1);
+                            if (!PlayedRadioId.Contains(PlayingList[i].Id))
                             {
-                                willPlayId = PlayingListBaseObjects[i].Id;
+                                willPlayId = PlayingList[i].Id;
                                 break;
                             }
                         }
@@ -602,15 +601,25 @@ namespace MyNCMusic.Services
             }
         }
 
+        #region new
+        public static HashSet<long> FavoriteMusics = new HashSet<long>();
+        public static void Play(long musicId)
+        {
+            string url = $"https://music.163.com/song/media/outer/url?id={musicId}.mp3";//不走song/url避免403
+            OnPlayingChanged?.Invoke(musicId,url);
+        }
+        public delegate void PlayingChanged(long id,string url);
+        public static event PlayingChanged OnPlayingChanged;
+        #endregion
     }
-    
+
     /// <summary>
     /// 供序列化保存使用的播放信息类,自动关联PlayingService
     /// </summary>
     [Serializable]
     public class PlayingInfoToSave
     {
-        public SongsItem PlayingSong
+        public MusicItem PlayingSong
         {
             get { return PlayingService.PlayingSong; }
             set { PlayingService.PlayingSong = value; }
@@ -620,7 +629,7 @@ namespace MyNCMusic.Services
             get { return PlayingService.PlayingRadio; }
             set { PlayingService.PlayingRadio = value; }
         }
-        public List<SongsItem> PlayingSongList
+        public List<MusicItem> PlayingSongList
         {
             get { return PlayingService.PlayingSongList; }
             set { PlayingService.PlayingSongList = value; }
@@ -630,7 +639,7 @@ namespace MyNCMusic.Services
             get { return PlayingService.PlayingRadioList; }
             set { PlayingService.PlayingRadioList = value; }
         }
-        public SongsItem PlayedSong
+        public MusicItem PlayedSong
         {
             get { return PlayingService.PlayedSong; }
             set { PlayingService.PlayedSong = value; }
@@ -655,10 +664,10 @@ namespace MyNCMusic.Services
             get { return PlayingService.PlayingListId; }
             set { PlayingService.PlayingListId = value; }
         }
-        public ObservableCollection<PlayingSongBaseObject> PlayingListBaseObjects
+        public ObservableCollection<MusicBase> PlayingListBaseObjects
         {
-            get { return PlayingService.PlayingListBaseObjects; }
-            set { PlayingService.PlayingListBaseObjects = value; }
+            get { return PlayingService.PlayingList; }
+            set { PlayingService.PlayingList = value; }
         }
         public PlayOrderStateEnum PlayOrderState
         {
@@ -681,10 +690,10 @@ namespace MyNCMusic.Services
             get { return PlayingService.PlayedRadioId; }
             set { PlayingService.PlayedRadioId = value ?? new List<long>(); }
         }
-        public List<SongsItem> PlayedSongList
+        public List<MusicItem> PlayedSongList
         {
             get { return PlayingService.PlayedSongList; }
-            set { PlayingService.PlayedSongList = value??new List<SongsItem>(); }
+            set { PlayingService.PlayedSongList = value??new List<MusicItem>(); }
         }
         public List<RadioSongItem> PlayedRadioList
         {

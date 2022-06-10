@@ -2,88 +2,132 @@
     x:Class="MyNCMusic.Views.MyCollection"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:MyNCMusic.Views"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:model="using:MyNCMusic.Model"
     xmlns:converter="using:MyNCMusic.Helper"
-    mc:Ignorable="d"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MyNCMusic.Models"
     Background="Transparent"
-    Foreground="{x:Bind local:Home.mainSolidColorBrush}">
+    
+    mc:Ignorable="d">
 
     <Page.Resources>
-        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem"/>
-        <converter:GetAlia x:Key="GetAlia"/>
-        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48"/>
-        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160"/>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem" />
+        <converter:GetAlia x:Key="GetAlia" />
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
     </Page.Resources>
     <Grid Margin="20,0,10,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ProgressBar x:Name="ProgressBar_loading" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
-        <TextBlock Text="我的收藏" FontFamily="SimSun" FontSize="48" Margin="0,48,0,10"
-                   Grid.Row="1"/>
+        <ProgressBar
+            x:Name="ProgressBar_loading"
+            IsIndeterminate="True"
+            ShowPaused="False"
+            Visibility="Collapsed" />
+        <TextBlock
+            Grid.Row="1"
+            Margin="0,48,0,10"
+            FontFamily="SimSun"
+            FontSize="48"
+            Text="我的收藏" />
         <Pivot Grid.Row="2" SelectionChanged="Pivot_SelectionChanged">
             <PivotItem Tag="0">
                 <PivotItem.Header>
-                    <TextBlock Text="专辑" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        
+                        Text="专辑" />
                 </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <ProgressBar x:Name="ProgressBar_loadAlbum" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
-                    <ListBox Grid.Row="1" Name="ListBox_album"
-                             Margin="0,4"
-                             Tapped="ListBox_album_Tapped">
+                    <ProgressBar
+                        x:Name="ProgressBar_loadAlbum"
+                        IsIndeterminate="True"
+                        ShowPaused="False"
+                        Visibility="Collapsed" />
+                    <ListBox
+                        Name="ListBox_album"
+                        Grid.Row="1"
+                        Margin="0,4"
+                        Tapped="ListBox_album_Tapped">
                         <ListBox.Background>
-                            <AcrylicBrush BackgroundSource="Backdrop"
-                          TintColor="Black"
-                          TintOpacity="0.1"/>
+                            <AcrylicBrush
+                                BackgroundSource="Backdrop"
+                                TintColor="Black"
+                                TintOpacity="0.1" />
                         </ListBox.Background>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="model:CADataItem">
-                                <Grid x:Name="Grid_itemTemplate"
-                                      >
+                                <Grid x:Name="Grid_itemTemplate">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="48"/>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="48" />
                                     </Grid.ColumnDefinitions>
-                                    <Image Source="{x:Bind picUrl,Converter={StaticResource ReturnImageUriWithParam_48}}" Width="48" Height="48"/>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10,0,0,0">
-                                        <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                                        <TextBlock Text="{x:Bind alias,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />
+                                    <Image
+                                        Width="48"
+                                        Height="48"
+                                        Source="{x:Bind PicUrl, Converter={StaticResource ReturnImageUriWithParam_48}}" />
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="{x:Bind Name}" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            Foreground="LightGray"
+                                            Text="{x:Bind Alias, Converter={StaticResource GetAlia}}" />
                                     </StackPanel>
-                                    <Button Content="{x:Bind artists,Converter={StaticResource GetArNames_ArtistsItem}}" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}" Style="{StaticResource ButtonStyle_tran}"
-                                            Click="Button_artists_Click_Artist">
+                                    <Button
+                                        Grid.Column="2"
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center"
+                                        Click="Button_artists_Click_Artist"
+                                        Content="{x:Bind Artists, Converter={StaticResource GetArNames_ArtistsItem}}"
+                                        
+                                        Style="{StaticResource ButtonStyle_tran}">
                                         <Button.Flyout>
                                             <Flyout>
-                                                <ListBox x:Name="ListBox_artists" SelectionChanged="ListBox_artists_SelectionChanged_Artist"
-                                                         ItemsSource="{x:Bind artists}">
+                                                <ListBox
+                                                    x:Name="ListBox_artists"
+                                                    ItemsSource="{x:Bind Artists}"
+                                                    SelectionChanged="ListBox_artists_SelectionChanged_Artist">
                                                     <ListBox.ItemTemplate>
                                                         <DataTemplate x:DataType="model:Artist">
-                                                            <TextBlock Text="{x:Bind name}"/>
+                                                            <TextBlock Text="{x:Bind Name}" />
                                                         </DataTemplate>
                                                     </ListBox.ItemTemplate>
                                                 </ListBox>
                                             </Flyout>
                                         </Button.Flyout>
                                     </Button>
-                                    <StackPanel Orientation="Horizontal"
-                                                Grid.Column="3">
-                                        <TextBlock Text="{x:Bind size}"  VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                                        <TextBlock Text="首" Margin="4,0,0,0"  VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                        <TextBlock
+                                            Margin="0,0,6,0"
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="{x:Bind Size}" />
+                                        <TextBlock
+                                            Margin="4,0,0,0"
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="首" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
@@ -93,49 +137,79 @@
             </PivotItem>
             <PivotItem Tag="1">
                 <PivotItem.Header>
-                    <TextBlock Text="歌手" FontSize="14" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        
+                        Text="歌手" />
                 </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
-                    <ProgressBar x:Name="ProgressBar_loadArtist" Visibility="Collapsed" IsIndeterminate="True" ShowPaused="False"/>
-                    <ListBox Grid.Row="1" Name="ListBox_artist"
-                             Margin="0,4"
-                             Tapped="ListBox_artist_Tapped">
+                    <ProgressBar
+                        x:Name="ProgressBar_loadArtist"
+                        IsIndeterminate="True"
+                        ShowPaused="False"
+                        Visibility="Collapsed" />
+                    <ListBox
+                        Name="ListBox_artist"
+                        Grid.Row="1"
+                        Margin="0,4"
+                        Tapped="ListBox_artist_Tapped">
                         <ListBox.Background>
-                            <AcrylicBrush BackgroundSource="Backdrop"
-                          TintColor="Black"
-                          TintOpacity="0.1"/>
+                            <AcrylicBrush
+                                BackgroundSource="Backdrop"
+                                TintColor="Black"
+                                TintOpacity="0.1" />
                         </ListBox.Background>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </ListBox.ItemContainerStyle>
                         <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="model:Artist">
-                                <Grid x:Name="Grid_itemTemplate"
-                                      >
+                                <Grid x:Name="Grid_itemTemplate">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="2*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Image Source="{x:Bind picUrl,Converter={StaticResource ReturnImageUriWithParam_48}}" Width="48" Height="48"/>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="1" Margin="10,0,0,0">
-                                        <TextBlock Text="{x:Bind name}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                    <Image
+                                        Width="48"
+                                        Height="48"
+                                        Source="{x:Bind PicUrl, Converter={StaticResource ReturnImageUriWithParam_48}}" />
+                                    <StackPanel
+                                        Grid.Column="1"
+                                        Margin="10,0,0,0"
+                                        Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="{x:Bind Name}" />
                                         <!--<TextBlock Text="{x:Bind alias,Converter={StaticResource GetAlia}}" Foreground="LightGray" VerticalAlignment="Center" />-->
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="2">
-                                        <TextBlock Text="专辑：" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                                        <TextBlock Text="{x:Bind albumSize}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="专辑：" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="{x:Bind AlbumSize}" />
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Grid.Column="3">
-                                        <TextBlock Text="MV：" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
-                                        <TextBlock Text="{x:Bind mvSize}" VerticalAlignment="Center" Foreground="{x:Bind local:Home.mainSolidColorBrush}"/>
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="MV：" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            
+                                            Text="{x:Bind MvSize}" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>

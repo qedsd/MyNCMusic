@@ -1,4 +1,4 @@
-﻿using MyNCMusic.Model;
+﻿using MyNCMusic.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,8 +34,8 @@ namespace MyNCMusic.Views
         {
             base.OnNavigatedTo(e);  //将传过来的数据 类型转换一下　　
             commentRoot = (CommentRoot)e.Parameter;
-            ListBox_HotComment.ItemsSource = commentRoot.hotComments == null ? null : commentRoot.hotComments;
-            ListBox_allComment.ItemsSource = commentRoot.comments == null ? null : commentRoot.comments;
+            ListBox_HotComment.ItemsSource = commentRoot.HotComments == null ? null : commentRoot.HotComments;
+            ListBox_allComment.ItemsSource = commentRoot.Comments == null ? null : commentRoot.Comments;
 
         }
 

@@ -1,5 +1,5 @@
 ﻿using MyNCMusic.Helper;
-using MyNCMusic.Model;
+using MyNCMusic.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -50,9 +50,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id">歌单id</param>
         /// <returns></returns>
-        public static CommentRoot GetPlaylistComment(long id)
+        public static async Task<CommentRoot> GetPlaylistCommentAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/comment/playlist?id=" + id + "&limit=100");
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/comment/playlist?id=" + id + "&limit=100");
             if (result == null || result.Equals(""))
                 return null;
             try
