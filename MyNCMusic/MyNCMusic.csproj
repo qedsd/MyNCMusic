@@ -21,7 +21,7 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>CCEAD500E88A34FE3E2EE5BB8F31AC53D7B06DBD</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>6733DAAF9926BE12FF4DE44A61CCB5220D445CA6</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -129,6 +129,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ContentDialogs\NewPlaylist.xaml.cs">
+      <DependentUpon>NewPlaylist.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\AlbumList.xaml.cs">
       <DependentUpon>AlbumList.xaml</DependentUpon>
     </Compile>
@@ -137,6 +140,9 @@
     </Compile>
     <Compile Include="Controls\MusicList.xaml.cs">
       <DependentUpon>MusicList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentDialogs\AddToPlaylist.xaml.cs">
+      <DependentUpon>AddToPlaylist.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PlaylistList.xaml.cs">
       <DependentUpon>PlaylistList.xaml</DependentUpon>
@@ -341,6 +347,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ContentDialogs\NewPlaylist.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\AlbumList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -350,6 +360,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\MusicList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentDialogs\AddToPlaylist.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

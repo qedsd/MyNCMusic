@@ -137,7 +137,7 @@ namespace MyNCMusic.Views
         private async void Button_comment_Click(object sender, RoutedEventArgs e)
         {
             ProgressBar_loading.Visibility = Visibility.Visible;
-            CommentRoot commentRoot = await Task.Run(() => CommentService.GetAlbumComment(albumRoot.Album.Id));
+            CommentRoot commentRoot = await CommentService.GetAlbumCommentAsync(albumRoot.Album.Id);
             ProgressBar_loading.Visibility = Visibility.Collapsed;
             if (commentRoot == null)
                 return;

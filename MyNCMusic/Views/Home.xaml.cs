@@ -170,19 +170,49 @@ namespace MyNCMusic.Views
         /// </summary>
         public void NavigateToPlayingPage()
         {
-            MainFrame.Navigate(typeof(PlayingPage));
+            if(MainFrame.Content.GetType() == typeof(PlayingPage))
+            {
+                this.Frame.Navigate(typeof(Home));
+                MainFrame.GoBack();
+            }
+            else
+            {
+                MainFrame.Navigate(typeof(PlayingPage));
+            }
+            
         }
-        public void NavigateTo([In] Type sourcePageType, [In] object parameter, [In] NavigationTransitionInfo infoOverride)
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter, [In] NavigationTransitionInfo infoOverride,bool isMain = false)
         {
-            Frame_main.Navigate(sourcePageType, parameter, infoOverride);
+            if(isMain)
+            {
+                MainFrame.Navigate(sourcePageType, parameter, infoOverride);
+            }
+            else
+            {
+                Frame_main.Navigate(sourcePageType, parameter, infoOverride);
+            }
         }
-        public void NavigateTo([In] Type sourcePageType, [In] object parameter)
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter, bool isMain = false)
         {
-            Frame_main.Navigate(sourcePageType, parameter);
+            if (isMain)
+            {
+                MainFrame.Navigate(sourcePageType, parameter);
+            }
+            else
+            {
+                Frame_main.Navigate(sourcePageType, parameter);
+            }
         }
-        public void NavigateTo([In] Type sourcePageType)
+        public void NavigateTo([In] Type sourcePageType, bool isMain = false)
         {
-            Frame_main.Navigate(sourcePageType);
+            if (isMain)
+            {
+                MainFrame.Navigate(sourcePageType);
+            }
+            else
+            {
+                Frame_main.Navigate(sourcePageType);
+            }
         }
         #endregion
     }

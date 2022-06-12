@@ -45,6 +45,9 @@ namespace MyNCMusic
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        public static MainPage Instance;
+
+
         public MediaPlayer _mediaPlayer;
         MediaSource _mediaSource;
         MediaPlaybackItem _mediaPlaybackItem;
@@ -104,8 +107,6 @@ namespace MyNCMusic
         {
             ChangeImage();
             ChangePlayBar(PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.MainSong.Duration / 1000);
-            if ((Application.Current as App).playingPage != null)
-                (Application.Current as App).playingPage.LoadLayout();
             if ((Application.Current as App).compactOverlayPage != null)
                 (Application.Current as App).compactOverlayPage.UpdateLayout();
             if (PlayingService.PlayingSongUrlRoot.Data.First().Url == null)
@@ -137,8 +138,7 @@ namespace MyNCMusic
         {
             ChangeImage();
             ChangePlayBar(PlayingService.PlayingSong,PlayingService.PlayingAlbumBitmapImage, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name, PlayingService.PlayingSong.Dt / 1000);
-            if ((Application.Current as App).playingPage != null)
-                (Application.Current as App).playingPage.LoadLayout();
+
             if ((Application.Current as App).compactOverlayPage != null)
                 (Application.Current as App).compactOverlayPage.UpdateLayout();
             if (PlayingService.PlayingSongUrlRoot.Data.First().Url == null)
@@ -215,8 +215,6 @@ namespace MyNCMusic
                 Slider_play.Value = sender.Position.TotalSeconds;
                 
                 TextBlock_currentTime.Text = OtherHelper.GetDt((int)sender.Position.TotalSeconds);
-                if ((Application.Current as App).playingPage != null)
-                    (Application.Current as App).playingPage.ChangeLyricPosition(sender.Position.TotalMilliseconds);
             });
         }
 

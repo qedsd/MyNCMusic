@@ -435,7 +435,7 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 多媒体控制器
         /// </summary>
-        public static MediaTimelineController MediaTimelineController = new MediaTimelineController();
+        public static MediaTimelineController MediaTimelineController;
 
         /// <summary>
         /// 播放下一首

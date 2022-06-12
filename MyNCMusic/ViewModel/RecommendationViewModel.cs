@@ -83,7 +83,10 @@ namespace MyNCMusic.ViewModel
             {
                 Controls.WaitingPopup.Show();
                 var recommendListRoot = await PlaylistService.GetCommendatoryListAsync();
-                RecommendPlaylists = recommendListRoot.Recommend;
+                if (recommendListRoot != null)
+                {
+                    RecommendPlaylists = recommendListRoot.Recommend;
+                }
                 Controls.WaitingPopup.Hide();
             }
         }

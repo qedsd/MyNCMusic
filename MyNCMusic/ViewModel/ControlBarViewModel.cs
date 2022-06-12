@@ -98,6 +98,7 @@ namespace MyNCMusic.ViewModel
             Instance = this;
             MediaPlayer = new MediaPlayer();
             MediaTimelineController = new MediaTimelineController();
+            PlayingService.MediaTimelineController = MediaTimelineController;
             MediaTimelineController.PositionChanged += MediaTimelineController_PositionChanged;
             MediaTimelineController.StateChanged += MediaTimelineController_StateChanged;
             MediaPlayer.TimelineController = MediaTimelineController;

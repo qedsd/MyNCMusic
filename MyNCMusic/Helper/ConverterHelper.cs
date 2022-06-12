@@ -57,14 +57,21 @@ namespace MyNCMusic.Helper
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             List<Artist> arItems = value as List<Artist>;
-            string name = "";
-            for (int i = 0; i < arItems.Count; i++)
+            if(arItems != null)
             {
-                if (i != 0)
-                    name += "/";
-                name += arItems[i].Name;
+                string name = "";
+                for (int i = 0; i < arItems.Count; i++)
+                {
+                    if (i != 0)
+                        name += "/";
+                    name += arItems[i].Name;
+                }
+                return name;
             }
-            return name;
+            else
+            {
+                return null;
+            }
         }
         public object ConvertBack(object value, Type targetType, object parameter, string language)
         {

@@ -16,9 +16,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id">音乐id</param>
         /// <returns></returns>
-        public static CommentRoot GetSongsComment(long id)
+        public static async Task<CommentRoot> GetSongsCommentAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/comment/music?id=" + id + "&limit=100");
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/comment/music?id=" + id + "&limit=100");
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -33,9 +33,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id">专辑id</param>
         /// <returns></returns>
-        public static CommentRoot GetAlbumComment(long id)
+        public static async Task<CommentRoot> GetAlbumCommentAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/comment/album?id=" + id + "&limit=100");
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/comment/album?id=" + id + "&limit=100");
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -67,9 +67,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id">节目id，即RadioSongItem，不是MainSong</param>
         /// <returns></returns>
-        public static CommentRoot GetRadioComment(long id)
+        public static async Task<CommentRoot> GetRadioCommentAsync(long id)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/comment/dj?id=" + id + "&limit=100");
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/comment/dj?id=" + id + "&limit=100");
             if (result == null || result.Equals(""))
                 return null;
             try

@@ -4,31 +4,36 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MyNCMusic.Controls"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     d:DesignHeight="300"
     d:DesignWidth="400"
     mc:Ignorable="d">
 
-    <Grid >
+    <Grid>
         <Border
             Grid.Row="1"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
-            CornerRadius="4"
-            >
-            <Grid Height="90" Width="160">
-                <muxc:ProgressRing HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="True" Margin="0,0,0,10"
-                              Width="36" Height="36"
-                              x:Name="ProgressRing"/>
+            CornerRadius="4">
+            <Grid Width="160" Height="90">
+                <muxc:ProgressRing
+                    x:Name="ProgressRing"
+                    Width="36"
+                    Height="36"
+                    Margin="0,0,0,10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsActive="True" />
                 <TextBlock
                     x:Name="NotifyTextBlock"
                     Margin="0,0,0,10"
-                    Text="加载中"
-                    Foreground="Black"
                     HorizontalAlignment="Center"
-                    TextWrapping="Wrap" 
-                    VerticalAlignment="Bottom"/>
+                    VerticalAlignment="Bottom"
+                    Foreground="Black"
+                    Text="加载中"
+                    TextWrapping="Wrap" />
             </Grid>
         </Border>
     </Grid>
