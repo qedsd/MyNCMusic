@@ -76,7 +76,7 @@ namespace MyNCMusic.ViewModel
             ChangeLyricPosition(sender.Position.TotalMilliseconds);
         }
         /// <summary>
-        /// _mediaTimelineController_PositionChanged 250ms间隔，无可避免歌词延迟
+        /// MediaTimelineController 250ms间隔，无可避免歌词延迟
         /// </summary>
         /// <param name="totalMilliseconds"></param>
         public async void ChangeLyricPosition(double totalMilliseconds)
@@ -288,11 +288,13 @@ namespace MyNCMusic.ViewModel
             CommentRoot commentRoot = await CommentService.GetRadioCommentAsync(PlayingService.PlayingRadio.Id);
             if (commentRoot == null)
             {
+                CommentCount = 0;
                 HotComments = null;
                 AllComments = null;
             }
             else
             {
+                CommentCount = commentRoot.Total;
                 HotComments = commentRoot.HotComments;
                 AllComments = commentRoot.Comments;
             }
@@ -311,14 +313,14 @@ namespace MyNCMusic.ViewModel
                 artist = PlayingService.PlayingSong.Ar.First();
             }
             ArtistBaseDetailRoot artistBaseDetailRoot = await ArtistService.GetArtistBaseDetailAsync(artist.Id);
-            NavigateService.NavigateToArtistAsync(artistBaseDetailRoot,true);
+            NavigateService.NavigateToArtistAsync(artistBaseDetailRoot);
             WaitingPopup.Hide();
         });
 
         public ICommand CheckAlbumCommand => new DelegateCommand(() =>
         {
             WaitingPopup.Show();
-            NavigateService.NavigateToAlbumAsync(PlayingService.PlayingAlbum, true);
+            NavigateService.NavigateToAlbumAsync(PlayingService.PlayingAlbum);
             WaitingPopup.Hide();
         });
         /// <summary>
@@ -330,7 +332,7 @@ namespace MyNCMusic.ViewModel
         });
 
         /// <summary>
-        /// 播放推荐单曲
+        /// 播放相似单曲
         /// </summary>
         /// <param name="music"></param>
         public async void PlaySimiMusic(MusicItem music = null)

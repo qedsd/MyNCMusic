@@ -61,7 +61,7 @@ namespace MyNCMusic.ViewModel
         /// <summary>
         /// 电台不可以设为喜欢
         /// </summary>
-        public bool IsShowFavorite { get; set; }
+        public bool IsPlayingSong { get; set; }
         private bool isPlaying;
         public bool IsPlaying
         {
@@ -105,12 +105,44 @@ namespace MyNCMusic.ViewModel
             MediaPlayer.MediaEnded += MediaPlayer_MediaEnded;
             MediaPlayer.SourceChanged += MediaPlayer_SourceChanged;
             PlayingService.OnPlayingChanged += PlayingService_OnPlayChanged;
+            PlayingService.OnFavoriteChanged += PlayingService_OnFavoriteChanged;
             UpdatePlayOrder(PlayOrder);
+        }
+
+        private void PlayingService_OnFavoriteChanged(long id, bool isFavorite)
+        {
+            if(PlayingService.IsPlayingSong && id == PlayingService.PlayingSong.Id)
+            {
+                if (isFavorite)
+                {
+                    FavoriteSymbolText = "\xE00B";
+                }
+                else
+                {
+                    FavoriteSymbolText = "\xE006";
+                }
+            }
         }
 
         private void PlayingService_OnPlayChanged(long id,string url)
         {
-            Play(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+            if (PlayingService.FavoriteMusics.Contains(id))
+            {
+                FavoriteSymbolText = "\xE00B";
+            }
+            else
+            {
+                FavoriteSymbolText = "\xE006";
+            }
+            IsPlayingSong = PlayingService.IsPlayingSong;
+            if (PlayingService.IsPlayingSong)
+            {
+                Play(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+            }
+            else
+            {
+                Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
+            }
         }
 
         private void MediaPlayer_SourceChanged(MediaPlayer sender, object args)
@@ -150,7 +182,7 @@ namespace MyNCMusic.ViewModel
         #region 事件
         public ICommand PlayingInfoCommand => new DelegateCommand<string>((p) =>
         {
-            Views.Home.Instance.NavigateToPlayingPage();
+            NavigateService.TryNavigateToPlayingPage();
         });
         public ICommand FavoriteCommand => new DelegateCommand(async() =>
         {
@@ -164,32 +196,26 @@ namespace MyNCMusic.ViewModel
             {
                 if (await SongService.LoveOrDontLoveSongAsync(PlayingService.PlayingSong.Id, false) == true)
                 {
-                    NotifyPopup notifyPopup = new NotifyPopup("已取消喜欢", "\xE00C");
-                    notifyPopup.Show();
-                    FavoriteSymbolText = "\xE006";
+                    NotifyPopup.ShowSuccess("已取消喜欢");
                     PlayingService.PlayingSong.IsFavorite = false;
-                    Services.PlayingService.FavoriteMusics.Remove(PlayingService.PlayingSong.Id);
+                    Services.PlayingService.RemoveFavorite(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
-                    NotifyPopup notifyPopup = new NotifyPopup("操作失败", "\xE10A");
-                    notifyPopup.Show();
+                    NotifyPopup.ShowError("操作失败");
                 }
             }
             else//添加为喜欢的
             {
                 if (await SongService.LoveOrDontLoveSongAsync(PlayingService.PlayingSong.Id, true) == true)
                 {
-                    NotifyPopup notifyPopup = new NotifyPopup("已添加为喜欢", "\xE00B", Windows.UI.Colors.MediumSeaGreen);
-                    notifyPopup.Show();
-                    FavoriteSymbolText = "\xE00B";
+                    NotifyPopup.ShowSuccess("已添加为喜欢");
                     PlayingService.PlayingSong.IsFavorite = true;
-                    Services.PlayingService.FavoriteMusics.Add(PlayingService.PlayingSong.Id);
+                    Services.PlayingService.AddFavorite(PlayingService.PlayingSong.Id);
                 }
                 else
                 {
-                    NotifyPopup notifyPopup = new NotifyPopup("操作失败", "\xE10A");
-                    notifyPopup.Show();
+                    NotifyPopup.ShowError("操作失败");
                 }
             }
         });
@@ -321,14 +347,13 @@ namespace MyNCMusic.ViewModel
                 MediaTimelineController.Start();
 
                 //左下角专辑图片
-                //AlbumImage = await Helper.FileHelper.ReadLoaclBitmapImage(ConfigService.ImageFilename);
                 AlbumImage = PlayingService.PlayingAlbumBitmapImage;
 
                 //修改SMTC 显示的元数据
                 MediaItemDisplayProperties props = MediaPlaybackItem.GetDisplayProperties();
                 props.Type = Windows.Media.MediaPlaybackType.Music;
-                props.MusicProperties.Title = PlayingService.PlayingSong.Name;
-                props.MusicProperties.Artist = PlayingService.PlayingSong.Ar.First().Name;
+                props.MusicProperties.Title = MusicName;
+                props.MusicProperties.Artist = ArtistName;
                 props.Thumbnail = Windows.Storage.Streams.RandomAccessStreamReference.CreateFromFile(await Windows.Storage.ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) as Windows.Storage.StorageFile);
                 MediaPlaybackItem.ApplyDisplayProperties(props);
             }

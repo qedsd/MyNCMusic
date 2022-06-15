@@ -1,0 +1,74 @@
+﻿<Page
+    x:Class="MyNCMusic.Views.CommentPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls1="using:MyNCMusic.Controls"
+    xmlns:converter="using:MyNCMusic.Helper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MyNCMusic.Models"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem" />
+        <converter:GetDt x:Key="GetDt" />
+        <converter:GetAlia x:Key="GetAlia" />
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility" />
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility" />
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
+    </Page.Resources>
+    <Grid Margin="20,10,20,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel
+            Grid.Row="0"
+            Margin="-10,14,0,2"
+            VerticalAlignment="Center"
+            Orientation="Horizontal">
+            <Button
+                x:Name="Button_Back"
+                VerticalAlignment="Center"
+                Click="Button_Back_Click"
+                Style="{StaticResource ButtonStyle_tran}">
+                <FontIcon
+                    FontFamily="Segoe MDL2 Assets"
+                    FontSize="16"
+                    Glyph="&#xE112;" />
+            </Button>
+        </StackPanel>
+        <ScrollViewer x:Name="ScrollViewer_comment" Grid.Row="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="热评" />
+                <Rectangle
+                    Grid.Row="1"
+                    Height="1"
+                    Margin="0,10"
+                    Fill="{StaticResource T1TextColorBrush}" />
+                <controls1:CommentControl Grid.Row="2" ItemsSource="{Binding HotComments}" />
+                <TextBlock
+                    Grid.Row="3"
+                    Margin="0,20,0,0"
+                    Foreground="{StaticResource T1TextColorBrush}"
+                    Text="最新" />
+                <Rectangle
+                    Grid.Row="4"
+                    Height="1"
+                    Margin="0,10"
+                    Fill="{StaticResource T1TextColorBrush}" />
+                <controls1:CommentControl Grid.Row="5" ItemsSource="{Binding AllComments}" />
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Page>

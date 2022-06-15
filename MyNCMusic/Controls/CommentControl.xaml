@@ -1,0 +1,71 @@
+﻿<UserControl
+    x:Class="MyNCMusic.Controls.CommentControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converter="using:MyNCMusic.Helper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:MyNCMusic.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="using:MyNCMusic.Models"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:GetArNames_ArtistsItem x:Key="GetArNames_ArtistsItem" />
+        <converter:GetDt x:Key="GetDt" />
+        <converter:GetAlia x:Key="GetAlia" />
+        <converter:GetFavoriteIconVisibility x:Key="GetFavoriteIconVisibility" />
+        <converter:GetPlayingIconVisibility x:Key="GetPlayingIconVisibility" />
+        <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
+        <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
+    </UserControl.Resources>
+    <ListBox
+        x:Name="CommentListBox"
+        Grid.Row="2"
+        Background="Transparent"
+        ItemContainerStyle="{StaticResource ListBoxItemStyle1}">
+        <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="model:CommentItem">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <controls:ImageEx
+                        Width="48"
+                        Height="48"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        CornerRadius="999"
+                        Source="{x:Bind User.AvatarUrl, Converter={StaticResource ReturnImageUriWithParam_48}}"
+                        Stretch="Fill" />
+                    <StackPanel Grid.Column="1" Margin="10,0,10,4">
+                        <Button
+                            Padding="0"
+                            Content="{x:Bind User.Nickname}"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Style="{StaticResource ButtonStyle_tran}" />
+                        <TextBlock
+                            Margin="0,4,0,0"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="{x:Bind Content}"
+                            TextWrapping="WrapWholeWords" />
+                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontFamily="Segoe MDL2 Assets"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text="&#xE19F;" />
+                            <TextBlock
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text="{x:Bind LikedCount}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

@@ -8,7 +8,7 @@ namespace MyNCMusic.Models
 {
     public class MyCollectionfAlbumRoot
     {
-        public List<CADataItem> Data { get; set; }
+        public List<Album> Data { get; set; }
         
         public int Count { get; set; }
         

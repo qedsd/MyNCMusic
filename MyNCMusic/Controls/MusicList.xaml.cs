@@ -24,8 +24,16 @@ namespace MyNCMusic.Controls
         {
             this.InitializeComponent();
             PlayingService.OnPlayingChanged += PlayingService_OnPlayingChanged;
+            PlayingService.OnFavoriteChanged += PlayingService_OnFavoriteChanged;
         }
-
+        private void PlayingService_OnFavoriteChanged(long id, bool isFavorite)
+        {
+            var item = ItemsSource.FirstOrDefault(p => p.Id == id);
+            if(item!=null)
+            {
+                item.IsFavorite = isFavorite;
+            }
+        }
         private void PlayingService_OnPlayingChanged(long id, string url)
         {
             if(ItemsSource!=null)
@@ -78,8 +86,8 @@ namespace MyNCMusic.Controls
         }
 
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(List<Models.MusicItem>), typeof(MusicList), new PropertyMetadata(null, new PropertyChangedCallback(DataCountPropertyChanged)));
-        private static void DataCountPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register("ItemsSource", typeof(List<Models.MusicItem>), typeof(MusicList), new PropertyMetadata(null, new PropertyChangedCallback(ItemsSourcePropertyChanged)));
+        private static void ItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if(e.NewValue!=null)
             {

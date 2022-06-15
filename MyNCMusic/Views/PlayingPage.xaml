@@ -23,14 +23,9 @@
         <converter:ReturnImageUriWithParam_48 x:Key="ReturnImageUriWithParam_48" />
         <converter:ReturnImageUriWithParam_160 x:Key="ReturnImageUriWithParam_160" />
         <converters:IntToVisibilityConverter x:Key="IntToVisibilityConverter" />
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
     </Page.Resources>
     <Grid>
-        <Grid.Background>
-            <AcrylicBrush
-                BackgroundSource="Backdrop"
-                TintColor="Black"
-                TintOpacity="0.4" />
-        </Grid.Background>
         <Grid Margin="50,50,20,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -88,97 +83,146 @@
                     Source="{Binding AlbumImage, Mode=OneWay}" />
                 <Grid Grid.Column="1" Margin="20,20,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <TextBlock
                         FontSize="24"
-                        Text="{Binding MusicName, Mode=OneWay}"
                         Foreground="{StaticResource T1TextColorBrush}"
+                        Text="{Binding MusicName, Mode=OneWay}"
                         TextWrapping="WrapWholeWords" />
-                    <StackPanel Grid.Row="2" Orientation="Horizontal">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Text="专辑:" 
-                            Foreground="{StaticResource T2TextColorBrush}"/>
-                        <Button
-                            Padding="4,0,0,0"
-                            VerticalAlignment="Center"
-                            Command="{Binding CheckAlbumCommand}"
-                            Content="{Binding AlbumName, Mode=OneWay}"
-                            Style="{StaticResource ButtonStyle_tran}" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Text="歌手:" 
-                            Foreground="{StaticResource T2TextColorBrush}"/>
-                        <!--  歌手多于1的时候显示Flyout  -->
-                        <Button
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            Content="{Binding Artists, Converter={StaticResource GetArNames}, Mode=OneWay}"
-                            Foreground="{StaticResource T1TextColorBrush}"
-                            Style="{StaticResource ButtonStyle_tran}"
-                            Visibility="{Binding Artists.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=MoreToVisibe, Mode=OneWay}">
-                            <Button.Flyout>
-                                <Flyout>
-                                    <ListBox
-                                        x:Name="ListBox_Artists"
-                                        ItemsSource="{Binding Artists, Mode=OneWay}"
-                                        SelectionChanged="ListBox_Artists_SelectionChanged">
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate x:DataType="model:Artist">
-                                                <TextBlock Text="{x:Bind Name}" />
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                    </ListBox>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
-                        <!--  歌手等于1的时候不显示Flyout  -->
-                        <Button
-                            Margin="4,0,0,0"
-                            VerticalAlignment="Center"
-                            Command="{Binding CheckArtistCommand}"
-                            Content="{Binding Artists, Converter={StaticResource GetArNames}, Mode=OneWay}"
-                            Foreground="{StaticResource T1TextColorBrush}"
-                            Style="{StaticResource ButtonStyle_tran}"
-                            Visibility="{Binding Artists.Count, Converter={StaticResource IntToVisibilityConverter}, Mode=OneWay}" />
+                    <Grid
+                        x:Name="Song"
+                        Grid.Row="1"
+                        Visibility="{Binding IsPlayingSong, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource T2TextColorBrush}"
+                                Text="歌手:" />
+                            <!--  歌手多于1的时候显示Flyout  -->
+                            <Button
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Content="{Binding Artists, Converter={StaticResource GetArNames}, Mode=OneWay}"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Style="{StaticResource ButtonStyle_tran}"
+                                Visibility="{Binding Artists.Count, Converter={StaticResource IntToVisibilityConverter}, ConverterParameter=MoreToVisibe, Mode=OneWay}">
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <ListBox
+                                            x:Name="ListBox_Artists"
+                                            ItemsSource="{Binding Artists, Mode=OneWay}"
+                                            SelectionChanged="ListBox_Artists_SelectionChanged">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate x:DataType="model:Artist">
+                                                    <TextBlock Text="{x:Bind Name}" />
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <!--  歌手等于1的时候不显示Flyout  -->
+                            <Button
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Command="{Binding CheckArtistCommand}"
+                                Content="{Binding Artists, Converter={StaticResource GetArNames}, Mode=OneWay}"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Style="{StaticResource ButtonStyle_tran}"
+                                Visibility="{Binding Artists.Count, Converter={StaticResource IntToVisibilityConverter}, Mode=OneWay}" />
 
-                    </StackPanel>
-                    <StackPanel Grid.Row="3" Orientation="Horizontal">
-                        <Button
-                            x:Name="Button_AddToPlaylist"
-                            Padding="0"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Command="{Binding AddToPlaylistCommand}"
-                            Style="{StaticResource ButtonStyle_tran}">
-                            <Button.Content>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontFamily="Segoe MDL2 Assets"
-                                        FontSize="13"
-                                        Text="&#xF61B;" />
-                                    <TextBlock
-                                        Margin="10,0,0,0"
-                                        FontSize="13"
-                                        Text="收藏" />
-                                </StackPanel>
-                            </Button.Content>
-                        </Button>
-                    </StackPanel>
+                        </StackPanel>
 
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource T2TextColorBrush}"
+                                Text="专辑:" />
+                            <Button
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Command="{Binding CheckAlbumCommand}"
+                                Content="{Binding AlbumName, Mode=OneWay}"
+                                Style="{StaticResource ButtonStyle_tran}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                            <Button
+                                x:Name="Button_AddToPlaylist"
+                                Padding="0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Command="{Binding AddToPlaylistCommand}"
+                                Style="{StaticResource ButtonStyle_tran}">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontFamily="Segoe MDL2 Assets"
+                                            FontSize="13"
+                                            Text="&#xF61B;" />
+                                        <TextBlock
+                                            Margin="10,0,0,0"
+                                            FontSize="13"
+                                            Text="收藏" />
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid
+                        x:Name="Radio"
+                        Grid.Row="1"
+                        Visibility="{Binding IsPlayingSong, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=False}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource T2TextColorBrush}"
+                                Text="主播:" />
+                            <Button
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Command="{Binding CheckDjCommand}"
+                                Content="{Binding ArtistName, Mode=OneWay}"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Style="{StaticResource ButtonStyle_tran}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                Foreground="{StaticResource T2TextColorBrush}"
+                                Text="电台:" />
+                            <Button
+                                Margin="4,0,0,0"
+                                VerticalAlignment="Center"
+                                Command="{Binding CheckRadioCommand}"
+                                Content="{Binding AlbumName, Mode=OneWay}"
+                                Style="{StaticResource ButtonStyle_tran}" />
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Grid>
             <Pivot Grid.Row="1" SelectedIndex="{Binding PivotIndex, Mode=TwoWay}">
                 <PivotItem Tag="0">
                     <PivotItem.Header>
-                        <TextBlock FontSize="14" Text="歌词" Foreground="{StaticResource T1TextColorBrush}"/>
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="歌词" />
                     </PivotItem.Header>
                     <Grid>
                         <ListBox
@@ -191,8 +235,8 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate x:DataType="model:LyricStr">
                                     <StackPanel>
-                                        <TextBlock Text="{x:Bind Original}" Foreground="{StaticResource T1TextColorBrush}"/>
-                                        <TextBlock Text="{x:Bind Tran}" Foreground="{StaticResource T1TextColorBrush}"/>
+                                        <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="{x:Bind Original}" />
+                                        <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="{x:Bind Tran}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -203,144 +247,33 @@
                 <PivotItem Tag="1">
                     <PivotItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock FontSize="14" Text="评论" Foreground="{StaticResource T1TextColorBrush}"/>
-                            <TextBlock FontSize="14" Text="(" Foreground="{StaticResource T1TextColorBrush}"/>
-                            <TextBlock FontSize="14" Text="{Binding CommentCount, Mode=TwoWay}" Foreground="{StaticResource T1TextColorBrush}"/>
-                            <TextBlock FontSize="14" Text=")" Foreground="{StaticResource T1TextColorBrush}"/>
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text="评论" />
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text="(" />
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text="{Binding CommentCount, Mode=TwoWay}" />
+                            <TextBlock
+                                FontSize="14"
+                                Foreground="{StaticResource T1TextColorBrush}"
+                                Text=")" />
                         </StackPanel>
 
                     </PivotItem.Header>
-                    <ScrollViewer x:Name="ScrollViewer_Comment">
-                        <Grid>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="热评" Foreground="{StaticResource T1TextColorBrush}"/>
-                                <Rectangle
-                                    Grid.Row="1"
-                                    Height="1"
-                                    Margin="0,10"
-                                    Fill="{StaticResource T1TextColorBrush}" />
-                                <ListBox
-                                    x:Name="ListBox_HotComment"
-                                    Grid.Row="2"
-                                    Background="Transparent"
-                                    ItemContainerStyle="{StaticResource ListBoxItemStyle1}"
-                                    ItemsSource="{Binding HotComments, Mode=OneWay}"
-                                    RightTapped="ListBox_Comment_RightTapped">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate x:DataType="model:CommentItem">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <controls:ImageEx
-                                                    Width="48"
-                                                    Height="48"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Top"
-                                                    CornerRadius="999"
-                                                    Source="{x:Bind User.AvatarUrl, Converter={StaticResource ReturnImageUriWithParam_48}}"
-                                                    Stretch="Fill" />
-                                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                                    <Button
-                                                        Padding="0"
-                                                        Content="{x:Bind User.Nickname}"
-                                                        Style="{StaticResource ButtonStyle_tran}" />
-                                                    <TextBlock
-                                                        Margin="0,4,0,0"
-                                                        Text="{x:Bind Content}"
-                                                        TextWrapping="WrapWholeWords" 
-                                                        Foreground="{StaticResource T1TextColorBrush}"/>
-                                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                        <TextBlock
-                                                            VerticalAlignment="Center"
-                                                            FontFamily="Segoe MDL2 Assets"
-                                                            Text="&#xE19F;" 
-                                                            Foreground="{StaticResource T1TextColorBrush}"/>
-                                                        <TextBlock
-                                                            Margin="4,0,0,0"
-                                                            VerticalAlignment="Center"
-                                                            Text="{x:Bind LikedCount}" 
-                                                            Foreground="{StaticResource T1TextColorBrush}"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <TextBlock
-                                    Grid.Row="3"
-                                    Margin="0,20,0,0"
-                                    Text="最新" Foreground="{StaticResource T1TextColorBrush}"/>
-                                <Rectangle
-                                    Grid.Row="4"
-                                    Height="1"
-                                    Margin="0,10"
-                                    Fill="{StaticResource T1TextColorBrush}" />
-                                <ListBox
-                                    x:Name="ListBox_AllComment"
-                                    Grid.Row="15"
-                                    Background="Transparent"
-                                    ItemContainerStyle="{StaticResource ListBoxItemStyle1}"
-                                    ItemsSource="{Binding AllComments}"
-                                    RightTapped="ListBox_Comment_RightTapped">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate x:DataType="model:CommentItem">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <controls:ImageEx
-                                                    Width="48"
-                                                    Height="48"
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Top"
-                                                    CornerRadius="999"
-                                                    Source="{x:Bind User.AvatarUrl}"
-                                                    Stretch="Fill" />
-                                                <StackPanel Grid.Column="1" Margin="10,0,10,4">
-                                                    <Button
-                                                        Padding="0"
-                                                        Content="{x:Bind User.Nickname}"
-                                                        Style="{StaticResource ButtonStyle_tran}" />
-                                                    <TextBlock
-                                                        Margin="0,4,0,0"
-                                                        Text="{x:Bind Content}"
-                                                        TextWrapping="WrapWholeWords" 
-                                                        Foreground="{StaticResource T1TextColorBrush}"/>
-                                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                                        <TextBlock
-                                                            VerticalAlignment="Center"
-                                                            FontFamily="Segoe MDL2 Assets"
-                                                            Text="&#xE19F;" 
-                                                            Foreground="{StaticResource T1TextColorBrush}"/>
-                                                        <TextBlock
-                                                            Margin="4,0,0,0"
-                                                            VerticalAlignment="Center"
-                                                            Text="{x:Bind LikedCount}" 
-                                                            Foreground="{StaticResource T1TextColorBrush}"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                            </Grid>
-                        </Grid>
-                    </ScrollViewer>
+                    <local:CommentPage CanGoBack="False" />
                 </PivotItem>
                 <PivotItem Tag="2">
                     <PivotItem.Header>
-                        <TextBlock FontSize="14" Text="相似歌曲" Foreground="{StaticResource T1TextColorBrush}"/>
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="{StaticResource T1TextColorBrush}"
+                            Text="相似歌曲" />
                     </PivotItem.Header>
                     <Grid>
                         <controls1:MusicList

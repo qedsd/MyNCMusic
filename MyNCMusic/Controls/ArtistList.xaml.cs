@@ -24,14 +24,14 @@ namespace MyNCMusic.Controls
             this.InitializeComponent();
         }
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(List<Models.Artist>), typeof(ArtistList), new PropertyMetadata(null, new PropertyChangedCallback(DataCountPropertyChanged)));
-        private static void DataCountPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register("ItemsSource", typeof(List<Models.Artist>), typeof(ArtistList), new PropertyMetadata(null, new PropertyChangedCallback(ItemsSourcePropertyChanged)));
+        private static void ItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((ArtistList)d).ListBox_Artist.ItemsSource = (List<Models.Artist>)e.NewValue;
         }
-        public int ItemsSource
+        public List<Models.Artist> ItemsSource
         {
-            get => (int)GetValue(ItemsSourceProperty);
+            get => (List<Models.Artist>)GetValue(ItemsSourceProperty);
             set
             {
                 SetValue(ItemsSourceProperty, value);

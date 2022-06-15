@@ -48,21 +48,6 @@ namespace MyNCMusic.Services
         /// 获取我收藏的专辑
         /// </summary>
         /// <returns></returns>
-        public static MyCollectionfAlbumRoot GetMyCollectionOfAlbum()
-        {
-            string result = Http.Get(ConfigService.ApiUri + @"/album/sublist?limit=1000");
-            if (result == null || result.Equals(""))
-                return null;
-            try
-            {
-                return JsonConvert.DeserializeObject<MyCollectionfAlbumRoot>(result);
-            }
-            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
-        }
-        /// <summary>
-        /// 获取我收藏的专辑
-        /// </summary>
-        /// <returns></returns>
         public static async Task<MyCollectionfAlbumRoot> GetMyCollectionOfAlbumAsync()
         {
             string result = await Http.GetAsync(ConfigService.ApiUri + @"/album/sublist?limit=1000");

@@ -12,33 +12,61 @@ namespace MyNCMusic.Services
     public static class NavigateService
     {
         /// <summary>
-        /// 调转到歌单详情界面
+        /// 歌单详情
         /// </summary>
         /// <param name="id"></param>
-        public static async void NavigateToPlaylistAsync(long id, bool isMain = false)
+        public static async void NavigateToPlaylistAsync(long id)
         {
             Controls.WaitingPopup.Show();
             PlaylistNavItem playlistNavItem = await PlaylistNavItem.CreateAsync(id);
             Controls.WaitingPopup.Hide();
             if(playlistNavItem != null)
             {
-                Home.Instance.NavigateTo(typeof(Views.PlayListDetai), playlistNavItem, isMain);
+                if(IsInPlayingPage)
+                {
+                    NavigationPage.Instance.NavigateTo(typeof(Views.PlayListDetai), playlistNavItem);
+                }
+                else
+                {
+                    Home.Instance.NavigateTo(typeof(Views.PlayListDetai), playlistNavItem);
+                }
             }
         }
 
-        public static void NavigateToArtistAsync(ArtistBaseDetailRoot artistBaseDetailRoot, bool isMain = false)
+        public static void NavigateToArtistAsync(ArtistBaseDetailRoot artistBaseDetailRoot)
         {
-            Home.Instance.NavigateTo(typeof(ArtistHome), artistBaseDetailRoot);
+            if(IsInPlayingPage)
+            {
+                NavigationPage.Instance.NavigateTo(typeof(ArtistHome), artistBaseDetailRoot);
+            }
+            else
+            {
+                Home.Instance.NavigateTo(typeof(ArtistHome), artistBaseDetailRoot);
+            }
         }
 
-        public static void NavigateToAlbumAsync(AlbumRoot albumRoot, bool isMain = false)
+        public static void NavigateToAlbumAsync(AlbumRoot albumRoot)
         {
-            Home.Instance.NavigateTo(typeof(AlbumDetail), albumRoot, isMain);
+            if (IsInPlayingPage)
+            {
+                NavigationPage.Instance.NavigateTo(typeof(AlbumDetail), albumRoot);
+            }
+            else
+            {
+                Home.Instance.NavigateTo(typeof(AlbumDetail), albumRoot);
+            }
         }
 
-        public static void NavigateToComment(CommentRoot commentRoot, bool isMain = false)
+        public static void NavigateToComment(CommentRoot commentRoot)
         {
-            Home.Instance.NavigateTo(typeof(Comment), commentRoot, isMain);
+            if (IsInPlayingPage)
+            {
+                NavigationPage.Instance.NavigateTo(typeof(CommentPage), commentRoot);
+            }
+            else
+            {
+                Home.Instance.NavigateTo(typeof(CommentPage), commentRoot);
+            }
         }
 
         public static async void NavigateToCompactOverlayMode()
@@ -46,7 +74,26 @@ namespace MyNCMusic.Services
             ViewModePreferences compactOptions = ViewModePreferences.CreateDefault(ApplicationViewMode.CompactOverlay);
             compactOptions.CustomSize = new Windows.Foundation.Size(340, 160);
             if (await ApplicationView.GetForCurrentView().TryEnterViewModeAsync(ApplicationViewMode.CompactOverlay, compactOptions))
-                MainPage.Instance.Frame.Navigate(typeof(CompactOverlayPage));
+            {
+                NavigationPage.Instance.Frame.Navigate(typeof(CompactOverlayPage));
+            }
+        }
+        private static bool IsInPlayingPage = false;
+        public static void TryNavigateToPlayingPage()
+        {
+            IsInPlayingPage = Home.Instance.NavigateToPlayingPage();
+        }
+
+        public static void NavigateToRadioDetail(List<RadioSongItem> radioDetail)
+        {
+            if (IsInPlayingPage)
+            {
+                NavigationPage.Instance.NavigateTo(typeof(RadioDetailPage), radioDetail);
+            }
+            else
+            {
+                Home.Instance.NavigateTo(typeof(RadioDetailPage), radioDetail);
+            }
         }
     }
 }

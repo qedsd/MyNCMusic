@@ -78,9 +78,7 @@ namespace MyNCMusic.Models
         /// 
         /// </summary>
         public int UserType { get; set; }
-        /// <summary>
-        /// 异元骇客
-        /// </summary>
+
         public string Nickname { get; set; }
         /// <summary>
         /// 

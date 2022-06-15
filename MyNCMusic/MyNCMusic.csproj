@@ -21,7 +21,6 @@
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <PackageCertificateKeyFile>
     </PackageCertificateKeyFile>
-    <PackageCertificateThumbprint>6733DAAF9926BE12FF4DE44A61CCB5220D445CA6</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
@@ -138,6 +137,9 @@
     <Compile Include="Controls\ArtistList.xaml.cs">
       <DependentUpon>ArtistList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\CommentControl.xaml.cs">
+      <DependentUpon>CommentControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\MusicList.xaml.cs">
       <DependentUpon>MusicList.xaml</DependentUpon>
     </Compile>
@@ -146,6 +148,12 @@
     </Compile>
     <Compile Include="Controls\PlaylistList.xaml.cs">
       <DependentUpon>PlaylistList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PlayRecordList.xaml.cs">
+      <DependentUpon>PlayRecordList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RadioList.xaml.cs">
+      <DependentUpon>RadioList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\WaitingPopup.xaml.cs">
       <DependentUpon>WaitingPopup.xaml</DependentUpon>
@@ -212,9 +220,7 @@
     <Compile Include="Models\Playlist\TracksItem.cs" />
     <Compile Include="Models\Recommend\RecommendList.cs" />
     <Compile Include="Models\Recommend\RecommendListRoot.cs" />
-    <Compile Include="Models\MyClass.cs" />
     <Compile Include="Models\MyImage.cs" />
-    <Compile Include="Models\MySourceId.cs" />
     <Compile Include="Models\PlayOrderState.cs" />
     <Compile Include="Models\Recommend\RecommendMusicData.cs" />
     <Compile Include="Models\Recommend\RecommendMusicRoot.cs" />
@@ -243,10 +249,16 @@
     <Compile Include="Services\SearchService.cs" />
     <Compile Include="Services\SongService.cs" />
     <Compile Include="Services\ThemeService.cs" />
+    <Compile Include="ViewModel\AlbumViewModel.cs" />
+    <Compile Include="ViewModel\ArtistHomeViewModel.cs" />
+    <Compile Include="ViewModel\CommentViewModel.cs" />
+    <Compile Include="ViewModel\CompactOverlayViewModel.cs" />
     <Compile Include="ViewModel\ControlBarViewModel.cs" />
     <Compile Include="ViewModel\HomeViewModel.cs" />
+    <Compile Include="ViewModel\NavigationViewModel.cs" />
     <Compile Include="ViewModel\PlayingViewModel.cs" />
     <Compile Include="ViewModel\PlaylistDetailViewModel.cs" />
+    <Compile Include="ViewModel\RadioDetailViewModel.cs" />
     <Compile Include="ViewModel\RecommendationViewModel.cs" />
     <Compile Include="Views\AlbumDetail.xaml.cs">
       <DependentUpon>AlbumDetail.xaml</DependentUpon>
@@ -254,8 +266,8 @@
     <Compile Include="Views\ArtistHome.xaml.cs">
       <DependentUpon>ArtistHome.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Comment.xaml.cs">
-      <DependentUpon>Comment.xaml</DependentUpon>
+    <Compile Include="Views\CommentPage.xaml.cs">
+      <DependentUpon>CommentPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\CompactOverlayPage.xaml.cs">
       <DependentUpon>CompactOverlayPage.xaml</DependentUpon>
@@ -269,6 +281,9 @@
     <Compile Include="Views\MyMusicList.xaml.cs">
       <DependentUpon>MyMusicList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\NavigationPage.xaml.cs">
+      <DependentUpon>NavigationPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\PlayedRecord.xaml.cs">
       <DependentUpon>PlayedRecord.xaml</DependentUpon>
     </Compile>
@@ -278,11 +293,11 @@
     <Compile Include="Views\PlayListDetai.xaml.cs">
       <DependentUpon>PlayListDetai.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Radio.xaml.cs">
-      <DependentUpon>Radio.xaml</DependentUpon>
+    <Compile Include="Views\RadioPage.xaml.cs">
+      <DependentUpon>RadioPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RadioDetail.xaml.cs">
-      <DependentUpon>RadioDetail.xaml</DependentUpon>
+    <Compile Include="Views\RadioDetailPage.xaml.cs">
+      <DependentUpon>RadioDetailPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Recommendation.xaml.cs">
       <DependentUpon>Recommendation.xaml</DependentUpon>
@@ -359,6 +374,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\CommentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\MusicList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -368,6 +387,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\PlaylistList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PlayRecordList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\RadioList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -395,7 +422,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Comment.xaml">
+    <Page Include="Views\CommentPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -415,6 +442,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\NavigationPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\PlayedRecord.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -427,11 +458,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Radio.xaml">
+    <Page Include="Views\RadioPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\RadioDetail.xaml">
+    <Page Include="Views\RadioDetailPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -472,7 +503,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="key.snk" />
-    <None Include="MyNCMusic_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

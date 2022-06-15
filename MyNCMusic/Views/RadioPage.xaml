@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="MyNCMusic.Views.PlayedRecord"
+    x:Class="MyNCMusic.Views.RadioPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:MyNCMusic.Controls"
@@ -27,32 +27,26 @@
             Margin="0,48,0,10"
             FontFamily="SimSun"
             FontSize="48"
-            Foreground="{StaticResource T1TextColorBrush}"
-            Text="播放记录" />
+            Text="我的电台" 
+            Foreground="{StaticResource T1TextColorBrush}"/>
         <Pivot Grid.Row="1" SelectionChanged="Pivot_SelectionChanged">
             <PivotItem Tag="0">
                 <PivotItem.Header>
                     <TextBlock
                         FontSize="14"
                         Foreground="{StaticResource T1TextColorBrush}"
-                        Text="最近一周" />
+                        Text="我创建的" />
                 </PivotItem.Header>
-                <controls:PlayRecordList
-                    x:Name="PlayRecordList_Week"
-                    OnChangedAlbum="PlayRecordList_OnChangedAlbum"
-                    OnChangedRecord="PlayRecordList_OnChangedRecord" />
+                <controls:RadioList x:Name="CreatedRadioList" OnChangedRadio="CreatedRadioList_OnChangedRadio" />
             </PivotItem>
             <PivotItem Tag="1">
                 <PivotItem.Header>
                     <TextBlock
                         FontSize="14"
                         Foreground="{StaticResource T1TextColorBrush}"
-                        Text="全部记录" />
+                        Text="我订阅的" />
                 </PivotItem.Header>
-                <controls:PlayRecordList
-                    x:Name="PlayRecordList_All"
-                    OnChangedAlbum="PlayRecordList_OnChangedAlbum"
-                    OnChangedRecord="PlayRecordList_OnChangedRecord" />
+                <controls:RadioList x:Name="SubRadioList" OnChangedRadio="CreatedRadioList_OnChangedRadio" />
             </PivotItem>
         </Pivot>
     </Grid>

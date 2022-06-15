@@ -99,9 +99,14 @@ namespace MyNCMusic
             tiWtleBar.ButtonHoverBackgroundColor = Colors.LightGray;
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
             Window.Current.SetTitleBar(MyTitleBar);
+            MainFrame.Navigate(typeof(Views.NavigationPage));
+            Loaded += MainPage_Loaded1;
         }
 
-
+        private void MainPage_Loaded1(object sender, RoutedEventArgs e)
+        {
+            //MainFrame.Navigate(typeof(Views.NavigationPage));
+        }
 
         private async void PlayingService_OnPlayingRadioChanged()
         {

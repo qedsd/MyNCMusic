@@ -242,7 +242,7 @@ namespace MyNCMusic.Services
             }
             bool b=await PreparePlayingRadio();
             PlayingListToBaseObject(PlayingRadioList);
-            WhenPlayingRadioChange();
+            Play(PlayingRadioId);
             return b;
         }
 
@@ -294,12 +294,6 @@ namespace MyNCMusic.Services
                     return false;
                 }
                 songsItem = musicDetailRoot.Songs.Last();
-                //判断是否为喜欢歌曲
-                if (MainPage.favoriteSongsRoot != null)
-                {
-                    if (MainPage.favoriteSongsRoot.Ids.Find(p => p.Equals(songsItem.Id)) != 0)
-                        songsItem.IsFavorite = true;
-                }
             }
             SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
             
@@ -307,7 +301,7 @@ namespace MyNCMusic.Services
                 return false;
             PlayingSong = songsItem;
             PlayingSongUrlRoot = songUrlRoot;
-            var playingSong = PlayingService.PlayingSongList.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id);
+            var playingSong = PlayingService.PlayingSongList == null?null:PlayingService.PlayingSongList.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id);
             if(playingSong==null)//将要播放的歌曲不在当前播放列表
             {
                 PlayingSongList = new List<MusicItem>() { PlayingSong };
@@ -337,14 +331,7 @@ namespace MyNCMusic.Services
             if (PlayingAlbum == null)
                 return false;
             PlayingService.PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingAlbum.Album.PicUrl + "?param=200y200"));
-
-            //if(PlayedSong!=null&& PlayedSongList!=null)
-            //    PlayedSongList.FirstOrDefault(p=>p.Id== PlayedSong.Id).IsPlaying = false;
-            //PlayingSongList.FirstOrDefault(p => p.Id == PlayingSong.Id).IsPlaying = true;
-
             return true;
-
-            
         }
 
         public static async Task<bool> PreparePlayingRadio()
@@ -437,6 +424,28 @@ namespace MyNCMusic.Services
         /// </summary>
         public static MediaTimelineController MediaTimelineController;
 
+        public static void PlayNext()
+        {
+            if(IsPlayingSong)
+            {
+                PlayNextSongs();
+            }
+            else
+            {
+                PlayNextRadio();
+            }
+        }
+        public static void PlayLast()
+        {
+            if (IsPlayingSong)
+            {
+                PlayLastSongs();
+            }
+            else
+            {
+                PlayLastRadio();
+            }
+        }
         /// <summary>
         /// 播放下一首
         /// </summary>
@@ -610,6 +619,16 @@ namespace MyNCMusic.Services
         }
         public delegate void PlayingChanged(long id,string url);
         public static event PlayingChanged OnPlayingChanged;
+        public static void AddFavorite(long id)
+        {
+            FavoriteMusics.Add(id);
+        }
+        public static void RemoveFavorite(long id)
+        {
+            FavoriteMusics.Remove(id);
+        }
+        public delegate void FavoriteChanged(long id,bool isFavorite);
+        public static event FavoriteChanged OnFavoriteChanged;
         #endregion
     }
 

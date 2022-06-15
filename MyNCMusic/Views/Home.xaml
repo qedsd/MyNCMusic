@@ -7,26 +7,22 @@
     xmlns:local="using:MyNCMusic.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mycontrols="using:MyNCMusic.Controls"
-    Background="{Binding MainBackgroundBrush}"
+    Background="Transparent"
     mc:Ignorable="d">
     <Page.Resources>
-        <Style TargetType="TextBlock" x:Key="MenuText">
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="20,0,0,0"/>
+        <Style x:Key="MenuText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="20,0,0,0" />
         </Style>
-        <Style TargetType="TextBlock" x:Key="MenuIcon">
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontFamily" Value="Segoe UI Symbol"/>
+        <Style x:Key="MenuIcon" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontFamily" Value="Segoe UI Symbol" />
         </Style>
     </Page.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
         <Frame x:Name="MainFrame">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -68,12 +64,11 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE189;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE189;" />
                                     <TextBlock
                                         Grid.Column="1"
-                                        Text="发现音乐" 
-                                        Style="{StaticResource MenuText}"/>
+                                        Style="{StaticResource MenuText}"
+                                        Text="发现音乐" />
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -84,12 +79,11 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE142;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE142;" />
                                     <TextBlock
                                         Grid.Column="1"
-                                        Text="我的歌单" 
-                                        Style="{StaticResource MenuText}"/>
+                                        Style="{StaticResource MenuText}"
+                                        Text="我的歌单" />
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -100,8 +94,7 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE1CE;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE1CE;" />
                                     <TextBlock
                                         Grid.Column="1"
                                         Style="{StaticResource MenuText}"
@@ -116,8 +109,7 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE18B;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE18B;" />
                                     <TextBlock
                                         Grid.Column="1"
                                         Style="{StaticResource MenuText}"
@@ -132,8 +124,7 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE121;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE121;" />
                                     <TextBlock
                                         Grid.Column="1"
                                         Style="{StaticResource MenuText}"
@@ -151,8 +142,7 @@
                             Style="{StaticResource ButtonStyle_tran}">
                             <Button.Content>
                                 <StackPanel Width="100" Orientation="Horizontal">
-                                    <TextBlock Style="{StaticResource MenuIcon}"
-                                        Text="&#xE115;" />
+                                    <TextBlock Style="{StaticResource MenuIcon}" Text="&#xE115;" />
                                     <TextBlock
                                         Grid.Column="1"
                                         Style="{StaticResource MenuText}"
@@ -164,13 +154,6 @@
                 </Grid>
                 <!--  中心主要内容区  -->
                 <Frame x:Name="Frame_main" Grid.Column="1">
-                    <Frame.Background>
-                        <AcrylicBrush
-                            x:Name="AcrylicBrush_mainFrame"
-                            BackgroundSource="Backdrop"
-                            TintColor="Black"
-                            TintOpacity="0.4" />
-                    </Frame.Background>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ProgressRing Name="ProgressRing_initState" IsActive="True" />
                         <TextBlock
@@ -181,6 +164,5 @@
                 </Frame>
             </Grid>
         </Frame>
-        <mycontrols:ControlBar Grid.Row="1" />
     </Grid>
 </Page>

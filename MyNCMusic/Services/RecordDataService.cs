@@ -17,9 +17,9 @@ namespace MyNCMusic.Services
         /// <param name="uid"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static RecordData GetRecordData(long uid, int type)
+        public static async Task<RecordData> GetRecordDataAsync(long uid, int type)
         {
-            string result = Http.Get(ConfigService.ApiUri + @"/user/record?uid=" + uid+ "&type="+type);
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/user/record?uid=" + uid+ "&type="+type);
             return JsonConvert.DeserializeObject<RecordData>(result);
         }
     }

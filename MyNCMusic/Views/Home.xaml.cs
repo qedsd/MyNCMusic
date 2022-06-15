@@ -154,7 +154,7 @@ namespace MyNCMusic.Views
         private void Button_Radio_Click(object sender, RoutedEventArgs e)
         {
             if (ConfigService.Uid >= 0)
-                Frame_main.Navigate(typeof(Radio));
+                Frame_main.Navigate(typeof(RadioPage));
             else
             {
                 NotifyPopup notifyPopup = new NotifyPopup("请先登录");
@@ -165,54 +165,36 @@ namespace MyNCMusic.Views
 
 
         #region new
-        /// <summary>
-        /// 显示播放界面
-        /// </summary>
-        public void NavigateToPlayingPage()
+        public bool NavigateToPlayingPage()
         {
-            if(MainFrame.Content.GetType() == typeof(PlayingPage))
+            if (Frame.CanGoBack)
             {
-                this.Frame.Navigate(typeof(Home));
-                MainFrame.GoBack();
+                Frame.GoBack();
             }
             else
             {
-                MainFrame.Navigate(typeof(PlayingPage));
+                Frame.Navigate(typeof(PlayingPage));
             }
-            
-        }
-        public void NavigateTo([In] Type sourcePageType, [In] object parameter, [In] NavigationTransitionInfo infoOverride,bool isMain = false)
-        {
-            if(isMain)
+            if (Frame.CanGoBack)
             {
-                MainFrame.Navigate(sourcePageType, parameter, infoOverride);
+                return true;
             }
             else
             {
-                Frame_main.Navigate(sourcePageType, parameter, infoOverride);
+                return false;
             }
         }
-        public void NavigateTo([In] Type sourcePageType, [In] object parameter, bool isMain = false)
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter, [In] NavigationTransitionInfo infoOverride)
         {
-            if (isMain)
-            {
-                MainFrame.Navigate(sourcePageType, parameter);
-            }
-            else
-            {
-                Frame_main.Navigate(sourcePageType, parameter);
-            }
+            Frame_main.Navigate(sourcePageType, parameter, infoOverride);
         }
-        public void NavigateTo([In] Type sourcePageType, bool isMain = false)
+        public void NavigateTo([In] Type sourcePageType, [In] object parameter)
         {
-            if (isMain)
-            {
-                MainFrame.Navigate(sourcePageType);
-            }
-            else
-            {
-                Frame_main.Navigate(sourcePageType);
-            }
+            Frame_main.Navigate(sourcePageType, parameter);
+        }
+        public void NavigateTo([In] Type sourcePageType)
+        {
+            Frame_main.Navigate(sourcePageType);
         }
         #endregion
     }

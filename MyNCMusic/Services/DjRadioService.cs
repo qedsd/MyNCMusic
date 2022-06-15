@@ -26,9 +26,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="uid"></param>
         /// <returns></returns>
-        public static async Task<DjRadio> GetUserSublistRadio()
+        public static async Task<DjRadio> GetUserSublistRadioAsync()
         {
-            string result = await Task.Run(() => Http.Get(ConfigService.ApiUri + @"/dj/sublist"));
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/dj/sublist");
             return JsonConvert.DeserializeObject<DjRadio>(result);
         }
 
@@ -37,9 +37,9 @@ namespace MyNCMusic.Services
         /// 此时获取到的节目不带有效播放链接
         /// </summary>
         /// <returns></returns>
-        public static async Task<RadioPrograms> GetRadioSongItem(long id)
+        public static async Task<RadioPrograms> GetRadioSongItemAsync(long id)
         {
-            string result = await Task.Run(() => Http.Get(ConfigService.ApiUri + @"/dj/program?rid="+id+ "&limit=1000"));
+            string result = await Http.GetAsync(ConfigService.ApiUri + @"/dj/program?rid="+id+ "&limit=1000");
             return JsonConvert.DeserializeObject<RadioPrograms>(result);
         }
 

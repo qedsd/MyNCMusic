@@ -32,10 +32,11 @@ namespace MyNCMusic.Views
     /// </summary>
     public sealed partial class PlayingPage : Page
     {
-        bool isLoad=false;
         private ViewModel.PlayingViewModel PlayingViewModel;
+        public static PlayingPage Instance { get;private set; }
         public PlayingPage()
         {
+            Instance = this;
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             PlayingViewModel = new ViewModel.PlayingViewModel();
@@ -66,7 +67,7 @@ namespace MyNCMusic.Views
 
         private void Button_compactOverlayback_Click(object sender, RoutedEventArgs e)
         {
-            (Application.Current as App).myMainPage.IntoCompactOverlayMode();
+            Services.NavigateService.NavigateToCompactOverlayMode();
         }
 
         private void Button_FullScreenMode_Click(object sender, RoutedEventArgs e)
@@ -87,19 +88,6 @@ namespace MyNCMusic.Views
             }
         }
 
-
-        private void ListBox_Comment_RightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            if (e.OriginalSource.GetType() == typeof(TextBlock))
-            {
-                OtherHelper.CopyTextToClipboard((e.OriginalSource as TextBlock).Text);
-            }
-            else if(e.OriginalSource.GetType() == typeof(Windows.UI.Xaml.Shapes.Rectangle))
-            {
-                OtherHelper.CopyTextToClipboard(((e.OriginalSource as Windows.UI.Xaml.Shapes.Rectangle).DataContext as CommentItem).Content);
-            }
-        }
-
         private void ListBox_Artists_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (PlayingService.IsPlayingSong)
@@ -108,6 +96,7 @@ namespace MyNCMusic.Views
                 if (arItem != null)
                 {
                     PlayingViewModel.CheckArtistCommand.Execute(arItem);
+                    ((ListBox)sender).SelectedIndex = -1;
                 }
             }
         }

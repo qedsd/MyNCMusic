@@ -16,8 +16,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace MyNCMusic.Views
 {
     /// <summary>
@@ -25,109 +23,52 @@ namespace MyNCMusic.Views
     /// </summary>
     public sealed partial class MyCollection : Page
     {
-        //public static SolidColorBrush mainSolidColorBrush;
         public MyCollection()
         {
-            //mainSolidColorBrush = MainPage.mainSolidColorBrush;
             this.InitializeComponent();
-            
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Loaded += MyCollection_Loaded;
         }
 
         private async void MyCollection_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ListBox_album.ItemsSource != null)
+            if (AlbumList.ItemsSource != null)
                 return;
-            ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-            MyCollectionfAlbumRoot myPlaylistRoot = await Task.Run(() => AlbumService.GetMyCollectionOfAlbum());
-            if (myPlaylistRoot == null)
+            Controls.WaitingPopup.Show();
+            MyCollectionfAlbumRoot myPlaylistRoot = await AlbumService.GetMyCollectionOfAlbumAsync();
+            Controls.WaitingPopup.Hide();
+            if (myPlaylistRoot != null)
             {
-                ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
-                return;
-            }
-            ListBox_album.ItemsSource = myPlaylistRoot.Data;
-            ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
-        }
-
-        private async void ListBox_album_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            CADataItem cADataItem = ((ListBox)sender).SelectedItem as CADataItem;
-            if (cADataItem == null)
-                return;
-            if (cADataItem.Id == PlayingService.PlayingListId)
-                Frame.Navigate(typeof(AlbumDetail));
-            else
-            {
-                ProgressBar_loadAlbum.Visibility = Visibility.Visible;
-                AlbumRoot albumRoot = await Task.Run(() => AlbumService.GetAlbum(cADataItem.Id));
-                if (albumRoot == null)
-                {
-                    ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
-                    return;
-                }
-                Frame.Navigate(typeof(AlbumDetail), albumRoot);
-                ProgressBar_loadAlbum.Visibility = Visibility.Collapsed;
+                AlbumList.ItemsSource = myPlaylistRoot.Data;
             }
         }
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            PivotItem pivotItem = (PivotItem)((Pivot)sender).SelectedItem;
-            if (pivotItem.Tag.ToString() == "1")
+            if(((Pivot)sender).SelectedIndex == 1&& ArtistList.ItemsSource==null)
             {
-                if (ListBox_artist.ItemsSource != null)
-                    return;
-                ProgressBar_loadArtist.Visibility = Visibility.Visible;
-                MyCollectionfArtistRoot myCollectionfArtistRoot=await Task.Run(() => ArtistService.GetMyCollectionOfArtist());
-                if (myCollectionfArtistRoot == null)
+                Controls.WaitingPopup.Show();
+                MyCollectionfArtistRoot myCollectionfArtistRoot = await ArtistService.GetMyCollectionOfArtistAsync();
+                Controls.WaitingPopup.Hide();
+                if (myCollectionfArtistRoot != null)
                 {
-                    ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
-                    return;
+                    ArtistList.ItemsSource = myCollectionfArtistRoot.Data;
                 }
-                ListBox_artist.ItemsSource = myCollectionfArtistRoot.Data;
-                ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
             }
         }
-
-        private async void ListBox_artist_Tapped(object sender, TappedRoutedEventArgs e)
+        private void AlbumList_OnChangedAlbum(AlbumRoot album)
         {
-            ProgressBar_loadArtist.Visibility = Visibility.Visible;
-            ListBox listBox = (ListBox)sender;
-            Artist artist = ((ListBox)sender).SelectedItem as Artist;
-            ArtistBaseDetailRoot artistBaseDetailRoot=await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.Id));
-            ProgressBar_loadArtist.Visibility = Visibility.Collapsed;
-            if (artistBaseDetailRoot == null)
-                return;
-            Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
+            NavigateService.NavigateToAlbumAsync(album);
         }
 
-        private async void Button_artists_Click_Artist(object sender, RoutedEventArgs e)
+        private void AlbumList_OnChangedArtist(ArtistBaseDetailRoot artist)
         {
-            Button button = sender as Button;
-            List<Artist> artists = ((CADataItem)button.DataContext).Artists as List<Artist>;
-            if (artists.Count == 1)
-            {
-                ProgressBar_loading.Visibility = Visibility.Visible;
-                ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artists.First().Id));
-                ProgressBar_loading.Visibility = Visibility.Collapsed;
-                if (artistBaseDetailRoot == null)
-                    return;
-                Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
-            }
+            NavigateService.NavigateToArtistAsync(artist);
         }
 
-        private async void ListBox_artists_SelectionChanged_Artist(object sender, SelectionChangedEventArgs e)
+        private void ArtistList_OnChangedArtist(ArtistBaseDetailRoot artist)
         {
-            Artist artist = ((ListBox)sender).SelectedItem as Artist;
-            if (artist == null)
-                return;
-            ProgressBar_loading.Visibility = Visibility.Visible;
-            ArtistBaseDetailRoot artistBaseDetailRoot = await Task.Run(() => ArtistService.GetArtistBaseDetail(artist.Id));
-            ProgressBar_loading.Visibility = Visibility.Collapsed;
-            if (artistBaseDetailRoot == null)
-                return;
-            Frame.Navigate(typeof(ArtistHome), artistBaseDetailRoot);
+            NavigateService.NavigateToArtistAsync(artist);
         }
     }
 }

@@ -3,11 +3,9 @@ using MyNCMusic.MyUserControl;
 using MyNCMusic.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,59 +23,59 @@ namespace MyNCMusic.Views
     /// <summary>
     /// 可用于自身或导航至 Frame 内部的空白页。
     /// </summary>
-    public sealed partial class PlayedRecord : Page
+    public sealed partial class RadioPage : Page
     {
-        public PlayedRecord()
+        public RadioPage()
         {
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            Loaded += PlayedRecord_Loaded;
+            Loaded += Radio_Loaded;
         }
 
-        private async void PlayedRecord_Loaded(object sender, RoutedEventArgs e)
+        private async void Radio_Loaded(object sender, RoutedEventArgs e)
         {
-            Controls.WaitingPopup.Show();
-            RecordData recordData = await RecordDataService.GetRecordDataAsync(ConfigService.Uid, 1);
-            Controls.WaitingPopup.Hide();
-            if (recordData.WeekData != null)
+            DjRadio djRadio=await DjRadioService.GetUserCreatedRadio(ConfigService.Uid);
+            if(djRadio==null)
             {
-                PlayRecordList_Week.ItemsSource = recordData.WeekData;
+                NotifyPopup.ShowError("获取失败");
             }
             else
             {
-                NotifyPopup.ShowError("获取最近一周记录失败");
+                CreatedRadioList.ItemsSource = djRadio.DjRadios;
             }
         }
 
         private async void Pivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(((Pivot)sender).SelectedIndex == 1 && PlayRecordList_All.ItemsSource == null)
+            if(((Pivot)sender).SelectedIndex == 1&&SubRadioList.ItemsSource==null)
             {
                 Controls.WaitingPopup.Show();
-                RecordData recordData = await RecordDataService.GetRecordDataAsync(ConfigService.Uid, 0);
+                DjRadio djRadio = await DjRadioService.GetUserSublistRadioAsync();
                 Controls.WaitingPopup.Hide();
-                if (recordData.AllData != null)
+                if(djRadio!=null)
                 {
-                    PlayRecordList_All.ItemsSource = recordData.AllData;
+                    SubRadioList.ItemsSource = djRadio.DjRadios;
                 }
                 else
                 {
-                    NotifyPopup.ShowError("获取全部记录失败");
+                    NotifyPopup.ShowError("获取失败");
                 }
             }
         }
 
-        private async void PlayRecordList_OnChangedRecord(RecordDataItem record)
-        {
-            await PlayingService.ChangePlayingSong(record.Song.Id, null);
-        }
-
-        private async void PlayRecordList_OnChangedAlbum(long id)
+        private async void CreatedRadioList_OnChangedRadio(DjRadiosItem Radio)
         {
             Controls.WaitingPopup.Show();
-            AlbumRoot albumRoot = await AlbumService.GetAlbumAsync(id);
+            RadioPrograms radioPrograms = await DjRadioService.GetRadioSongItemAsync(Radio.Id);
             Controls.WaitingPopup.Hide();
-            NavigateService.NavigateToAlbumAsync(albumRoot);
+            if (radioPrograms == null)
+            {
+                NotifyPopup.ShowError("获取失败");
+            }
+            else
+            {
+                NavigateService.NavigateToRadioDetail(radioPrograms.Programs);
+            }
         }
     }
 }

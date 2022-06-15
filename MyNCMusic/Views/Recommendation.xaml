@@ -34,13 +34,15 @@
             Margin="0,48,0,10"
             FontFamily="SimSun"
             FontSize="48"
-            Text="发现音乐"
-            Foreground="{StaticResource T1TextColorBrush}"/>
-        <Pivot Grid.Row="1" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}"
-               >
+            Foreground="{StaticResource T1TextColorBrush}"
+            Text="发现音乐" />
+        <Pivot Grid.Row="1" SelectedIndex="{Binding SelectedIndex, Mode=TwoWay}">
             <PivotItem Tag="0">
                 <PivotItem.Header>
-                    <TextBlock FontSize="14" Text="推荐歌单" Foreground="{StaticResource T1TextColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="推荐歌单" />
                 </PivotItem.Header>
                 <controls:AdaptiveGridView
                     Grid.Row="1"
@@ -79,7 +81,10 @@
             </PivotItem>
             <PivotItem Tag="1">
                 <PivotItem.Header>
-                    <TextBlock FontSize="14" Text="推荐歌曲" Foreground="{StaticResource T1TextColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="推荐歌曲" />
                 </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -117,7 +122,10 @@
 
             <PivotItem Tag="2">
                 <PivotItem.Header>
-                    <TextBlock FontSize="14" Text="随机我喜欢的" Foreground="{StaticResource T1TextColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="随机我喜欢的" />
                 </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -158,7 +166,8 @@
                     <TextBlock
                         FontFamily="Segoe MDL2 Assets"
                         FontSize="14"
-                        Text="&#xE11A;" Foreground="{StaticResource T1TextColorBrush}"/>
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="&#xE11A;" />
                 </PivotItem.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -179,7 +188,10 @@
                         SelectedIndex="{Binding SearchSelectedIndex, Mode=TwoWay}">
                         <PivotItem Tag="1">
                             <PivotItem.Header>
-                                <TextBlock FontSize="14" Text="单曲" Foreground="{StaticResource T1TextColorBrush}"/>
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{StaticResource T1TextColorBrush}"
+                                    Text="单曲" />
                             </PivotItem.Header>
                             <controls1:MusicList
                                 ItemsSource="{Binding SearchMusics, Mode=OneWay}"
@@ -189,7 +201,10 @@
                         </PivotItem>
                         <PivotItem Tag="10">
                             <PivotItem.Header>
-                                <TextBlock FontSize="14" Text="专辑" Foreground="{StaticResource T1TextColorBrush}"/>
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{StaticResource T1TextColorBrush}"
+                                    Text="专辑" />
                             </PivotItem.Header>
                             <controls1:AlbumList
                                 ItemsSource="{Binding SearchAlbums, Mode=OneWay}"
@@ -198,13 +213,19 @@
                         </PivotItem>
                         <PivotItem Tag="100">
                             <PivotItem.Header>
-                                <TextBlock FontSize="14" Text="歌手" Foreground="{StaticResource T1TextColorBrush}" />
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{StaticResource T1TextColorBrush}"
+                                    Text="歌手" />
                             </PivotItem.Header>
                             <controls1:ArtistList ItemsSource="{Binding SearchArtists, Mode=OneWay}" OnChangedArtist="MusicList_OnChangedArtist" />
                         </PivotItem>
                         <PivotItem Tag="1000">
                             <PivotItem.Header>
-                                <TextBlock FontSize="14" Text="歌单" Foreground="{StaticResource T1TextColorBrush}"/>
+                                <TextBlock
+                                    FontSize="14"
+                                    Foreground="{StaticResource T1TextColorBrush}"
+                                    Text="歌单" />
                             </PivotItem.Header>
                             <controls1:PlaylistList
                                 ItemsSource="{Binding SearchPlaylists, Mode=OneWay}"

@@ -25,21 +25,21 @@ namespace MyNCMusic.Controls
             this.InitializeComponent();
         }
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(List<Models.Album>), typeof(AlbumList), new PropertyMetadata(null, new PropertyChangedCallback(DataCountPropertyChanged)));
-        private static void DataCountPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register("ItemsSource", typeof(List<Models.Album>), typeof(AlbumList), new PropertyMetadata(null, new PropertyChangedCallback(ItemsSourcePropertyChanged)));
+        private static void ItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((AlbumList)d).ListBox_Album.ItemsSource = (List<Models.Album>)e.NewValue;
         }
-        public int ItemsSource
+        public List<Models.Album> ItemsSource
         {
-            get => (int)GetValue(ItemsSourceProperty);
+            get => (List<Models.Album>)GetValue(ItemsSourceProperty);
             set
             {
                 SetValue(ItemsSourceProperty, value);
             }
         }
 
-        public delegate void ChangedAlbumDelegate(AlbumRoot artist);
+        public delegate void ChangedAlbumDelegate(AlbumRoot albumRoot);
         public event ChangedAlbumDelegate OnChangedAlbum;
         private bool IsHandledTapped = false;
         private async void ListBox_Album_Tapped(object sender, TappedRoutedEventArgs e)

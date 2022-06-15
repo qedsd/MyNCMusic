@@ -29,14 +29,14 @@ namespace MyNCMusic.Controls
             this.InitializeComponent();
         }
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(List<PlaylistItem>), typeof(PlaylistList), new PropertyMetadata(null, new PropertyChangedCallback(DataCountPropertyChanged)));
-        private static void DataCountPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+            DependencyProperty.Register("ItemsSource", typeof(List<PlaylistItem>), typeof(PlaylistList), new PropertyMetadata(null, new PropertyChangedCallback(ItemsSourcePropertyChanged)));
+        private static void ItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ((PlaylistList)d).AdaptiveGridView.ItemsSource = (List<PlaylistItem>)e.NewValue;
         }
-        public int ItemsSource
+        public List<PlaylistItem> ItemsSource
         {
-            get => (int)GetValue(ItemsSourceProperty);
+            get => (List<PlaylistItem>)GetValue(ItemsSourceProperty);
             set
             {
                 SetValue(ItemsSourceProperty, value);
