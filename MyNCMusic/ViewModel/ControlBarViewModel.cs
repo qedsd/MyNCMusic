@@ -84,7 +84,7 @@ namespace MyNCMusic.ViewModel
         /// </summary>
         public MediaTimelineController MediaTimelineController { get; private set; }
 
-        public ObservableCollection<MusicBase> PlayingList { get; set; } = PlayingService.PlayingList;
+        public ObservableCollection<MusicBase> PlayingList { get; set; }
 
         private MediaSource MediaSource;
         /// <summary>
@@ -106,7 +106,25 @@ namespace MyNCMusic.ViewModel
             MediaPlayer.SourceChanged += MediaPlayer_SourceChanged;
             PlayingService.OnPlayingChanged += PlayingService_OnPlayChanged;
             PlayingService.OnFavoriteChanged += PlayingService_OnFavoriteChanged;
+            Init();
+        }
+        private async void Init()
+        {
+            //上次播放信息
+            await PlayingService.Load();
+            PlayOrder = PlayingService.PlayOrderState;
             UpdatePlayOrder(PlayOrder);
+            PlayingList = PlayingService.PlayingList;
+            if (PlayingService.IsPlayingSong &&  PlayingService.PlayingSong!=null)
+            {
+                string url = PlayingService.GetSongMediaUrl(PlayingService.PlayingSong.Id);
+                UpdateLayout(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+            }
+            else if (PlayingService.PlayingRadio != null)
+            {
+                string url = PlayingService.GetSongMediaUrl(PlayingService.PlayingRadio.Id);
+                Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
+            }
         }
 
         private void PlayingService_OnFavoriteChanged(long id, bool isFavorite)
@@ -254,16 +272,16 @@ namespace MyNCMusic.ViewModel
             {
                 if (PlayingService.IsPlayingSong)
                 {
-                    await PlayingService.ChangePlayingSong(item.Id);
+                    await PlayingService.ChangePlayingSongAsync(item.Id, PlayingService.PlayingListId, null, null);
                 }
                 else
                 {
-                    await PlayingService.ChangePlayingRadio(item.Id);
+                    await PlayingService.ChangePlayingSongAsync(item.Id, PlayingService.PlayingListId, null, null);
                 }
             }
         });
         #endregion
-        private PlayOrderStateEnum PlayOrder = PlayingService.PlayOrderState;
+        private PlayOrderStateEnum PlayOrder;
         /// <summary>
         /// 按输入播放顺序修改新播放顺序
         /// </summary>
@@ -332,7 +350,13 @@ namespace MyNCMusic.ViewModel
         }
 
         private string lastPlayedUrl;
-        public async void Play(string url,string musicName,string artistName, string albumName)
+        private void Play(string url, string musicName, string artistName, string albumName)
+        {
+            UpdateLayout(url, musicName, artistName, albumName);
+            MediaTimelineController.Start();
+            IsPlaying = true;
+        }
+        private async void UpdateLayout(string url,string musicName,string artistName, string albumName)
         {
             if (lastPlayedUrl != url)//非重复播放
             {
@@ -344,7 +368,6 @@ namespace MyNCMusic.ViewModel
                 MediaSource.OpenOperationCompleted += MediaSource_OpenOperationCompleted;
                 MediaPlaybackItem = new MediaPlaybackItem(MediaSource);
                 MediaPlayer.Source = MediaPlaybackItem;
-                MediaTimelineController.Start();
 
                 //左下角专辑图片
                 AlbumImage = PlayingService.PlayingAlbumBitmapImage;
@@ -358,8 +381,7 @@ namespace MyNCMusic.ViewModel
                 MediaPlaybackItem.ApplyDisplayProperties(props);
             }
             lastPlayedUrl = url;
-            MediaTimelineController.Start();
-            IsPlaying = true;
+            
         }
         private async void MediaSource_OpenOperationCompleted(MediaSource sender, MediaSourceOpenOperationCompletedEventArgs args)
         {

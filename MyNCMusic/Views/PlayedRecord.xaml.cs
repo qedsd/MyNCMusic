@@ -69,7 +69,7 @@ namespace MyNCMusic.Views
 
         private async void PlayRecordList_OnChangedRecord(RecordDataItem record)
         {
-            await PlayingService.ChangePlayingSong(record.Song.Id, null);
+            await PlayingService.ChangePlayingSongAsync(record.Song.Id, record.Song.Al.Id,null,null);
         }
 
         private async void PlayRecordList_OnChangedAlbum(long id)

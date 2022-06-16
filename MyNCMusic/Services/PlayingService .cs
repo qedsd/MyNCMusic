@@ -19,57 +19,14 @@ namespace MyNCMusic.Services
     public static class PlayingService
     {
         /// <summary>
-        /// 全局唯一音乐、播客媒体播放控制器
-        /// </summary>
-        public static MediaPlayer MediaPlayer = new MediaPlayer();
-
-        /// <summary>
-        /// 我创建的歌单
-        /// </summary>
-        public static ObservableCollection<PlaylistItem> PlaylistItems_Created;
-        /// <summary>
-        /// 我订阅的歌单
-        /// </summary>
-        public static ObservableCollection<PlaylistItem> PlaylistItems_Subscribed;
-
-
-        /// <summary>
-        /// 上一次播放的歌曲列表
-        /// </summary>
-        public static List<MusicItem> PlayedSongList;
-
-        public static List<MusicItem> _PlayingSongList;
-        /// <summary>
         /// 当前播放的歌曲列表
         /// </summary>
-        public static List<MusicItem> PlayingSongList
-        {
-            get { return _PlayingSongList; }
-            set
-            {
-                PlayedSongList = PlayingSongList;
-                _PlayingSongList = value;
-            }
-        }
+        public static List<MusicItem> PlayingSongList { get; set; }
 
-        /// <summary>
-        /// 上一次播放的电台列表
-        /// </summary>
-        public static List<RadioSongItem> PlayedRadioList;
-
-        public static List<RadioSongItem> _PlayingRadioList;
         /// <summary>
         /// 当前播放的电台列表
         /// </summary>
-        public static List<RadioSongItem> PlayingRadioList
-        {
-            get { return _PlayingRadioList; }
-            set
-            {
-                PlayedRadioList = PlayingRadioList;
-                _PlayingRadioList = value;
-            }
-        }
+        public static List<RadioSongItem> PlayingRadioList { get; set; }
 
         /// <summary>
         /// 正在播放的歌曲的ID
@@ -82,42 +39,14 @@ namespace MyNCMusic.Services
         public static long PlayingRadioId;
 
         /// <summary>
-        /// 上次播放的歌曲
-        /// </summary>
-        public static MusicItem PlayedSong;
-
-        /// <summary>
-        /// 上次播放的电台
-        /// </summary>
-        public static RadioSongItem PlayedRadio;
-
-        public static MusicItem _PlayingSong;
-        /// <summary>
         /// 当前播放歌曲
         /// </summary>
-        public static MusicItem PlayingSong
-        {
-            get { return _PlayingSong; }
-            set
-            {
-                PlayedSong = PlayingSong;
-                _PlayingSong = value;
-            }
-        }
+        public static MusicItem PlayingSong { get; set; }
 
-        public static RadioSongItem _PlayingRadio;
         /// <summary>
         /// 当前播放电台
         /// </summary>
-        public static RadioSongItem PlayingRadio
-        {
-            get { return _PlayingRadio; }
-            set
-            {
-                PlayedRadio = PlayingRadio;
-                _PlayingRadio = value;
-            }
-        }
+        public static RadioSongItem PlayingRadio { get; set; }
 
         /// <summary>
         /// 当前播放的歌曲的专辑
@@ -140,42 +69,14 @@ namespace MyNCMusic.Services
         public static List<long> PlayedRadioId;
 
         /// <summary>
-        /// 当前播放时长
-        /// </summary>
-        public static Stopwatch PlayDurationStopwatch = new Stopwatch();
-
-        /// <summary>
-        /// 上次播放的歌单/专辑id
-        /// </summary>
-        public static long PlayedListId;
-
-        public static long _PlayingListId;
-        /// <summary>
         /// 当前播放的歌单/专辑ID
         /// </summary>
-        public static long PlayingListId
-        {
-            get { return _PlayingListId; }
-            set
-            {
-                PlayedListId = PlayingListId;
-                _PlayingListId = value;
-            }
-        }
+        public static long PlayingListId{get;set;}
 
         /// <summary>
         /// 当前播放歌曲专辑Image
         /// </summary>
         public static BitmapImage PlayingAlbumBitmapImage;
-
-        public delegate void PlayingSongChanged();
-        //与委托相关联的事件
-        public static event PlayingSongChanged OnPlayingSongChanged;
-        //事件触发函数
-        private static void WhenPlayingSongChange()
-        {
-            OnPlayingSongChanged?.Invoke();
-        }
 
         public static bool IsPlayingSong;
 
@@ -188,73 +89,96 @@ namespace MyNCMusic.Services
         /// <param name="songsItems"></param>
         /// <param name="songsItem"></param>
         /// <returns></returns>
-        public static async Task<bool> ChangePlayingSong(long playingSongId, List<MusicItem> songsItems, MusicItem songsItem = null)
+        public static async Task<bool> ChangePlayingSongAsync(long playingSongId,long playingListId, List<MusicItem> songsItems, MusicItem songsItem)
         {
-            IsPlayingSong = true;
-            PlayingSongId = playingSongId;
-            PlayingSongList = songsItems;
-            bool b = await PreparePlayingSong(PlayingSongId, songsItem);
-            if (!b)
+            if(IsPlayingSong && MediaTimelineController != null && MediaTimelineController.Position.TotalSeconds!=0)
             {
-                NotifyPopup notifyPopup = new NotifyPopup("获取音乐失败");
-                notifyPopup.Show();
+                long sourceId = PlayingListId;
+                if (sourceId <= 0)//日推、搜索等没有明确播放来源的，都按自身专辑记录
+                {
+                    sourceId = PlayingAlbum.Album.Id;
+                }
+                _ = SongService.MarkPlayDurationAsync(PlayingSong.Id, sourceId, (long)MediaTimelineController.Position.TotalSeconds);
             }
-            else
+            if(PlayingListId != playingListId)//不同播放列表
             {
-                Play(PlayingSong.Id);
+                PlayingSongList.Clear();
+                PlayedSongId.Clear();
                 PlayingListToBaseObject(PlayingSongList);
-                //WhenPlayingSongChange();
+                PlayingListId = playingListId;
             }
-            return b;
-        }
-        public static async Task<bool> ChangePlayingSong(long playingSongId, MusicItem songsItem = null)
-        {
+            if (songsItem == null)//需获取实例
+            {
+                MusicDetailRoot musicDetailRoot = await SongService.GetMusicDetail_GetAsync(playingSongId.ToString());
+                if (musicDetailRoot == null || musicDetailRoot.Songs == null || musicDetailRoot.Songs.Count == 0)
+                {
+                    NotifyPopup.ShowError("获取音乐失败");
+                    return false;
+                }
+                songsItem = musicDetailRoot.Songs.Last();
+            }
+            PlayingSong = songsItem;
+            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
+            if(songUrlRoot == null)
+            {
+                NotifyPopup.ShowError("获取播放地址失败");
+                return false;
+            }
+            PlayingSongUrlRoot = songUrlRoot;
+
+            PlayedSongId.Remove(playingSongId);
+            PlayedSongId.Add(playingSongId);
+
+            PlayingAlbum = await AlbumService.GetAlbumAsync(songsItem.Al.Id);
+            if (PlayingAlbum == null)
+            {
+                NotifyPopup.ShowError("获取专辑失败");
+                return false;
+            }
+            PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingAlbum.Album.PicUrl + "?param=200y200"));
+
             IsPlayingSong = true;
             PlayingSongId = playingSongId;
-            PlayingSongList = PlayingSongList;
-            
-            bool b = await PreparePlayingSong(PlayingSongId, songsItem);
+            if(songsItems!=null)
+            {
+                PlayingSongList = songsItems;
+            }
             Play(PlayingSong.Id);
-            PlayingListToBaseObject(PlayingSongList);
-            //WhenPlayingSongChange();
-            return b;
+            return true;
         }
 
-        public delegate void PlayingRadioChanged();
-        //与委托相关联的事件
-        public static event PlayingRadioChanged OnPlayingRadioChanged;
-        //事件触发函数
-        private static void WhenPlayingRadioChange()
+        public static async Task<bool> ChangePlayingRadioAsync(long playingRadioId, List<RadioSongItem> radioSongItems)
         {
-            OnPlayingRadioChanged?.Invoke();
-        }
-        public static async Task<bool> ChangePlayingRadio(long playingRadioId, List<RadioSongItem> radioSongItems=null)
-        {
+            if (IsPlayingSong && MediaTimelineController != null && MediaTimelineController.Position.TotalSeconds != 0)
+            {
+                _ = SongService.MarkPlayDurationAsync(PlayingSong.Id, PlayingListId, (long)MediaTimelineController.Position.TotalSeconds);
+            }
             IsPlayingSong = false;
             PlayingRadioId = playingRadioId;
             if(radioSongItems!=null)
             {
                 PlayingRadioList = radioSongItems;
+                PlayedRadioId.Clear();
+                PlayingListToBaseObject(PlayingRadioList);
             }
-            else
+            PlayedRadioId.Remove(playingRadioId);
+            PlayedRadioId.Add(playingRadioId);
+            PlayingRadio = PlayingRadioList.FirstOrDefault(p=>p.Id == playingRadioId);
+            if(PlayingRadio == null)
             {
-                PlayingRadioList = PlayingRadioList;
+                NotifyPopup.ShowError("未找到电台信息");
+                return false;
             }
-            bool b=await PreparePlayingRadio();
-            PlayingListToBaseObject(PlayingRadioList);
+            PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingRadio.CoverUrl + "?param=200y200"));
+            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingRadioId);
+            if (songUrlRoot == null)
+            {
+                NotifyPopup.ShowError("获取播放地址失败");
+                return false;
+            }
+            PlayingSongUrlRoot = songUrlRoot;
             Play(PlayingRadioId);
-            return b;
-        }
-
-        
-
-        public delegate void PlayingRadioListChanged();
-        //与委托相关联的事件
-        public static event PlayingRadioListChanged OnPlayingRadioListChanged;
-        //事件触发函数
-        private static void WhenPlayingRadioListChange()
-        {
-            OnPlayingRadioListChanged?.Invoke();
+            return true;
         }
 
         /// <summary>
@@ -276,98 +200,6 @@ namespace MyNCMusic.Services
         public static void Save()
         {
             XmlSerializerHelper.SerializeToXml(ConfigService.Folder.Path + "/playinginfo.xml", new PlayingInfoToSave());
-        }
-
-        /// <summary>
-        /// 开始播放前获取相关信息准备
-        /// </summary>
-        /// <param name="playingSongId"></param>
-        /// <param name="songsItem"></param>
-        /// <returns></returns>
-        public static async Task<bool> PreparePlayingSong(long playingSongId, MusicItem songsItem = null)
-        {
-            if (songsItem == null)//需获取实例
-            {
-                MusicDetailRoot musicDetailRoot = await Task.Run(() => SongService.GetMusicDetail_Get(playingSongId.ToString()));
-                if (musicDetailRoot == null || musicDetailRoot.Songs == null || musicDetailRoot.Songs.Count == 0)
-                {
-                    return false;
-                }
-                songsItem = musicDetailRoot.Songs.Last();
-            }
-            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
-            
-            if (songUrlRoot == null)
-                return false;
-            PlayingSong = songsItem;
-            PlayingSongUrlRoot = songUrlRoot;
-            var playingSong = PlayingService.PlayingSongList == null?null:PlayingService.PlayingSongList.FirstOrDefault(p => p.Id == PlayingService.PlayingSong.Id);
-            if(playingSong==null)//将要播放的歌曲不在当前播放列表
-            {
-                PlayingSongList = new List<MusicItem>() { PlayingSong };
-                playingSong = PlayingSong;
-            }
-            if(PlayedSongId!=null)
-            {
-                if (PlayingSongList != PlayedSongList)//不同一个播放列表需清空列表
-                {
-                    PlayedSongId.Clear();
-                }
-            }
-            else
-            {
-                PlayedSongId = new List<long>();
-            }
-            PlayedSongId.Remove(playingSong.Id);//删除重复的，避免死循环
-            PlayedSongId.Add(playingSong.Id);
-            if (PlayingService.PlayedSong != null)//听歌打卡
-            {
-                PlayingService.PlayDurationStopwatch.Stop();
-                await SongService.MarkPlayDurationAsync(PlayedSong.Id, PlayedListId, PlayDurationStopwatch.ElapsedMilliseconds / 1000);
-            }
-
-            //获取专辑
-            PlayingAlbum = await Task.Run(() => AlbumService.GetAlbum(songsItem.Al.Id));
-            if (PlayingAlbum == null)
-                return false;
-            PlayingService.PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingAlbum.Album.PicUrl + "?param=200y200"));
-            return true;
-        }
-
-        public static async Task<bool> PreparePlayingRadio()
-        {
-            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingRadioId);
-            if (songUrlRoot == null)
-                return false;
-            PlayingSongUrlRoot = songUrlRoot;
-            var playingRadio = PlayingRadioList.FirstOrDefault(p => p.MainSong.Id == PlayingRadioId);
-            if (playingRadio == null)//将要播放的电台不在当前播放列表
-            {
-                PlayingRadioList = new List<RadioSongItem>() { PlayingRadio };
-                playingRadio = PlayingRadio;
-            }
-            if (PlayedRadioId != null)
-            {
-                if (PlayingRadioList != PlayedRadioList)//不同一个播放列表需清空列表
-                {
-                    PlayedRadioId.Clear();
-                }
-            }
-            else
-            {
-                PlayedRadioId = new List<long>();
-            }
-            PlayedRadioId.Remove(playingRadio.MainSong.Id);//删除重复的，避免死循环
-            PlayedRadioId.Add(playingRadio.MainSong.Id);
-            PlayingRadio = playingRadio;
-
-
-            PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingRadio.CoverUrl + "?param=200y200"));
-
-            if (PlayedRadio != null&& PlayedRadioList!=null)
-                PlayedRadioList.FirstOrDefault(p => p.Id == PlayedRadio.Id).MainSong.IsPlaying = false;
-            PlayingRadioList.FirstOrDefault(p => p.Id == PlayingRadio.Id).MainSong.IsPlaying = true;
-            return true;
         }
 
         /// <summary>
@@ -396,7 +228,6 @@ namespace MyNCMusic.Services
                         PlayingList.Add((temp as RadioSongItem).MainSong);
                 }
             }
-            
         }
 
         /// <summary>
@@ -505,7 +336,7 @@ namespace MyNCMusic.Services
             }
             for (int i = 0; i < 5; i++)
             {
-                if (await ChangePlayingSong(willPlayId, PlayingSongList))
+                if (await ChangePlayingSongAsync(willPlayId, PlayingListId, null,null))
                     break;
             }
             NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
@@ -521,7 +352,7 @@ namespace MyNCMusic.Services
                 PlayedSongId.Remove(PlayedSongId.Last());//移出当前
                 for (int i = 0; i < 5; i++)
                 {
-                    if (await ChangePlayingSong(PlayedSongId.Last(), PlayingService.PlayedSongList))
+                    if (await ChangePlayingSongAsync(PlayedSongId.Last(), PlayingListId, null, null))
                         break;
                 }
                 NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
@@ -587,7 +418,7 @@ namespace MyNCMusic.Services
             }
             for (int i = 0; i < 5; i++)
             {
-                if (await ChangePlayingRadio(willPlayId, PlayingRadioList))
+                if (await ChangePlayingRadioAsync(willPlayId, PlayingRadioList))
                     break;
             }
             NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
@@ -603,7 +434,7 @@ namespace MyNCMusic.Services
                 PlayedRadioId.Remove(PlayedRadioId.Last());//移出当前
                 for (int i = 0; i < 5; i++)
                 {
-                    if (await ChangePlayingRadio(PlayedRadioId.Last(), PlayedRadioList))
+                    if (await ChangePlayingRadioAsync(PlayedRadioId.Last(), PlayingRadioList))
                         break;
                 }
                 NotifyPopup notifyPopup = new NotifyPopup("多次获取音乐失败，停止播放");
@@ -614,18 +445,24 @@ namespace MyNCMusic.Services
         public static HashSet<long> FavoriteMusics = new HashSet<long>();
         public static void Play(long musicId)
         {
-            string url = $"https://music.163.com/song/media/outer/url?id={musicId}.mp3";//不走song/url避免403
+            string url = GetSongMediaUrl(musicId);
             OnPlayingChanged?.Invoke(musicId,url);
+        }
+        public static string GetSongMediaUrl(long musicId)
+        {
+            return $"https://music.163.com/song/media/outer/url?id={musicId}.mp3";//不走song/url避免403
         }
         public delegate void PlayingChanged(long id,string url);
         public static event PlayingChanged OnPlayingChanged;
         public static void AddFavorite(long id)
         {
             FavoriteMusics.Add(id);
+            OnFavoriteChanged?.Invoke(id, true);
         }
         public static void RemoveFavorite(long id)
         {
             FavoriteMusics.Remove(id);
+            OnFavoriteChanged?.Invoke(id, false);
         }
         public delegate void FavoriteChanged(long id,bool isFavorite);
         public static event FavoriteChanged OnFavoriteChanged;
@@ -658,16 +495,7 @@ namespace MyNCMusic.Services
             get { return PlayingService.PlayingRadioList; }
             set { PlayingService.PlayingRadioList = value; }
         }
-        public MusicItem PlayedSong
-        {
-            get { return PlayingService.PlayedSong; }
-            set { PlayingService.PlayedSong = value; }
-        }
-        public RadioSongItem PlayedRadio
-        {
-            get { return PlayingService.PlayedRadio; }
-            set { PlayingService.PlayedRadio = value; }
-        }
+
         public SongUrlRoot PlayingSongUrlRoot
         {
             get { return PlayingService.PlayingSongUrlRoot; }
@@ -708,16 +536,6 @@ namespace MyNCMusic.Services
         {
             get { return PlayingService.PlayedRadioId; }
             set { PlayingService.PlayedRadioId = value ?? new List<long>(); }
-        }
-        public List<MusicItem> PlayedSongList
-        {
-            get { return PlayingService.PlayedSongList; }
-            set { PlayingService.PlayedSongList = value??new List<MusicItem>(); }
-        }
-        public List<RadioSongItem> PlayedRadioList
-        {
-            get { return PlayingService.PlayedRadioList; }
-            set { PlayingService.PlayedRadioList = value??new List<RadioSongItem>(); }
         }
 
         public double Volume

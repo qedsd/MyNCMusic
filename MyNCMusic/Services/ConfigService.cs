@@ -21,22 +21,22 @@ namespace MyNCMusic.Services
         public static long Uid = -1;
         public static string PhoneOrEmail = "";
         public static string Password = "";
-        public string _apiUri { get; set; }
-        public string _phoneOrEmail { get; set; }
-        public string _password { get; set; }
-        public long _uid { get; set; }
+        public string apiUri { get; set; }
+        public string phoneOrEmail { get; set; }
+        public string password { get; set; }
+        public long uid { get; set; }
 
         private ConfigService() { }
 
-        public static async void LoadConfig()
+        public static async Task LoadConfig()
         {
             if (await ApplicationData.Current.LocalFolder.TryGetItemAsync("config.xml") is StorageFile)
             {
                 ConfigService configService = XmlSerializerHelper.DeserializeFromXml(Folder.Path + "/config.xml", typeof(ConfigService)) as ConfigService;
-                ApiUri = configService._apiUri == null ? ApiUri : configService._apiUri;
-                Uid = configService._uid == 0 ? Uid : configService._uid;
-                PhoneOrEmail = configService._phoneOrEmail == null ? PhoneOrEmail : configService._phoneOrEmail;
-                Password = configService._password == null ? Password : configService._password;
+                ApiUri = configService.apiUri == null ? ApiUri : configService.apiUri;
+                Uid = configService.uid == 0 ? Uid : configService.uid;
+                PhoneOrEmail = configService.phoneOrEmail == null ? PhoneOrEmail : configService.phoneOrEmail;
+                Password = configService.password == null ? Password : configService.password;
             }
             ReadLocalCookie();
         }
@@ -57,21 +57,15 @@ namespace MyNCMusic.Services
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void SaveConfig()
         {
             XmlSerializerHelper.SerializeToXml(Folder.Path + "/config.xml", new ConfigService()
             {
-                _apiUri=ApiUri,
-                _phoneOrEmail=PhoneOrEmail,
-                _password=Password,
-                _uid=Uid
+                apiUri=ApiUri,
+                phoneOrEmail=PhoneOrEmail,
+                password=Password,
+                uid=Uid
             });
         }
-
-
-        
     }
 }

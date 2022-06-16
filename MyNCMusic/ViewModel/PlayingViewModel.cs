@@ -343,8 +343,7 @@ namespace MyNCMusic.ViewModel
             }
             if (music != null)
             {
-                PlayingService.PlayingListId = music.Al.Id;
-                await PlayingService.ChangePlayingSong(music.Id, SimiSongs, music);
+                await PlayingService.ChangePlayingSongAsync(music.Id, music.Al.Id, SimiSongs, music);
             }
         }
     }

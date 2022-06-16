@@ -32,7 +32,6 @@ namespace MyNCMusic.Views
         {
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            (Application.Current as App).PlayListDetai = this;
         }
         private ViewModel.PlaylistDetailViewModel ViewModel;
         protected override void OnNavigatedTo(NavigationEventArgs e)

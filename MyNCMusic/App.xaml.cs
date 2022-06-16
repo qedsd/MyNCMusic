@@ -32,12 +32,6 @@ namespace MyNCMusic
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
         /// </summary>
         /// 
-        public MainPage myMainPage;
-        public Home homepage;
-        public PlayingPage playingPage;
-        public PlayListDetai PlayListDetai;
-        public CompactOverlayPage compactOverlayPage;
-
         public App()
         {
             this.InitializeComponent();
@@ -89,14 +83,7 @@ namespace MyNCMusic
 
         private void Page_CloseRequested(object sender, SystemNavigationCloseRequestedPreviewEventArgs e)
         {
-            //PlayingService.Volume = myMainPage._mediaPlayer.Volume;
             PlayingService.Save();
-            if (myMainPage == null || PlayingService.PlayDurationStopwatch == null)
-                return;
-            myMainPage.playDurationStopwatch.Stop();
-            if (PlayingService.PlayingSong == null)
-                return;
-            System.Threading.Tasks.Task.Run(() => SongService.MarkPlayDurationAsync(PlayingService.PlayingSong.Id, PlayingService.PlayingListId, PlayingService.PlayDurationStopwatch.ElapsedMilliseconds / 1000));
         }
 
         /// <summary>

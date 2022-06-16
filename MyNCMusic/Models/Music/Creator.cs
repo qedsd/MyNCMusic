@@ -30,6 +30,9 @@ namespace MyNCMusic.Models
         public int Gender { get; set; }
         public string AvatarUrl { get; set; }
         public int AuthStatus { get; set; }
+        /// <summary>
+        /// 10为官方账号，如私人雷达的创建者
+        /// </summary>
         public int UserType { get; set; }
         public string Nickname { get; set; }
         public long Birthday { get; set; }
@@ -37,5 +40,13 @@ namespace MyNCMusic.Models
         public string Description { get; set; }
         public string Signature { get; set; }
         public int Authority { get; set; }
+
+        /// <summary>
+        /// 是否为非官方的用户
+        /// </summary>
+        public bool IsUser
+        {
+            get => UserType == 10 ? false : true;
+        }
     }
 }

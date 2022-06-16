@@ -29,7 +29,6 @@ namespace MyNCMusic.Views
         
         public CompactOverlayPage()
         {
-            (Application.Current as App).compactOverlayPage = this;
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             Window.Current.SetTitleBar(MyTitleBar);

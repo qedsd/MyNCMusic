@@ -66,17 +66,25 @@
                 </Grid.RowDefinitions>
                 <TextBlock
                     FontSize="24"
+                    Foreground="{StaticResource T1TextColorBrush}"
                     Text="{Binding ArtistName, Mode=OneWay}"
-                    TextWrapping="WrapWholeWords" 
-                     Foreground="{StaticResource T1TextColorBrush}"/>
-                <TextBlock Grid.Row="1" Text="{Binding Alias, Mode=OneWay}" 
-                            Foreground="{StaticResource T1TextColorBrush}"/>
+                    TextWrapping="WrapWholeWords" />
+                <TextBlock
+                    Grid.Row="1"
+                    Foreground="{StaticResource T1TextColorBrush}"
+                    Text="{Binding Alias, Mode=OneWay}" />
             </Grid>
         </Grid>
-        <Pivot Grid.Row="2" SelectedIndex="{Binding PivotIndex, Mode=TwoWay}" x:Name="Pivot">
+        <Pivot
+            x:Name="Pivot"
+            Grid.Row="2"
+            SelectedIndex="{Binding PivotIndex, Mode=TwoWay}">
             <PivotItem Tag="0">
                 <PivotItem.Header>
-                    <TextBlock FontSize="14" Text="热门50" Foreground="{StaticResource T1TextColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="热门50" />
                 </PivotItem.Header>
                 <controls1:MusicList
                     ItemsSource="{Binding HotMusics, Mode=OneWay}"
@@ -86,7 +94,10 @@
             </PivotItem>
             <PivotItem Tag="1">
                 <PivotItem.Header>
-                    <TextBlock FontSize="14" Text="专辑"  Foreground="{StaticResource T1TextColorBrush}"/>
+                    <TextBlock
+                        FontSize="14"
+                        Foreground="{StaticResource T1TextColorBrush}"
+                        Text="专辑" />
                 </PivotItem.Header>
                 <controls1:AlbumList
                     ItemsSource="{Binding Albums, Mode=OneWay}"

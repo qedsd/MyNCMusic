@@ -23,6 +23,7 @@ namespace MyNCMusic.Controls
         {
             this.InitializeComponent();
         }
+        
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(List<Models.DjRadiosItem>), typeof(RadioList), new PropertyMetadata(null, new PropertyChangedCallback(ItemsSourcePropertyChanged)));
         private static void ItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

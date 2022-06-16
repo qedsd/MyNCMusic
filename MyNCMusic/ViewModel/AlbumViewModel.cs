@@ -62,8 +62,7 @@ namespace MyNCMusic.ViewModel
             }
             if (music != null)
             {
-                PlayingService.PlayingListId = AlbumRoot.Album.Id;
-                await PlayingService.ChangePlayingSong(music.Id, Musics, music);
+                await PlayingService.ChangePlayingSongAsync(music.Id, AlbumRoot.Album.Id, Musics, music);
             }
         }
 

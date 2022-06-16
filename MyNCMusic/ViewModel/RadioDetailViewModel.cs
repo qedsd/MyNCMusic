@@ -33,6 +33,7 @@ namespace MyNCMusic.ViewModel
             RadioName = radioSongItems.First().Radio.Name;
             DjName = radioSongItems.First().Dj.Nickname;
             Des = radioSongItems.First().Radio.Desc;
+            Services.PlayingService.OnPlayingChanged += PlayingService_OnPlayingChanged;
         }
 
         public ICommand PlayCommand => new DelegateCommand<RadioSongItem>(async(r) =>
@@ -41,7 +42,24 @@ namespace MyNCMusic.ViewModel
             {
                 r = RadioSongItems.FirstOrDefault();
             }
-            await PlayingService.ChangePlayingRadio(r.MainSong.Id, RadioSongItems);
+            await PlayingService.ChangePlayingRadioAsync(r.MainSong.Id, RadioSongItems);
         });
+        private void PlayingService_OnPlayingChanged(long id, string url)
+        {
+            if (RadioSongItems != null)
+            {
+                foreach (var item in RadioSongItems)
+                {
+                    if (item.Id == id)
+                    {
+                        item.MainSong.IsPlaying = true;
+                    }
+                    else
+                    {
+                        item.MainSong.IsPlaying = false;
+                    }
+                }
+            }
+        }
     }
 }

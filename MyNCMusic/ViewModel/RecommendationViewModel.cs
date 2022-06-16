@@ -85,8 +85,20 @@ namespace MyNCMusic.ViewModel
                 var recommendListRoot = await PlaylistService.GetCommendatoryListAsync();
                 if (recommendListRoot != null)
                 {
+                    foreach (var list in recommendListRoot.Recommend)
+                    {
+                        if (!list.Creator.IsUser)
+                        {
+                            PlayListDetailRoot playListDetailRoot = await PlaylistService.GetPlaylistDetailAsync(list.Id);
+                            if (playListDetailRoot != null)
+                            {
+                                list.PicUrl = playListDetailRoot?.Playlist.CoverImgUrl;
+                            }
+                        }
+                    }
                     RecommendPlaylists = recommendListRoot.Recommend;
                 }
+                
                 Controls.WaitingPopup.Hide();
             }
         }
@@ -150,8 +162,7 @@ namespace MyNCMusic.ViewModel
             }
             if(music!=null)
             {
-                PlayingService.PlayingListId = music.Al.Id;
-                await PlayingService.ChangePlayingSong(music.Id, RecommendMusics, music);
+                await PlayingService.ChangePlayingSongAsync(music.Id, music.Al.Id, RecommendMusics, music);
             }
         }
 
@@ -167,8 +178,7 @@ namespace MyNCMusic.ViewModel
             }
             if (music != null)
             {
-                PlayingService.PlayingListId = music.Al.Id;
-                await PlayingService.ChangePlayingSong(music.Id, RandomFavoriteMusics, music);
+                await PlayingService.ChangePlayingSongAsync(music.Id, music.Al.Id,RandomFavoriteMusics, music);
             }
         }
 
@@ -184,8 +194,7 @@ namespace MyNCMusic.ViewModel
             }
             if (music != null)
             {
-                PlayingService.PlayingListId = music.Al.Id;
-                await PlayingService.ChangePlayingSong(music.Id, SearchMusics, music);
+                await PlayingService.ChangePlayingSongAsync(music.Id, music.Al.Id,SearchMusics, music);
             }
         }
 

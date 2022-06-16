@@ -20,7 +20,6 @@ namespace MyNCMusic.ViewModel
         {
             MainImageBrush = new ImageBrush();
             Services.PlayingService.OnPlayingChanged += PlayingService_OnPlayChanged;
-            ConfigService.LoadConfig();
             ChangeMainBackgroundImage();
         }
 

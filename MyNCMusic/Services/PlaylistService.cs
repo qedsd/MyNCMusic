@@ -165,8 +165,6 @@ namespace MyNCMusic.Services
         {
             string result = await Http.GetAsync(ConfigService.ApiUri + @"/recommend/resource");
             if (result == null || result.Equals(""))
-                result = await Http.GetAsync(ConfigService.ApiUri + @"/recommend/resource");
-            if (result == null || result.Equals(""))
                 return null;
             return JsonConvert.DeserializeObject<RecommendListRoot>(result);
         }

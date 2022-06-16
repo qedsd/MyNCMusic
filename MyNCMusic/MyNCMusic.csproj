@@ -242,7 +242,6 @@
     <Compile Include="Services\DjRadioService.cs" />
     <Compile Include="Services\NavigateService.cs" />
     <Compile Include="Services\PlayingService .cs" />
-    <Compile Include="Helper\LoginHelper.cs" />
     <Compile Include="Services\LyricService.cs" />
     <Compile Include="Services\PlaylistService.cs" />
     <Compile Include="Services\RecordDataService.cs" />
@@ -501,9 +500,6 @@
       <Version>3.4.1</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="key.snk" />
-  </ItemGroup>
   <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
@@ -512,7 +508,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,6 +12,12 @@ namespace MyNCMusic.Models
         public int Type { get; set; }
         public string Name { get; set; }
         public string Copywriter { get; set; }
+        /// <summary>
+        /// 仅当非自动创建的歌单时才使用
+        /// 可通过Creator.UserType判断？
+        /// 如私人雷达这类歌单，此处的图片将是一个固定的图，需要获取歌单详细来取封面图
+        /// PlaylistItem.CoverImgUrl
+        /// </summary>
         public string PicUrl { get; set; }
         public long Playcount { get; set; }
         public long CreateTime { get; set; }

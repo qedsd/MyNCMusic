@@ -39,7 +39,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="0.8*" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="70" />
                     </Grid.ColumnDefinitions>
                     <Image
                         Width="48"
@@ -78,7 +78,7 @@
                             </StackPanel>
                         </Button.Content>
                     </Button>
-                    <StackPanel
+                    <StackPanel HorizontalAlignment="Right"
                         Grid.Column="3"
                         Margin="10,0,0,0"
                         Orientation="Horizontal">
