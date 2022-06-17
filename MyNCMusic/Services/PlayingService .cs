@@ -56,7 +56,7 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 当前播放歌曲URL
         /// </summary>
-        public static SongUrlRoot PlayingSongUrlRoot;
+        public static SongUrlRoot PlayingUrlRoot;
 
         /// <summary>
         /// 播放过的歌曲的ID
@@ -104,8 +104,23 @@ namespace MyNCMusic.Services
             {
                 PlayingSongList.Clear();
                 PlayedSongId.Clear();
-                PlayingListToBaseObject(PlayingSongList);
+                PlayingListToBaseObject(songsItems);
                 PlayingListId = playingListId;
+                PlayingSongList = songsItems;
+            }
+            else
+            {
+                foreach (var item in PlayingList)
+                {
+                    if (item.Id == playingSongId)
+                    {
+                        item.IsPlaying = true;
+                    }
+                    else
+                    {
+                        item.IsPlaying = false;
+                    }
+                }
             }
             if (songsItem == null)//需获取实例
             {
@@ -124,7 +139,7 @@ namespace MyNCMusic.Services
                 NotifyPopup.ShowError("获取播放地址失败");
                 return false;
             }
-            PlayingSongUrlRoot = songUrlRoot;
+            PlayingUrlRoot = songUrlRoot;
 
             PlayedSongId.Remove(playingSongId);
             PlayedSongId.Add(playingSongId);
@@ -139,11 +154,7 @@ namespace MyNCMusic.Services
 
             IsPlayingSong = true;
             PlayingSongId = playingSongId;
-            if(songsItems!=null)
-            {
-                PlayingSongList = songsItems;
-            }
-            Play(PlayingSong.Id);
+            OnPlayingChanged?.Invoke(PlayingSongId, songUrlRoot.Data.First().Url);
             return true;
         }
 
@@ -161,6 +172,20 @@ namespace MyNCMusic.Services
                 PlayedRadioId.Clear();
                 PlayingListToBaseObject(PlayingRadioList);
             }
+            else
+            {
+                foreach (var item in PlayingList)
+                {
+                    if (item.Id == playingRadioId)
+                    {
+                        item.IsPlaying = true;
+                    }
+                    else
+                    {
+                        item.IsPlaying = false;
+                    }
+                }
+            }
             PlayedRadioId.Remove(playingRadioId);
             PlayedRadioId.Add(playingRadioId);
             PlayingRadio = PlayingRadioList.FirstOrDefault(p=>p.Id == playingRadioId);
@@ -176,8 +201,8 @@ namespace MyNCMusic.Services
                 NotifyPopup.ShowError("获取播放地址失败");
                 return false;
             }
-            PlayingSongUrlRoot = songUrlRoot;
-            Play(PlayingRadioId);
+            PlayingUrlRoot = songUrlRoot;
+            OnPlayingChanged?.Invoke(PlayingRadioId, songUrlRoot.Data.First().Url);
             return true;
         }
 
@@ -443,15 +468,20 @@ namespace MyNCMusic.Services
 
         #region new
         public static HashSet<long> FavoriteMusics = new HashSet<long>();
-        public static void Play(long musicId)
-        {
-            string url = GetSongMediaUrl(musicId);
-            OnPlayingChanged?.Invoke(musicId,url);
-        }
-        public static string GetSongMediaUrl(long musicId)
-        {
-            return $"https://music.163.com/song/media/outer/url?id={musicId}.mp3";//不走song/url避免403
-        }
+        //public static void Play(long musicId)
+        //{
+        //    string url = GetSongMediaUrl(musicId);
+        //    OnPlayingChanged?.Invoke(musicId,url);
+        //}
+        ///// <summary>
+        ///// 128k
+        ///// </summary>
+        ///// <param name="musicId"></param>
+        ///// <returns></returns>
+        //public static string GetSongMediaUrl(long musicId)
+        //{
+        //    return $"https://music.163.com/song/media/outer/url?id={musicId}.mp3";//不走song/url避免403
+        //}
         public delegate void PlayingChanged(long id,string url);
         public static event PlayingChanged OnPlayingChanged;
         public static void AddFavorite(long id)
@@ -498,8 +528,8 @@ namespace MyNCMusic.Services
 
         public SongUrlRoot PlayingSongUrlRoot
         {
-            get { return PlayingService.PlayingSongUrlRoot; }
-            set { PlayingService.PlayingSongUrlRoot = value; }
+            get { return PlayingService.PlayingUrlRoot; }
+            set { PlayingService.PlayingUrlRoot = value; }
         }
         public AlbumRoot PlayingAlbum
         {

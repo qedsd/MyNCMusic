@@ -72,7 +72,7 @@ namespace MyNCMusic.ViewModel
                 PlayStatusSymbol = !isPlaying ? Symbol.Play : Symbol.Pause;
             }
         }
-        public Symbol PlayStatusSymbol { get; set; } = Symbol.Pause;
+        public Symbol PlayStatusSymbol { get; set; } = Symbol.Play;
         public Symbol PlayOrderSymbol { get; set; }
         public string FavoriteSymbolText { get; set; }
         /// <summary>
@@ -115,14 +115,23 @@ namespace MyNCMusic.ViewModel
             PlayOrder = PlayingService.PlayOrderState;
             UpdatePlayOrder(PlayOrder);
             PlayingList = PlayingService.PlayingList;
+            IsPlayingSong = PlayingService.IsPlayingSong;
             if (PlayingService.IsPlayingSong &&  PlayingService.PlayingSong!=null)
             {
-                string url = PlayingService.GetSongMediaUrl(PlayingService.PlayingSong.Id);
+                string url = PlayingService.PlayingUrlRoot.Data.First().Url;
                 UpdateLayout(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+                if(PlayingService.PlayingSong.IsFavorite)
+                {
+                    FavoriteSymbolText = "\xE00B";
+                }
+                else
+                {
+                    FavoriteSymbolText = "\xE006";
+                }
             }
             else if (PlayingService.PlayingRadio != null)
             {
-                string url = PlayingService.GetSongMediaUrl(PlayingService.PlayingRadio.Id);
+                string url = PlayingService.PlayingUrlRoot.Data.First().Url;
                 Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
             }
         }
@@ -144,14 +153,7 @@ namespace MyNCMusic.ViewModel
 
         private void PlayingService_OnPlayChanged(long id,string url)
         {
-            if (PlayingService.FavoriteMusics.Contains(id))
-            {
-                FavoriteSymbolText = "\xE00B";
-            }
-            else
-            {
-                FavoriteSymbolText = "\xE006";
-            }
+            UpdateFavoriteSymbol(id);
             IsPlayingSong = PlayingService.IsPlayingSong;
             if (PlayingService.IsPlayingSong)
             {
@@ -161,6 +163,7 @@ namespace MyNCMusic.ViewModel
             {
                 Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
             }
+
         }
 
         private void MediaPlayer_SourceChanged(MediaPlayer sender, object args)
@@ -315,7 +318,8 @@ namespace MyNCMusic.ViewModel
                     }
                     break;
             }
-            UpdatePlayOrder(playOrder);
+            UpdatePlayOrder(PlayOrder);
+            PlayingService.PlayOrderState = PlayOrder;
         }
         /// <summary>
         /// 更新为指定播放顺序
@@ -390,6 +394,18 @@ namespace MyNCMusic.ViewModel
             {
                 TotalSeconds = duration.TotalSeconds;
             });
+        }
+
+        public void UpdateFavoriteSymbol(long id)
+        {
+            if (PlayingService.FavoriteMusics.Contains(id))
+            {
+                FavoriteSymbolText = "\xE00B";
+            }
+            else
+            {
+                FavoriteSymbolText = "\xE006";
+            }
         }
     }
 }

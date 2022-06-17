@@ -37,6 +37,9 @@ namespace MyNCMusic.ViewModel
             if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(ConfigService.ImageFilename) is StorageFile localFile)//本地有专辑图片，读取
             {
                 WriteableBitmap writeableBitmap = await FileHelper.OpenWriteableBitmapFile(localFile);
+                PlayingService.PlayingAlbumBitmapImage = await FileHelper.ReadLoaclBitmapImage(ConfigService.ImageFilename);
+                ControlBarViewModel.Instance.AlbumImage = PlayingService.PlayingAlbumBitmapImage;
+                
                 MainImageBrush.ImageSource = writeableBitmap;
                 MainImageBrush.Stretch = Stretch.UniformToFill;
                 MainBackgroundBrush = MainImageBrush;

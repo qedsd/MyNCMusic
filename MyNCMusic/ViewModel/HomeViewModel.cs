@@ -54,11 +54,13 @@ namespace MyNCMusic.ViewModel
             Controls.WaitingPopup.Hide();
             if (favoriteSongsRoot != null)
             {
+                PlayingService.FavoriteMusics.Clear();
                 favoriteSongsRoot.Ids.ForEach(p =>
                 {
                     PlayingService.FavoriteMusics.Add(p);
                 });
             }
+            Home.Instance.NavigateTo(typeof(Recommendation));
         }
 
         /// <summary>

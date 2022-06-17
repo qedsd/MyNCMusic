@@ -37,7 +37,6 @@ namespace MyNCMusic.Views
             Instance = this;
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
-            Frame_main.Navigate(typeof(Recommendation));
         }
         public bool NavigateToPlayingPage()
         {

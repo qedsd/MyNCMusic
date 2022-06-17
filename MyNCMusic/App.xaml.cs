@@ -113,7 +113,8 @@ namespace MyNCMusic
         private void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            OtherHelper.ShowContentDialog(e.Exception.ToString());
+            //OtherHelper.ShowContentDialog(e.Exception.ToString());
+            MyUserControl.NotifyPopup.ShowError(e.Message);
         }
     }
 }
