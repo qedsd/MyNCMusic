@@ -18,8 +18,6 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// https://go.microsoft.com/fwlink/?LinkId=234238 上介绍了“空白页”项模板
-
 namespace MyNCMusic.Views
 {
     /// <summary>
@@ -33,6 +31,7 @@ namespace MyNCMusic.Views
             Version = String.Format("{0}.{1}.{2}", Package.Current.Id.Version.Major, Package.Current.Id.Version.Minor, Package.Current.Id.Version.Build);
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
+            DataContext = new ViewModel.SettingViewModel();
         }
 
         private async void Button_Save_Click(object sender, RoutedEventArgs e)

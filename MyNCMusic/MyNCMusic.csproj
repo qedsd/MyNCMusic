@@ -218,6 +218,9 @@
     <Compile Include="Models\Playlist\SubscribersItem.cs" />
     <Compile Include="Models\Playlist\TrackIdsItem.cs" />
     <Compile Include="Models\Playlist\TracksItem.cs" />
+    <Compile Include="Models\Qr\QrCheck.cs" />
+    <Compile Include="Models\Qr\QrImg.cs" />
+    <Compile Include="Models\Qr\QrKey.cs" />
     <Compile Include="Models\Recommend\RecommendList.cs" />
     <Compile Include="Models\Recommend\RecommendListRoot.cs" />
     <Compile Include="Models\MyImage.cs" />
@@ -259,6 +262,7 @@
     <Compile Include="ViewModel\PlaylistDetailViewModel.cs" />
     <Compile Include="ViewModel\RadioDetailViewModel.cs" />
     <Compile Include="ViewModel\RecommendationViewModel.cs" />
+    <Compile Include="ViewModel\SettingViewModel.cs" />
     <Compile Include="Views\AlbumDetail.xaml.cs">
       <DependentUpon>AlbumDetail.xaml</DependentUpon>
     </Compile>
