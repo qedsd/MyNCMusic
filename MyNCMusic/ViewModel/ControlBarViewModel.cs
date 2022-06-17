@@ -153,17 +153,24 @@ namespace MyNCMusic.ViewModel
 
         private void PlayingService_OnPlayChanged(long id,string url)
         {
-            UpdateFavoriteSymbol(id);
-            IsPlayingSong = PlayingService.IsPlayingSong;
-            if (PlayingService.IsPlayingSong)
+            if (url == null || url == string.Empty)
             {
-                Play(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+                NotifyPopup.ShowError("无效播放地址");
+                NextMusicCommand.Execute(null);
             }
             else
             {
-                Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
+                UpdateFavoriteSymbol(id);
+                IsPlayingSong = PlayingService.IsPlayingSong;
+                if (PlayingService.IsPlayingSong)
+                {
+                    Play(url, PlayingService.PlayingSong.Name, PlayingService.PlayingSong.Ar.First().Name, PlayingService.PlayingSong.Al.Name);
+                }
+                else
+                {
+                    Play(url, PlayingService.PlayingRadio.Name, PlayingService.PlayingRadio.Dj.Nickname, PlayingService.PlayingRadio.Name);
+                }
             }
-
         }
 
         private void MediaPlayer_SourceChanged(MediaPlayer sender, object args)

@@ -31,8 +31,11 @@ namespace MyNCMusic.ViewModel
             //账号信息
             Controls.WaitingPopup.Show();
             await ConfigService.LoadConfig();
-            if(ConfigService.PhoneOrEmail == null || ConfigService.PhoneOrEmail == "")
+            Controls.WaitingPopup.Hide();
+            if (ConfigService.PhoneOrEmail == null || ConfigService.PhoneOrEmail == "")
             {
+                MyUserControl.NotifyPopup.ShowError("请先登陆");
+                SettingCommand.Execute(null);
                 return;
             }
             LoginRoot loginRoot = await LoginAccountAsync();

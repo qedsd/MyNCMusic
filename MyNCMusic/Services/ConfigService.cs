@@ -21,6 +21,11 @@ namespace MyNCMusic.Services
         public static long Uid = -1;
         public static string PhoneOrEmail = "";
         public static string Password = "";
+        /// <summary>
+        /// 音乐码率
+        /// 320k
+        /// </summary>
+        public static int Br = 320000;
         public string apiUri { get; set; }
         public string phoneOrEmail { get; set; }
         public string password { get; set; }

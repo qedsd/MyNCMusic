@@ -55,7 +55,7 @@ namespace MyNCMusic.Models
                         stringBuilder.Append(playListDetailRoot.Playlist.TrackIds[j].Id);
                     }
                 }
-                MusicDetailRoot musicDetailRootTemp = SongService.GetMusicDetail_Post(stringBuilder.ToString());
+                MusicDetailRoot musicDetailRootTemp = await SongService.GetMusicDetail_PostAsync(stringBuilder.ToString());
                 if (musicDetailRootTemp != null && musicDetailRootTemp.Songs != null)
                 {
                     playlistNavItem.Songs.AddRange(musicDetailRootTemp.Songs);

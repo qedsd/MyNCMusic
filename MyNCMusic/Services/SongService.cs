@@ -85,26 +85,9 @@ namespace MyNCMusic.Services
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public static SongUrlRoot GetMusicUrl(long id)
-        {
-            string result = Http.Get(ConfigService.ApiUri + @"/song/url?id=" + id);
-            if (result == null || result.Equals(""))
-                return null;
-            try
-            {
-                return JsonConvert.DeserializeObject<SongUrlRoot>(result);
-            }
-            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return null; }
-        }
-
-        /// <summary>
-        /// 获取歌曲url
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         public static async Task<SongUrlRoot> GetMusicUrlAsync(long id)
         {
-            string result = await Http.GetAsync(ConfigService.ApiUri + @"/song/url?id=" + id);
+            string result = await Http.GetAsync(ConfigService.ApiUri + $"/song/url?id={id}&br={ConfigService.Br}");
             if (result == null || result.Equals(""))
                 return null;
             try
@@ -198,6 +181,25 @@ namespace MyNCMusic.Services
             //    p.IsFavorite = PlayingService.FavoriteMusics.Contains(p.Id);
             //});
             return recommendMusics.Data.DailySongs;
+        }
+
+        public static async Task<bool> CheckMusicAsync(long id)
+        {
+            string result = await Http.GetAsync(ConfigService.ApiUri + $"/check/music?id={id}");
+            if (result == null || result.Equals(""))
+                return false;
+            try
+            {
+                if(result.Contains("success: true"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception er) { OtherHelper.ShowContentDialog(er.ToString()); return false; }
         }
     }
 }

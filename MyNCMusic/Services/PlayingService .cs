@@ -21,7 +21,7 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 当前播放的歌曲列表
         /// </summary>
-        public static List<MusicItem> PlayingSongList { get; set; }
+        public static List<MusicItem> PlayingSongList { get; set; } = new List<MusicItem>();
 
         /// <summary>
         /// 当前播放的电台列表
@@ -61,7 +61,7 @@ namespace MyNCMusic.Services
         /// <summary>
         /// 播放过的歌曲的ID
         /// </summary>
-        public static List<long> PlayedSongId;
+        public static List<long> PlayedSongId = new List<long>();
 
         /// <summary>
         /// 播放过的电台的ID
@@ -133,7 +133,7 @@ namespace MyNCMusic.Services
                 songsItem = musicDetailRoot.Songs.Last();
             }
             PlayingSong = songsItem;
-            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(songsItem.Id);
+            SongUrlRoot songUrlRoot = await SongService.GetMusicUrlAsync(songsItem.Id);
             if(songUrlRoot == null)
             {
                 NotifyPopup.ShowError("获取播放地址失败");
@@ -195,7 +195,7 @@ namespace MyNCMusic.Services
                 return false;
             }
             PlayingAlbumBitmapImage = await FileHelper.DownloadFile(new Uri(PlayingRadio.CoverUrl + "?param=200y200"));
-            SongUrlRoot songUrlRoot = SongService.GetMusicUrl(PlayingRadioId);
+            SongUrlRoot songUrlRoot = await SongService.GetMusicUrlAsync(PlayingRadioId);
             if (songUrlRoot == null)
             {
                 NotifyPopup.ShowError("获取播放地址失败");
