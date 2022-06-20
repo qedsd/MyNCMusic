@@ -43,10 +43,10 @@ namespace MyNCMusic.Services
                 PhoneOrEmail = configService.phoneOrEmail == null ? PhoneOrEmail : configService.phoneOrEmail;
                 Password = configService.password == null ? Password : configService.password;
             }
-            ReadLocalCookie();
+            await ReadLocalCookie();
         }
 
-        public static async void ReadLocalCookie()
+        public static async Task ReadLocalCookie()
         {
             if (await ApplicationData.Current.LocalFolder.TryGetItemAsync(CookieHelper.SavedFileName) is StorageFile)
             {

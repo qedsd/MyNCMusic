@@ -33,20 +33,5 @@ namespace MyNCMusic.Views
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             DataContext = new ViewModel.SettingViewModel();
         }
-
-        private async void Button_Save_Click(object sender, RoutedEventArgs e)
-        {
-            if (TextBox_account.Text == "" || PasswordBox_password.Password == "" || TextBox_serverIP.Text == "")
-            {
-                NotifyPopup notifyPopup = new NotifyPopup("?");
-                notifyPopup.Show();
-                return;
-            }
-            ConfigService.ApiUri = TextBox_serverIP.Text;
-            ConfigService.PhoneOrEmail = TextBox_account.Text;
-            ConfigService.Password = OtherHelper.Encrypt(PasswordBox_password.Password);
-            ConfigService.SaveConfig();
-            await CoreApplication.RequestRestartAsync(String.Empty);
-        }
     }
 }

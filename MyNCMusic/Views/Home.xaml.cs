@@ -33,11 +33,17 @@ namespace MyNCMusic.Views
         public static Home Instance;
         public Home()
         {
-            DataContext = new ViewModel.HomeViewModel();
             Instance = this;
+            Loaded += Home_Loaded;
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
         }
+
+        private void Home_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = new ViewModel.HomeViewModel();
+        }
+
         public bool NavigateToPlayingPage()
         {
             if (Frame.CanGoBack)

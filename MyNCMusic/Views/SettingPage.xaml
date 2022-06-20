@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:MyNCMusic.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:services="using:MyNCMusic.Services"
     Background="Transparent"
     mc:Ignorable="d">
@@ -141,17 +142,16 @@
                                         MinWidth="300"
                                         BorderThickness="0,0,0,1"
                                         PlaceholderText="示例：http://localhost:3000"
-                                        Text="{x:Bind services:ConfigService.ApiUri, Mode=OneTime}">
+                                        Text="{Binding ApiUri, Mode=TwoWay}">
                                         <TextBox.Header>
                                             <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="服务器" />
                                         </TextBox.Header>
                                     </TextBox>
                                     <TextBox
-                                        Name="TextBox_account"
                                         MinWidth="300"
                                         Margin="0,20,0,0"
                                         BorderThickness="0,0,0,1"
-                                        Text="{x:Bind services:ConfigService.PhoneOrEmail, Mode=OneTime}">
+                                        Text="{Binding PhoneOrEmail, Mode=TwoWay}">
                                         <TextBox.Header>
                                             <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="手机号/163邮箱" />
                                         </TextBox.Header>
@@ -161,29 +161,50 @@
                                         MinWidth="300"
                                         Margin="0,20,0,0"
                                         BorderThickness="0,0,0,1"
-                                        Password="{x:Bind services:ConfigService.Password, Mode=OneTime}"
+                                        Password="{Binding Password, Mode=TwoWay}"
                                         PasswordChar="•">
                                         <PasswordBox.Header>
                                             <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="登陆密码" />
                                         </PasswordBox.Header>
                                     </PasswordBox>
                                 </StackPanel>
-                                <Image
-                                    Grid.Column="1"
-                                    Width="120"
-                                    Height="120"
-                                    Margin="40,0,0,0"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom"
-                                    Source="{Binding QrBitmap, Mode=OneWay}" />
+                                <Grid Grid.Column="1">
+                                    <Grid
+                                        Width="120"
+                                        Height="120"
+                                        Margin="40,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Bottom">
+                                        <Image Source="{Binding QrBitmap, Mode=OneWay}" />
+                                        <muxc:ProgressRing
+                                            Width="36"
+                                            Height="36"
+                                            Margin="0,0,0,10"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            IsActive="{Binding IsWaitingConfirm, Mode=OneWay}" />
+
+                                    </Grid>
+
+
+                                </Grid>
                             </Grid>
-                            <Button
-                                x:Name="Button_Save"
-                                Grid.Row="1"
-                                Margin="0,20,0,0"
-                                Click="Button_Save_Click"
-                                Content="保存并重启"
-                                Style="{StaticResource ButtonStyle1}" />
+                            <Grid Grid.Row="1" Margin="0,20,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Button
+                                    Grid.Column="0"
+                                    Command="{Binding GetQrCommand}"
+                                    Content="二维码登陆" />
+                                <Button
+                                    x:Name="Button_Save"
+                                    Grid.Column="1"
+                                    Margin="10,0,0,0"
+                                    Command="{Binding LoginCommand}"
+                                    Content="账号密码登陆" />
+                            </Grid>
                         </Grid>
                     </PivotItem>
 
