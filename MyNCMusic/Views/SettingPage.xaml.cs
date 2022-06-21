@@ -32,6 +32,12 @@ namespace MyNCMusic.Views
             this.InitializeComponent();
             this.NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Enabled;
             DataContext = new ViewModel.SettingViewModel();
+            Unloaded += SettingPage_Unloaded;
+        }
+
+        private void SettingPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            (DataContext as ViewModel.SettingViewModel).TryCancelQr();
         }
     }
 }

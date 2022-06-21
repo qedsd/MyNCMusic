@@ -91,10 +91,7 @@ namespace MyNCMusic.ViewModel
         private CancellationTokenSource CancellationTokenSource;
         private async void CreateQr(string api = null)
         {
-            if (CancellationTokenSource != null)
-            {
-                CancellationTokenSource.Cancel();
-            }
+            TryCancelQr();
             if (api == null)
             {
                 api = ConfigService.ApiUri;
@@ -123,6 +120,10 @@ namespace MyNCMusic.ViewModel
                             while(KeepCheckingQr)
                             {
                                 System.Threading.Thread.Sleep(500);
+                                if(CancellationTokenSource.IsCancellationRequested)
+                                {
+                                    break;
+                                }
                                 TimeSpan ts = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0, 0);
                                 json = await Http.GetAsync(api + $"/login/qr/check?key={key}&timerstamp={Convert.ToInt64(ts.TotalSeconds)}");
                                 var status = JsonConvert.DeserializeObject<Models.ResponseRoot<Models.Qr.QrCheck>>(json);
@@ -171,7 +172,14 @@ namespace MyNCMusic.ViewModel
                 }
             }
         }
-
+        public void TryCancelQr()
+        {
+            if (CancellationTokenSource != null)
+            {
+                CancellationTokenSource.Cancel();
+                QrBitmap = null;
+            }
+        }
         public static async Task<WriteableBitmap> Base64StringToBitmapAsync(string base64String)
         {
             byte[] bytes = Convert.FromBase64String(base64String);
