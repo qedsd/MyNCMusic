@@ -28,10 +28,13 @@ namespace MyNCMusic.Controls
         }
         private void PlayingService_OnFavoriteChanged(long id, bool isFavorite)
         {
-            var item = ItemsSource.FirstOrDefault(p => p.Id == id);
-            if(item!=null)
+            if (ItemsSource != null)
             {
-                item.IsFavorite = isFavorite;
+                var item = ItemsSource.FirstOrDefault(p => p.Id == id);
+                if (item != null)
+                {
+                    item.IsFavorite = isFavorite;
+                }
             }
         }
         private void PlayingService_OnPlayingChanged(long id, string url)

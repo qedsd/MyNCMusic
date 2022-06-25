@@ -199,7 +199,6 @@
                                     Command="{Binding GetQrCommand}"
                                     Content="二维码登陆" />
                                 <Button
-                                    x:Name="Button_Save"
                                     Grid.Column="1"
                                     Margin="10,0,0,0"
                                     Command="{Binding LoginCommand}"
@@ -215,17 +214,25 @@
                                 Foreground="{StaticResource T1TextColorBrush}"
                                 Text="播放" />
                         </PivotItem.Header>
-                        <ComboBox
+                        <StackPanel>
+                            <ComboBox
                             Width="300"
-                            IsEditable="True"
+                            IsEditable="False"
                             Text="{Binding Br, Mode=TwoWay}">
-                            <ComboBoxItem Content="128k" />
-                            <ComboBoxItem Content="320k" />
-                            <ComboBoxItem Content="无损" />
-                            <ComboBox.Header>
-                                <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="码率" />
-                            </ComboBox.Header>
-                        </ComboBox>
+                                <ComboBoxItem Content="128k" />
+                                <ComboBoxItem Content="320k" />
+                                <ComboBoxItem Content="无损" />
+                                <ComboBox.Header>
+                                    <TextBlock Foreground="{StaticResource T1TextColorBrush}" Text="码率" />
+                                </ComboBox.Header>
+                            </ComboBox>
+                            <Button
+                                    Grid.Column="1"
+                                    Margin="0,20,0,0"
+                                    Command="{Binding SaveCommand}"
+                                    Content="保存" />
+                        </StackPanel>
+                        
                     </PivotItem>
                 </Pivot>
             </StackPanel>

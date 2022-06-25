@@ -140,7 +140,8 @@ namespace MyNCMusic.Services
         /// <returns></returns>
         public static async Task<bool> LoveOrDontLoveSongAsync(long id, bool b)
         {
-            string result = await Http.GetAsync(ConfigService.ApiUri + @"/like?id=" + id + "&like=" + b.ToString());
+            string uri = $"{ConfigService.ApiUri}/like?id={id}&like={b.ToString().ToLower()}";
+            string result = await Http.GetAsync(uri);
             if (result == null || result.Equals(""))
                 return false;
             else

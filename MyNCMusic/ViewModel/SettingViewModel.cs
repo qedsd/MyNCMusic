@@ -34,7 +34,7 @@ namespace MyNCMusic.ViewModel
             {
                 case 128000:Br = "128k";break;
                 case 320000: Br = "320k"; break;
-                default: Br = "无损";break;
+                default: Br = "最高";break;
             }
             ApiUri = ConfigService.ApiUri;
             PhoneOrEmail = ConfigService.PhoneOrEmail;
@@ -191,5 +191,16 @@ namespace MyNCMusic.ViewModel
             await writebleBitmap.SetSourceAsync(stream);
             return writebleBitmap;
         }
+
+        public ICommand SaveCommand => new DelegateCommand(() =>
+        {
+            switch (Br)
+            {
+                case "128k": ConfigService.Br = 128000; break;
+                case "320k": ConfigService.Br = 320000; break;
+                default: ConfigService.Br = 999000; break;
+            }
+            ConfigService.SaveConfig();
+        });
     }
 }

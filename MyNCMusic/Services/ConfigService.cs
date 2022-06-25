@@ -30,6 +30,7 @@ namespace MyNCMusic.Services
         public string phoneOrEmail { get; set; }
         public string password { get; set; }
         public long uid { get; set; }
+        public int br { get; set; }
 
         private ConfigService() { }
 
@@ -69,7 +70,8 @@ namespace MyNCMusic.Services
                 apiUri=ApiUri,
                 phoneOrEmail=PhoneOrEmail,
                 password=Password,
-                uid=Uid
+                uid=Uid,
+                br = Br
             });
         }
     }
